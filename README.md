@@ -98,7 +98,7 @@ to .so͡u_ u:ředňi: dokumentı
 
 nashromáždilo se to na tom se shodneme už dnes                     
                      
-                                           zh         ž_
+                                zh         ž_
 na=sxroma:žďılo se to na tom se sxodneme_ uš|dnes
    zh                                   _ʔ
                                         |ʔ         
