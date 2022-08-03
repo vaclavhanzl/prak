@@ -834,21 +834,26 @@ def bme_factorize_sausages(ssgs):
     sections with less variants where such factorization succeeds.
     This is a costly, yet heuristic and unsure optimization.
     """
-    ssgs_tmp = []
-    for s in ssgs:
-        ssgs_tmp += try_factorize_beg_mid_end(s)
-    ssgs_tmp_2 = []
-    for s in ssgs_tmp:
-        ssgs_tmp_2 += try_factorize_cut46(s)
-    ssgs_tmp_2 = reversed_sausages(ssgs_tmp_2) # needed for "v USA je to tak"
-    ssgs_out = []
-    for s in ssgs_tmp_2:
-        ssgs_out += try_factorize_cut46(s)
-    ssgs_out = reversed_sausages(ssgs_out)
+    while True:
+        ssgs_tmp = []
+        for s in ssgs:
+            ssgs_tmp += try_factorize_beg_mid_end(s)
+        ssgs_tmp_2 = []
+        for s in ssgs_tmp:
+            ssgs_tmp_2 += try_factorize_cut46(s)
+        ssgs_tmp_2 = reversed_sausages(ssgs_tmp_2) # needed for "v USA je to tak"
+        ssgs_out = []
+        for s in ssgs_tmp_2:
+            ssgs_out += try_factorize_cut46(s)
+        ssgs_out = reversed_sausages(ssgs_out)
+        if ssgs_out==ssgs: # did we converge?
+            break
+        ssgs = ssgs_out # no, more loops needed
     return ssgs_out
 
 
 def ssgs_process_phones(ssgs):
+    ssgs = reversed_sausages(ssgs) # we do everything backward, as most assimilations work backward
     outputs_and_contexts = {("", devoicing)} # init: just 1 variant, final devoicing
     out_ssgs = []
     for section in ssgs:
@@ -887,7 +892,7 @@ def ssgs_process_phones(ssgs):
     alternatives = {text for text, context in outputs_and_contexts}
     if alternatives!={""}:
         out_ssgs.append(alternatives)
-    return out_ssgs
+    return reversed_sausages(out_ssgs) # we worked on it backword, return it in natural order
 
 
 
@@ -916,19 +921,35 @@ def factor_out_common_begins(sausages):
     When alternatives in a sausage happen to start by a common
     substring, factor the substring out to its own one-alternative
     sausage.
-    TODO: At the moment we factor out 1 char at most.
+    Repeat until length of sausages stops increasing.
     """
-    result = []
-    for s in sausages:
-        starting_chars = {txt[0] if len(txt)>0 else "" for txt in s}
-        if len(starting_chars) == 1:
-            result.append(starting_chars) # 1 member set
-            rests_of_strings = {txt[1:] if len(txt)>0 else "" for txt in s}
-            if rests_of_strings!={""}:
-                result.append(rests_of_strings)
-        else:
-            result.append(s)
-    return result
+    did_change = True # fake it the first time to get in
+    while did_change:
+        did_change = False
+        result = []
+        for s in sausages:
+            starting_chars = {txt[0] if len(txt)>0 else "" for txt in s}
+            if len(starting_chars) == 1:
+                result.append(starting_chars) # 1 member set
+                rests_of_strings = {txt[1:] if len(txt)>0 else "" for txt in s}
+                if rests_of_strings!={""}:
+                    did_change = True
+                    result.append(rests_of_strings)
+            else:
+                result.append(s)
+        sausages = result
+    return sausages
+
+def factor_out_common_ends(sausages):
+    """
+    When alternatives in a sausage happen to end by a common
+    substring, factor the substring out to its own one-alternative
+    sausage.
+    Repeat until length of sausages stops increasing.
+    """
+    sausages = reversed_sausages(sausages)
+    sausages = factor_out_common_begins(sausages)
+    return reversed_sausages(sausages)
 
 
 def join_simple_sausages(sausages):
@@ -1230,40 +1251,31 @@ def process(txt, all_begins=True, all_ends=True):
     txt = transform(downcasetab, txt)
     txt = glue_prepos(txt)  # multipron will split also on '=' and add more '='
     if all_begins:
-        txt = "&"+txt
+        txt = "&"+txt # the "&" forces both versions in maybe-glottal-stop situations at start
     else:
-        txt = "|"+txt
+        txt = "|"+txt # the "|" is an imaginary space, forcing glottal stops before initial vowels
     if all_ends:
-        txt = txt+"*"
+        txt = txt+"*" # the "*" forces generating both voiced and devoiced versions of ends
 
-    ssgs = text_to_multipron_sausage(txt)
+    ssgs = text_to_multipron_sausage(txt) # apply foreign (and strange) words rules here
 
-    ssgs = sausages_transform(phonetizetab, ssgs)
-    ssgs = sausages_transform(rr_forward_assim, ssgs)
+    ssgs = sausages_transform(phonetizetab, ssgs) # convert to internal phonetic alphabet
+    ssgs = sausages_transform(rr_forward_assim, ssgs) # do that little bit of forward assimilations
+    ssgs = sausages_replacement_rules(phone_merging, ssgs) # do it here while we have unbroken words
+    ssgs = ssgs_process_phones(ssgs) # do assimilations working backward (and related processing)
 
-    ssgs = sausages_replacement_rules(phone_merging, ssgs)
+    # Phonetic processing is done by now, below we just optimize/prettify the graph
+    # which got out of order when composition of multitude of non-deterministic FSTs
+    # was applied in ssgs_process_phones and graph was only partially re-optimized.
 
-    ssgs = reversed_sausages(ssgs) # get ready for assimilations, which are done backward
-    ssgs = ssgs_process_phones(ssgs)
-    ssgs = reversed_sausages(ssgs) # back to natural order
-
-    ssgs = reintroduce_space(ssgs)
+    ssgs = reintroduce_space(ssgs) # this step might be omitted
     ssgs = factor_out_common_begins(ssgs)
-    ssgs = factor_out_common_begins(ssgs)
-    ssgs = reversed_sausages(ssgs)
-    ssgs = factor_out_common_begins(ssgs)
-    ssgs = factor_out_common_begins(ssgs)
-    ssgs = factor_out_common_begins(ssgs)
-    ssgs = factor_out_common_begins(ssgs)
-    ssgs = factor_out_common_begins(ssgs)
-    ssgs = reversed_sausages(ssgs)
-    
+    ssgs = factor_out_common_ends(ssgs)
     ssgs = bme_factorize_sausages(ssgs)
-    ssgs = bme_factorize_sausages(ssgs) # seccond pass for "měkký byl"
-    ssgs = reintroduce_space(ssgs)
+    ssgs = reintroduce_space(ssgs)  # merge any "|" or "_" choice to equivalent " "
 
-    if len(ssgs)>0 and ssgs[0]=={'|'}:
-        ssgs = ssgs[1:]
+    if len(ssgs)>0 and ssgs[0]=={'|'}: # it is that imaginary pause we faked in above
+        ssgs = ssgs[1:]                # remove it to make things tidy
 
     ssgs = join_simple_sausages(ssgs)    
     return ssgs
