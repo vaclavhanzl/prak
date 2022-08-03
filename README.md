@@ -18,6 +18,12 @@ For in-depth experiments and development, you may also want:
 * kaldi
 * CommonVoice Czech data
 
+## Usage
+To get an idea about pronunciation variants being considered, run this first:\
+```
+prongen/prak_prongen.py
+```
+The tool will nicely help you.
 
 ## About the name
 Some Czech phonetitians call similar tools "nastřelovač" as these tools position phones and their time stamps
