@@ -480,95 +480,6 @@ eu E eu
 """.split("\n"))
 
 
-milanek = """
- Milánek 
- maminka se zeptala Milana 
- Milánku už máš hotový úkol 
- kdy ho budeš psát 
- Milan chvilku přemýšlel a pak odpověděl 
- já musím napsat pár souvětí na Říhovou kde budou nějaké gramatické fígle 
- například vztažné věty 
- čárky před á a podobně 
- vlastně jsem tě chtěl poprosit jestli mi s tím nepomůžeš 
- můžeme se na to mrknout klidně hned řekla maminka 
- jen bych dala vařit vodu na čaj a podívám se jestli máme citrony 
- jak dlouho nám ten úkol zabere 
- bude to těžké 
- no mají tam být i různé příklady na zastaralou a knižní slovní zásobu 
- skoro půlku jsem už ve škole udělal ale moc dobře mi to nešlo 
- chtěl bych začít co nejdřív 
- až budu hotov došel bych ti do lékárny pro ten pneumocyt 
- a potom půjdu hrát fotbal 
- včera jsem dal čtyři góly 
- nebýt láďových faulů mohlo jich být víc 
- jen míč budu muset přifouknout 
- neboj se dám pozor na auta
- strnad lovil a nad lesem bez uzardění letěl chroust
- měl jsem panický strach z proudění vzduchu
- v podtitulu poukázal na použité vypouklé zrcadlo
- vedl poučně hloupoučké řeči a říkal poučky
- pouliční komik se nepousmál a poulil oči na poukázku
- nerouhej se v černouhelném dole na rakouskouherskou korouhev
- pouvažuj o videoukázce rychloupínací soupravy
- pantomimou se domluvíš s mimounijní osobou odnikud
- doučte pseudoučence z Radouče aby v okrouhlíku našli sirouhlík
- tiplice a hadi ti tinktůru nediskvalifikují
- haranti tiše hodnotili nitrožilní nikotin v univerzitních diskusích
- vtipný nihilista tipoval dinosaury nitrotoluenem
- rachitický tim goldoni podlehl závrati
- diktát zvládl s pronikavým niterným zápalem pro gramatiku
- diletanti ztratili protichůdné snivé názory
- karbonizace dielektrika je minimální
- prozodická aktivita melodie se ztratila
- protistrana aktivně zkrotila třetí dimenzi nitrolakem
- kniha ti chaoticky přiblíží diplodoky
- v disketě je dirka ale disketě to nevadí
- výzvu k zátěžovým testům jsme poslali
- asi k městu náleží i park
- části jsou rozptýlené
- informace k nalezení
- to jsou úřední dokumenty
- srdce mé dcery bije jako zvon
- po přeshraniční neshodě řekl nashledanou a disharmonicky shodil pěvkyni z pódia
- nashromáždilo se to na tom se shodneme už dnes
- pes rychle prchl před rachejtlí
- host lákal drozda slez rychle a pak drozd lákal hosta
- bez rychlené zeleniny se obejdu
- husa letěla nad lesem ale strnad lesem prolétl
- mrož mrznul na kře
- včera jsem dal šest gólů citronem do citronové citronády mechanicky a optomechanicky
- snad s batohem vlez ten chlap v les za zpěvu abych byl za modř Amerického nebe rád
- subpolární pes automaticky kouše
- piv je v organizaci dost
- potvrďte objížďky abychom věděli kudy to obpelášit
- diskžokej vyloučený ze sdružení hořce plakal a tak ztratil modř očí
- odfiltroval zfalšované předfinancování jako podfuk zfetovaných úřednic
- chci třeba pět řep a pět ryb
- bridž si rádi zahrajeme bridž je naše radost
- větší štráf gumy by takhle nebyl
- zmnožení vlků u Rožmberka a u Plzně bylo osmkrát popsáno
- bez Arabů a bez Britů bez mrkve i s mrkví ale vždy s Bivojem
- samouk z ODS použil trojúhelník na pavouky
- sedm či osm osmanů pilo sedum či osum až osmdesát piv se sedmero krkavci
- sedmá symfonie končí tragikomicky
- jakkoli měkký byl měkkýšem se nestal
- nejvyšší z bossů je z assisi a pije espresso létá cessnou a svádí missky
- sušší laššan tiššímu nevěří sorry jako stáhni si torrent
- exhalace z exhibiční exekuce jsou neexistující existenciální problém
- nokia plnila média v mnoha variantách
- rozzlobený až rozzuřený chrt je bezztrátový
- anna denně plnila rodinné povinnosti oboustranně takže dostala milion korun
- v USA pneumatiky za eura nekoupíš
- bez boty nepotkáš bez botanický alias šeřík
-"""
-# pepa z JAR nemá jar
-
-"""
-  BACHA NA šeřík
-  bez boty       [bez]
-  bez botanický  [bes] i [bez]     bez jarní bez jader  [bes] [bez]
-"""
-
 def all_substrings(txt):
     """
     Return set of all possible substrings of txt
@@ -977,12 +888,6 @@ def ssgs_process_phones(ssgs):
     if alternatives!={""}:
         out_ssgs.append(alternatives)
     return out_ssgs
-
-
-
-txt = milanek
-
-
 
 
 

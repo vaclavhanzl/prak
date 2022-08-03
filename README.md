@@ -19,7 +19,7 @@ For in-depth experiments and development, you may also want:
 * CommonVoice Czech data
 
 ## Usage
-To get an idea about pronunciation variants being considered, run this first:\
+To get an idea about pronunciation variants being considered, run this first:
 ```
 prongen/prak_prongen.py
 ```
