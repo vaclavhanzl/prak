@@ -67,43 +67,7 @@ The overall structure of the pronunciation variants generator is roughly as foll
 * optimize the resulting graph of possibilities so as it can be presented in a human readable way
 
 ## Example output
-```
-prak/prongen$ ./prak_prongen.py -p
---- reading stdin, printing possible pronunciations ---
-
-slyšel jsem asi galantní zpjěv ptáků
-
-           |ʔ
-           _ʔ
-slıšel .sem_ ası galantňi: spjef pta:ku:
-       j             nť
-                     ňť
-
-
-v USA pneumatiky za eura nekoupíš
-
-      ʔ         eu
-f=ʔu:=.es=.a: pne͡umatıkı za_ e͡ura neko͡upi:š
-v=        ʔ                _ʔ
-                           |ʔ
-
-
-to jsou úřední dokumenty
-
-       |ʔ
-       _ʔ
-to .so͡u_ u:ředňi: dokumentı
-   j         ď
-
-
-nashromáždilo se to na tom se shodneme už dnes                     
-                     
-                                zh         ž_
-na=sxroma:žďılo se to na tom se sxodneme_ uš|dnes
-   zh                                   _ʔ
-                                        |ʔ         
-```
-
+![example color terminal output](prongen/doc/images/example_output.svg)  
 ## About the name
 Some Czech phonetitians call similar tools "nastřelovač" as these tools position phones and their time stamps
 in a fast but rather unprecise manner, like positioning objects by shooting them where they should be.
