@@ -1,4 +1,4 @@
-# About svg images of terminal output here
+## About svg images of terminal output here
 svg images of a color terminal output are made and used like this:
 * run ```prak_prongen``` in a Xfce4 terminal
 * copy as HTML
