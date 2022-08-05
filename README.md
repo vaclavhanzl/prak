@@ -26,6 +26,18 @@ prongen/prak_prongen.py
 The tool will nicely help you. Look at [prongen/README.md](prongen/README.md) for details about
 this pronunciation generator.
 
+You will need a Czech voice recording and a corresponding utf8 Czech plain text transcript. The transcript can
+contain usual interpunction (as a secretary would transcribe it) but should be precise even at disfluencies - 
+if the recording contains a repeated word, so should the transcript.
+
+Feed the transcript to pronunciation generator and look whether the generated pronunciation variants likely
+contain what is in the audio. Multiple variants are OK, the acoustic model will hopefully choose the right
+one. You may need to learn the tool some additional foreign words or tell it about important seams in composite
+words.
+
+If pronunciation looks mostly OK, let the acoustic model to match it against the audio, select variants and
+delimit phones in time.
+
 ## About the name
 Some Czech phonetitians call similar tools "nastřelovač" as these tools position phones and their time stamps
 in a fast but rather unprecise manner, like positioning objects by shooting them where they should be.
