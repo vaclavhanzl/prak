@@ -11,12 +11,12 @@ allow others co continue this work.
 
 ## Instalation
 Prerequisities:
-* python
+* [python3](https://www.python.org/)
 
 For in-depth experiments and development, you may also want:
-* praat
-* kaldi
-* CommonVoice Czech data
+* [praat](https://www.fon.hum.uva.nl/praat/)
+* [kaldi](https://kaldi-asr.org/)
+* [CommonVoice](https://commonvoice.mozilla.org/en/datasets) Czech data
 
 ## Usage
 To get an idea about pronunciation variants being considered, run this first:
