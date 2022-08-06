@@ -43,4 +43,9 @@ The overall structure of the pronunciation variants generator is roughly as foll
 ![example color terminal output](doc/images/example_output.svg)
 
 ## Automatic rules for "ditini"
-To aid our acoustic model training, all the words from CommonVoice train subset were included in training of the "ditini" ruleset. Pronunciation should be nearly 100% correct for these words. Approx. 98% accuracy can be expected for other words. 
+To aid our acoustic model training, all the words from CommonVoice train subset were included in training of the "ditini" ruleset. Pronunciation should be nearly 100% correct for these words. Approx. 98% accuracy can be expected for other words.
+
+## Where hand made rules may be needed
+* foreign words which kept ortography and pronunciation not corresponding to Czech rules
+* abbreviations
+* insertion of a glottal stop at seam of composite words (where the second part starts with a vowel)
