@@ -51,4 +51,4 @@ To aid our acoustic model training, all the words from CommonVoice train subset 
 * insertion of a glottal stop at seam of composite words (where the second part starts with a vowel)
 
 ## How pronunciation rules work
-Order of rules is mostly not important. Priority is governed by the length of a string to be replaced (possibly by multiple options for the replacement string). Word is compared against the whole ruleset and the longest match is replaced. The part of word which is replaced is never touched by other pronunciation rules. However, the preceding and following part are searched for any additional replacements by rules matching shortes substrings.
+Order of rules is mostly not important. Priority is governed by the length of a string to be replaced (possibly by multiple options for the replacement string). Word is compared against the whole ruleset and the longest match is replaced. The part of word which is replaced is never touched again by other pronunciation rules. However, the preceding and following part are searched for any additional replacements by rules matching shorter substrings.
