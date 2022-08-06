@@ -50,5 +50,9 @@ To aid our acoustic model training, all the words from CommonVoice train subset 
 * abbreviations
 * insertion of a glottal stop at seam of composite words (where the second part starts with a vowel)
 
+The prongen tool contains no substantial dictionaries for the above categories of words. Community help is welcome here.
+
+For the composite words, we attempted some automatic detection but simple approach finding words composed of two parts which are words themselves finds much more funny potential examples like "petr=olej" than real composed words (and still, many composed words have parts which are NOT words by themselves). There is certainly some space for a patient human work.
+
 ## How pronunciation rules work
 Order of rules is mostly not important. Priority is governed by the length of a string to be replaced (possibly by multiple options for the replacement string). Word is compared against the whole ruleset and the longest match is replaced. The part of word which is replaced is never touched again by other pronunciation rules. However, the preceding and following part are searched for any additional replacements by rules matching shorter substrings.
