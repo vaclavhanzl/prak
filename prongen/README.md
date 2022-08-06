@@ -32,7 +32,7 @@ The overall structure of the pronunciation variants generator is roughly as foll
 * care for few forward assimilations (mostly for "ř" and initial "sh")
 * do bulk of the "logical" work in a system of backward assimilations (each of the parts is in fact a Finite State Transducer with a very limited state set - backward direction makes these FSTs much simpler or even possible at all):
   - expansion of "multiphone" h/ch created in the forward assimilation step above
-  - glottal stop insertion
+  - glottal stop insertion, insertion of "j" in vocalic groups like "io"
   - voiced/voiceless assimilations
   - dtn/ďťň processing in groups like "ntní", processing of bě/pě/vě/mě/fě
   - velarization in nk/ng
@@ -40,4 +40,7 @@ The overall structure of the pronunciation variants generator is roughly as foll
 * optimize the resulting graph of possibilities so as it can be presented in a human readable way
 
 ## Example output
-![example color terminal output](doc/images/example_output.svg)  
+![example color terminal output](doc/images/example_output.svg)
+
+## Automatic rules for "ditini"
+To aid our acoustic model training, all the words from CommonVoice train subset were included in training of the "ditini" ruleset. Pronunciation should be nearly 100% correct for these words. Approx. 98% accuracy can be expected for other words. 
