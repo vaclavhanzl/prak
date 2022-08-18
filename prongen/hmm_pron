@@ -1,0 +1,105 @@
+#! /usr/bin/env python3
+lib_intro = """
+hmm_pron library - generate possible Czech pronunciations as HMM
+
+Copyright (c) 2022 Vaclav Hanzl. This is a free software (see the MIT license).
+
+This file is part of the https://github.com/vaclavhanzl/prak project
+"""
+
+from prak_prongen import *
+
+
+# line_iterable_to_lexirules() cannot make this because of space being replaced
+explicit_spaces = {" ": ["", "|"], "_": [""], "=": [""]}
+
+def print_hmm(A, b):
+    """
+    Print an informative HMM structure
+    """
+    print("   "+" ".join(b))
+    for p, row in zip(b, A):
+        print(" " + p + " " + " ".join([p for p in row]))
+
+
+
+
+def sausages_to_hmm(sg):
+    """
+    Create transition matrix A and string of phone labels b.
+    Elements of b correspond to columns of A.
+    A is indexed [from, to]
+    """
+    b = ""
+    for s in sg:
+        for txt in sorted(s):
+            for p in txt:
+                b += p
+
+    A = [["." for c in b] for r in b] # both rows and columns are as many as phones in b
+
+    row = 0
+    dim = len(b)
+    ends = [] # no previous ends to connect to
+    for s in sg:
+        new_ends = [] # collect all variant ends here for later connection
+        for txt in sorted(s):
+            first_in_txt = True
+            for e in ends:
+                A[e][row] = "1" # connect to all prev. emds
+            for p in txt:
+                A[row][row] = "1" # self loop
+                if not first_in_txt:
+                    A[row-1][row] = "1" # connect phones in txt
+                first_in_txt = False
+                row += 1
+            new_ends.append(row-1)
+        ends = new_ends # in the next variant list, each begin will be connected to these
+    return A, b
+
+if (__name__ == '__main__'):
+    print("Test of the hmm_pron library - generate Czech pron HMM")
+
+    # simulate some prak_prongen options - we also imported it's args object and can modify it here
+    args.ctu_phone_symbols = True
+    args.all_begins = False
+    args.all_ends = False
+    print(f"{args.__dict__=}")
+
+    sen = "jsou oba dva"
+    #sen = "panický atak"
+    sen = "jsou"
+    sen = "a a a"
+    sen = "k dohodě došlo již dlouho předtím"
+
+    print(f"{sen=}")
+
+    sen = sen.strip()
+    sg = process(sen, all_begins=args.all_begins, all_ends=args.all_ends)
+    print(prettyprint_sausage(sg))
+    print(f"{sg=}")
+
+
+    sg = [{"|"}] + sg + [{"|"}]
+
+    print("")
+    print(prettyprint_sausage(sg))
+    print(f"{sg=}")
+
+    sg = factor_out_common_begins(sg)
+    sg = factor_out_common_ends(sg)
+    #sg = bme_factorize_sausages(sg)
+
+
+    sg = sausages_replacement_rules(explicit_spaces, sg)
+    print("")
+    print(prettyprint_sausage(sg))
+    print(f"{sg=}")
+
+    A, b = sausages_to_hmm(sg)
+
+    #print(f"{b=}")
+
+    print("")
+
+    print_hmm(A, b)

@@ -1283,6 +1283,9 @@ def process(txt, all_begins=True, all_ends=True):
     return ssgs
 
 
+class a:
+    pass
+args = a() # if we are used as a library, this object can be used to pass us global options
 
 
 if (__name__ == '__main__'):
