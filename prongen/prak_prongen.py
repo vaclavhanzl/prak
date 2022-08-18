@@ -977,6 +977,8 @@ def to_final_alfabet(txt):
     Convert phonetic symbols to the final alphabet selected
     for presentation.
     """
+    if args.ctu_phone_symbols:
+        return txt # keep our internal CTU phone symbols as the output format
     return transform(to_cz_transcription, txt)
 
 
@@ -1304,6 +1306,9 @@ if (__name__ == '__main__'):
 
     parser.add_argument('-e', '--all-ends', action='store_true',
                         help='Also create variants which may arise if other speech immediately follows')
+
+    parser.add_argument('-c', '--ctu-phone-symbols', action='store_true',
+                        help='Use CTU phone symbols to print pronunciations')
 
 
     args = parser.parse_args()
