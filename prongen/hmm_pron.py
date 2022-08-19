@@ -22,7 +22,7 @@ def print_hmm(A, b):
         print(" " + p + " " + " ".join([p for p in row]))
 
 
-class hmm:
+class HMM:
     """
     Container for a one sentence HMM description.
     First we put just a pronunciation there, later on we may add more.
@@ -68,10 +68,10 @@ def sausages_to_hmm(sg):
                 row += 1
             new_ends.append(row-1)
         ends = new_ends # in the next variant list, each begin will be connected to these
-    retval = hmm()
-    retval.A = A
-    retval.b = b
-    return retval
+    hmm = HMM()
+    hmm.A = A
+    hmm.b = b
+    return hmm
 
 if (__name__ == '__main__'):
     print("Test of the hmm_pron library - generate Czech pron HMM")
@@ -119,10 +119,10 @@ if (__name__ == '__main__'):
     print(f"{sg=}")
 
 
-    Ab_hmm = sausages_to_hmm(sg)
+    hmm = sausages_to_hmm(sg)
 
-    A = Ab_hmm.A
-    b = Ab_hmm.b
+    A = hmm.A
+    b = hmm.b
 
     #print(f"{b=}")
 
