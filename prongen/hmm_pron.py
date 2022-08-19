@@ -22,7 +22,12 @@ def print_hmm(A, b):
         print(" " + p + " " + " ".join([p for p in row]))
 
 
-
+class hmm:
+    """
+    Container for a one sentence HMM description.
+    First we put just a pronunciation there, later on we may add more.
+    """
+    pass
 
 def sausages_to_hmm(sg):
     """
@@ -30,6 +35,14 @@ def sausages_to_hmm(sg):
     Elements of b correspond to columns of A.
     A is indexed [from, to]
     """
+    if len(sg[0])!=1:
+        print(f"Warning: Just one variant of the first element will be accessible. {sg=}")
+    #NOTE: We decided to make a system WITHOUT non-emitting states to keep things simpler.
+    #      In alignment, the first state will be a one variant silence so we should be OK.
+    #      If really needed, theoretically we could fix things by multiple entries in the
+    #      initial states vector x (but we'd have to make x part of the HMM description).
+    #      To make this theoretical adition easier, we composed A and b into a hmm class
+    #      where x could be added later.
     b = ""
     for s in sg:
         for txt in sorted(s):
@@ -55,7 +68,10 @@ def sausages_to_hmm(sg):
                 row += 1
             new_ends.append(row-1)
         ends = new_ends # in the next variant list, each begin will be connected to these
-    return A, b
+    retval = hmm()
+    retval.A = A
+    retval.b = b
+    return retval
 
 if (__name__ == '__main__'):
     print("Test of the hmm_pron library - generate Czech pron HMM")
@@ -71,6 +87,7 @@ if (__name__ == '__main__'):
     sen = "jsou"
     sen = "a a a"
     sen = "k dohodě došlo již dlouho předtím"
+    sen = "kč"
 
     print(f"{sen=}")
 
@@ -94,9 +111,18 @@ if (__name__ == '__main__'):
     sg = sausages_replacement_rules(explicit_spaces, sg)
     print("")
     print(prettyprint_sausage(sg))
+
+
+    sg = [{'aa','bb'}, {'ccc','dd','eee'}]
+
+
     print(f"{sg=}")
 
-    A, b = sausages_to_hmm(sg)
+
+    Ab_hmm = sausages_to_hmm(sg)
+
+    A = Ab_hmm.A
+    b = Ab_hmm.b
 
     #print(f"{b=}")
 
