@@ -15,7 +15,7 @@ if (__name__ == '__main__'): # messing with path to make imports work when this 
     sys.path.append(os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')))
 
 from prongen.prak_prongen import *
-#from acmodel import matrix
+from acmodel import matrix
 
 
 
