@@ -63,23 +63,29 @@ class m:
         return result
 
     def __mul__(self, val):
+
         result = m()
+
+        if type(val)==float or type(val)==int:
+            result.val = self.val * val
+            return result
+
+
+        if type(self.val)==list: # need to convert from rowlist first
+            self.rowlist2sparse()
+        if type(val.val)==list: # dtto
+            val.rowlist2sparse()
+
+
+
         #result.val = self.val*(val.val.view(1,4)) # HACK!!!
 
         if type(val)==m:
             #result.val = self.val.mul(val.val.to_sparse())
-
-
             result.val = self.val.mul(val.val)
-
-
-
             return result
-        elif type(val)==float or type(val)==int:
-            result.val = self.val * val
-            return result
-        else:
-            raise Exception(f"Unsupported type {type(val)}")
+
+        raise Exception(f"Unsupported type {type(val)}")
 
 
 
