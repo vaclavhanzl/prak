@@ -13,65 +13,74 @@ from prak_prongen import *
 # line_iterable_to_lexirules() cannot make this because of space being replaced
 explicit_spaces = {" ": ["", "|"], "_": [""], "=": [""]}
 
-def print_hmm(A, b):
-    """
-    Print an informative HMM structure
-    """
-    print("   "+" ".join(b))
-    for p, row in zip(b, A):
-        print(" " + p + " " + " ".join([p for p in row]))
-
 
 class HMM:
     """
     Container for a one sentence HMM description.
-    First we put just a pronunciation there, later on we may add more.
+    First we put just a pronunciation there, later on we may add more
+    like cepstrum. It is in fact not only HMM but also the related
+    utterance and its acoustic representation.
     """
-    pass
 
-def sausages_to_hmm(sg):
-    """
-    Create transition matrix A and string of phone labels b.
-    Elements of b correspond to columns of A.
-    A is indexed [from, to]
-    """
-    if len(sg[0])!=1:
-        print(f"Warning: Just one variant of the first element will be accessible. {sg=}")
-    #NOTE: We decided to make a system WITHOUT non-emitting states to keep things simpler.
-    #      In alignment, the first state will be a one variant silence so we should be OK.
-    #      If really needed, theoretically we could fix things by multiple entries in the
-    #      initial states vector x (but we'd have to make x part of the HMM description).
-    #      To make this theoretical adition easier, we composed A and b into a hmm class
-    #      where x could be added later.
-    b = ""
-    for s in sg:
-        for txt in sorted(s):
-            for p in txt:
-                b += p
+    def __str__(self):
+        """
+        Human readable form, used by print()
+        """
+        s = "------ sentence and HMM ------\n"
+        s += f" WAV: {self.wav}\n"
+        s += f"ORTO: {self.orto}\n"
+        s += self.pretty_pron
+        s += "\n"
+        s += "   "+" ".join(self.b)
+        for p, row in zip(self.b, self.A):
+            s += "\n " + p + " " + " ".join([p for p in row])
+        return s
 
-    A = [["." for c in b] for r in b] # both rows and columns are as many as phones in b
 
-    row = 0
-    dim = len(b)
-    ends = [] # no previous ends to connect to
-    for s in sg:
-        new_ends = [] # collect all variant ends here for later connection
-        for txt in sorted(s):
-            first_in_txt = True
-            for e in ends:
-                A[e][row] = "1" # connect to all prev. emds
-            for p in txt:
-                A[row][row] = "1" # self loop
-                if not first_in_txt:
-                    A[row-1][row] = "1" # connect phones in txt
-                first_in_txt = False
-                row += 1
-            new_ends.append(row-1)
-        ends = new_ends # in the next variant list, each begin will be connected to these
-    hmm = HMM()
-    hmm.A = A
-    hmm.b = b
-    return hmm
+    def add_sausages(self, sg):
+        """
+        Create transition matrix A and string of phone labels b.
+        Elements of b correspond to columns of A.
+        A is indexed [from, to]
+        """
+        if len(sg[0])!=1:
+            print(f"Warning: The very first element has variants (but we can cope with this) {sg=}")
+        if len(sg[-1])!=1:
+            print(f"Warning/Error: The last element has variants, just one of them will work {sg=}")
+        # NOTE: We decided to make a system WITHOUT non-emitting states to keep things simpler.
+        #       In alignment, the first state will be a one variant silence so we should be OK.
+        #       We do not need to fix things by multiple entries in the initial states vector x
+        #       as long as transition probabilities are all the same. But we cannot trick a similar
+        #       problem at the end. (We could add no-loop special state with take-anything b...)
+        #       Just call this with "|" as the only possibility at begin/end and things will work.
+        b = ""
+        for s in sg:
+            for txt in sorted(s):
+                for p in txt:
+                    b += p
+
+        A = [["." for c in b] for r in b] # both rows and columns are as many as phones in b
+
+        row = 0
+        dim = len(b)
+        ends = [0] # [] would mostly do but fake this in case sg starts by multivariant
+        for s in sg:
+            new_ends = [] # collect all variant ends here for later connection
+            for txt in sorted(s):
+                first_in_txt = True
+                for e in ends:
+                    A[e][row] = "e" # connect to all prev. ends
+                for p in txt:
+                    A[row][row] = "1" # self loop
+                    if not first_in_txt:
+                        A[row-1][row] = "+" # connect phones in txt
+                    first_in_txt = False
+                    row += 1
+                new_ends.append(row-1)
+            ends = new_ends # in the next variant list, each begin will be connected to these
+        self.A = A
+        self.b = b
+        return self # for any chaining with other ops (like add cepstrum etc.)
 
 if (__name__ == '__main__'):
     print("Test of the hmm_pron library - generate Czech pron HMM")
@@ -87,7 +96,7 @@ if (__name__ == '__main__'):
     sen = "jsou"
     sen = "a a a"
     sen = "k dohodě došlo již dlouho předtím"
-    sen = "kč"
+    #sen = "kč"
 
     print(f"{sen=}")
 
@@ -113,19 +122,18 @@ if (__name__ == '__main__'):
     print(prettyprint_sausage(sg))
 
 
-    sg = [{'aa','bb'}, {'ccc','dd','eee'}]
+    #sg = [{'aa','bb'}, {'ccc','dd','eee'}]
 
 
     print(f"{sg=}")
 
 
-    hmm = sausages_to_hmm(sg)
+    hmm = HMM().add_sausages(sg)
 
-    A = hmm.A
-    b = hmm.b
 
-    #print(f"{b=}")
+    hmm.orto = sen
+    hmm.pretty_pron = prettyprint_sausage([{"PRON: "}] + sg)
+    hmm.wav = "/home/hanzl/f-w/prak/prongen/common_voice_cs_23962589.wav"
 
     print("")
-
-    print_hmm(A, b)
+    print(hmm)
