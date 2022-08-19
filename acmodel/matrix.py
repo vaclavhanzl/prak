@@ -43,18 +43,23 @@ class m:
                 
     def __add__(self, val):
         result = m()
+        if type(val)==float or type(val)==int:
+            #result.val = torch.full(self.size(), val, device=device) + self.val
+            result.val = (torch.full(self.size(), val, device=device) + self.val).to_sparse()
+            return result
+
+        if type(self.val)==list: # need to convert from rowlist first
+            self.val = torch.tensor(self.val, device=device).float().to_sparse()
+        if type(val.val)==list: # dtto
+            val.val = torch.tensor(val.val, device=device).float().to_sparse()
+
+
         if type(val)==m:
             result.val = self.val+val.val
             return result
-        elif type(val)==float or type(val)==int:
-            #result.val = torch.full(self.size(), val, device=device) + self.val
-
-            result.val = (torch.full(self.size(), val, device=device) + self.val).to_sparse()
 
 
-            return result
-        else:
-            raise Exception(f"Unsupported type {type(val)}")
+        raise Exception(f"Unsupported type {type(val)}")
         
         
     def to_dense(self):
