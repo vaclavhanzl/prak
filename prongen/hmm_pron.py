@@ -7,7 +7,17 @@ Copyright (c) 2022 Vaclav Hanzl. This is a free software (see the MIT license).
 This file is part of the https://github.com/vaclavhanzl/prak project
 """
 
-from prak_prongen import *
+
+import sys
+import os
+
+if (__name__ == '__main__'): # messing with path to make imports work when this is a script
+    sys.path.append(os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')))
+
+from prongen.prak_prongen import *
+#from acmodel import matrix
+
+
 
 
 # line_iterable_to_lexirules() cannot make this because of space being replaced
@@ -69,11 +79,11 @@ class HMM:
             for txt in sorted(s):
                 first_in_txt = True
                 for e in ends:
-                    A[e][row] = "e" # connect to all prev. ends
+                    A[e][row] = "1" # connect to all prev. ends
                 for p in txt:
                     A[row][row] = "1" # self loop
                     if not first_in_txt:
-                        A[row-1][row] = "+" # connect phones in txt
+                        A[row-1][row] = "1" # connect phones in txt
                     first_in_txt = False
                     row += 1
                 new_ends.append(row-1)
