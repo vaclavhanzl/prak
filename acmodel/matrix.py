@@ -42,7 +42,7 @@ class m:
         return "m(" + str(self.val) + ")"
                 
     def __add__(self, val):
-        print("In add")
+        #print("In add")
 
         result = m()
         if type(val)==float or type(val)==int:
@@ -65,14 +65,14 @@ class m:
         
         
     def to_dense(self):
-        print("In to_dense")
+        #print("In to_dense")
 
         result = m()
         result.val = self.val.to_dense()
         return result
 
     def __mul__(self, val):
-        print("In mul")
+        #print("In mul")
 
         result = m()
 
@@ -95,7 +95,7 @@ class m:
 
 
             if not self.val.is_sparse and val.val.is_sparse:
-                print("mul dense * sparse")
+                #print("mul dense * sparse")
                 result.val = self.val.mul(val.val.to_dense())
                 return result
 
@@ -111,7 +111,7 @@ class m:
 
 
     def __matmul__(self, val):
-        print("In matmul")
+        #print("In matmul")
 
         result = m()
         #result.val = self.val@val.val
@@ -154,7 +154,7 @@ class m:
  
     
     def __setitem__(self, index, val):
-        print("In setitem")
+        #print("In setitem")
         if type(val)==float or type(val)==int:
             self.val[index] = val
             return
@@ -164,9 +164,9 @@ class m:
             return
 
         if type(self.val)==torch.Tensor and self.val.is_sparse:
-            print("Converting to dense in setitem")
+            #print("Converting to dense in setitem")
             self.val = self.val.to_dense()
-            print(f"{self.val=}")
+            #print(f"{self.val=}")
 
 
         if val.val.is_sparse:
@@ -177,22 +177,21 @@ class m:
         return
     
     def __getitem__(self, index):
-        print("In getitem")
+        #print("In getitem")
         result = m()
         result.val = self.val[index][None] # return size (1, n)
         #result.val = self.val[index] # return size (1, n)
         return result
 
     def rowlist2sparse(self):
-        print("In rowlist2sparse")
+        #print("In rowlist2sparse")
         self.val = torch.cat(self.val)
 
 
 
 
 
-
-
+"""
 print(f"VH Matrix Library, {use_torch=}, {use_sparse=}")
 
 
@@ -216,6 +215,6 @@ print(f"{(x[0]*b).to_dense()=}")
 #r = m.rowlist((3, 4))
 
 #print(f"{r=}")
-
+"""
 
 
