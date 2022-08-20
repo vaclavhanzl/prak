@@ -130,8 +130,12 @@ class m:
         return self.val.size()
     
     def max(self): # WARNING: ALWAYS COMPUTES A SCALAR, GLOBAL MAX
+        if not self.val.is_sparse:
+            return self.val.max()
         return self.val.values().max()
     def min(self): # WARNING: ALWAYS COMPUTES A SCALAR, GLOBAL MIN
+        if not self.val.is_sparse:
+            return self.val.min()
         return self.val.values().min()
     
     @staticmethod
@@ -158,10 +162,6 @@ class m:
         if type(self.val)==list:
             self.val[index] = val.val
             return
-
-
-
-
 
         if type(self.val)==torch.Tensor and self.val.is_sparse:
             print("Converting to dense in setitem")
