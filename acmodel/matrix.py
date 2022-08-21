@@ -5,8 +5,8 @@ import numpy as np
 
 
 import torch
-#device = torch.device("cuda:0")
-device = torch.device("cpu")
+device = torch.device("cuda:0")
+#device = torch.device("cpu")
 #dtype = torch.float
 dtype = torch.double
 
@@ -132,11 +132,11 @@ class m:
     def max(self): # WARNING: ALWAYS COMPUTES A SCALAR, GLOBAL MAX
         if not self.val.is_sparse:
             return self.val.max()
-        return self.val.values().max()
+        return self.val._values().max()
     def min(self): # WARNING: ALWAYS COMPUTES A SCALAR, GLOBAL MIN
         if not self.val.is_sparse:
             return self.val.min()
-        return self.val.values().min()
+        return self.val._values().min()
     
     @staticmethod
     def zeros(siz):
