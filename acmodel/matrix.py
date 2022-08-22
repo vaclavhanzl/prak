@@ -5,8 +5,8 @@ import numpy as np
 
 
 import torch
-device = torch.device("cuda:0")
-#device = torch.device("cpu")
+#device = torch.device("cuda:0")
+device = torch.device("cpu")
 #dtype = torch.float
 dtype = torch.double
 
@@ -14,18 +14,20 @@ dtype = torch.double
 #print(x)
 
 use_torch = True
-use_sparse = True
+use_sparse = False
 
 
-
-
+def sparsify(t):
+    return t.to_sparse()
+    #return t.to_sparse_csr()
+    #return t.to_sparse_bsr(32)
 
 
 class m:
     if use_sparse:
         def __init__(self, val=None):
             if val is not None:
-                self.val = torch.tensor(val, device=device).float().to_sparse()
+                self.val = sparsify(torch.tensor(val, device=device).float())
             else:
                 self.val = None
     else:
@@ -47,13 +49,22 @@ class m:
         result = m()
         if type(val)==float or type(val)==int:
             #result.val = torch.full(self.size(), val, device=device) + self.val
-            result.val = (torch.full(self.size(), val, device=device) + self.val).to_sparse()
+            if use_sparse:
+                result.val = sparsify(torch.full(self.size(), val, device=device) + self.val)
+            else:
+                result.val = (torch.full(self.size(), val, device=device) + self.val)
             return result
 
         if type(self.val)==list: # need to convert from rowlist first
-            self.val = torch.tensor(self.val, device=device).float().to_sparse()
+            if use_sparse:
+                self.val = sparsify(torch.tensor(self.val, device=device).float())
+            else:
+                self.val = torch.tensor(self.val, device=device).float()
         if type(val.val)==list: # dtto
-            val.val = torch.tensor(val.val, device=device).float().to_sparse()
+            if use_sparse:
+                val.val = sparsify(torch.tensor(val.val, device=device).float())
+            else:
+                val.val = torch.tensor(val.val, device=device).float()
 
 
         if type(val)==m:
@@ -115,10 +126,12 @@ class m:
 
         result = m()
         #result.val = self.val@val.val
-        result.val = torch.sparse.mm(self.val, val.val)
+        if use_sparse:
+            result.val = torch.sparse.mm(self.val, val.val)
+        else:
+            result.val = torch.mm(self.val, val.val)
         return result
-    
-    
+   
     
 
     def T(self):
@@ -142,7 +155,10 @@ class m:
     def zeros(siz):
         result = m()
         #result.val = torch.zeros(siz, layout=torch.sparse_coo, device=device)
-        result.val = torch.zeros(siz, layout=torch.sparse_coo, device=device)
+        if use_sparse:
+            result.val = torch.zeros(siz, layout=torch.sparse_coo, device=device)
+        else:
+            result.val = torch.zeros(siz, device=device)
         return result
        
     @staticmethod
