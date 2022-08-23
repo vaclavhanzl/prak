@@ -155,7 +155,7 @@ if (__name__ == '__main__'):
 
     hmm.orto = sen
     hmm.pretty_pron = prettyprint_sausage([{"PRON: "}] + sg)
-    hmm.wav = "/home/hanzl/f-w/prak/prongen/common_voice_cs_23962589.wav"
+    hmm.wav = "/home/hanzl/f-w/prak/common_voice_cs_23962589.wav"
 
     print("")
     print(hmm)
