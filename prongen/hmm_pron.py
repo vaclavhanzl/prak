@@ -43,7 +43,7 @@ class HMM:
         s += "\n"
         s += "   "+" ".join(self.b)
         for p, row in zip(self.b, self.A):
-            s += "\n " + p + " " + " ".join([p for p in row])
+            s += "\n " + p + " " + " ".join([[".", "1"][p] for p in row])
         return s
 
 
@@ -69,7 +69,7 @@ class HMM:
                 for p in txt:
                     b += p
 
-        A = [["." for c in b] for r in b] # both rows and columns are as many as phones in b
+        A = [[0 for c in b] for r in b] # both rows and columns are as many as phones in b
 
         row = 0
         dim = len(b)
@@ -79,11 +79,11 @@ class HMM:
             for txt in sorted(s):
                 first_in_txt = True
                 for e in ends:
-                    A[e][row] = "1" # connect to all prev. ends
+                    A[e][row] = 1 # connect to all prev. ends
                 for p in txt:
-                    A[row][row] = "1" # self loop
+                    A[row][row] = 1 # self loop
                     if not first_in_txt:
-                        A[row-1][row] = "1" # connect phones in txt
+                        A[row-1][row] = 1 # connect phones in txt
                     first_in_txt = False
                     row += 1
                 new_ends.append(row-1)
@@ -106,6 +106,18 @@ if (__name__ == '__main__'):
     sen = "jsou"
     sen = "a a a"
     sen = "k dohodě došlo již dlouho předtím"
+
+    """
+    sen = sen + " " + sen
+    sen = sen + " " + sen
+    sen = sen + " " + sen
+    sen = sen + " " + sen
+    sen = sen + " " + sen
+    sen = sen + " " + sen
+    sen = sen + " " + sen
+    """
+
+
     #sen = "kč"
 
     print(f"{sen=}")
