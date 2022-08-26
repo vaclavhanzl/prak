@@ -44,6 +44,9 @@ def plot_waveform(waveform, sample_rate):
     figure.canvas.footer_visible = False
     #plt.clf()
 
+def plot_wavfile(wavfile):
+    waveform, fs = torchaudio.load(wavfile)
+    plot_waveform(waveform, fs)
 
 def plot_fun(x, frame_sample_rate=100):
     #figure = plt.figure()

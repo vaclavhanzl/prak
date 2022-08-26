@@ -10,6 +10,7 @@ This file is part of the https://github.com/vaclavhanzl/prak project
 
 import sys
 import os
+import torchaudio # for mfcc
 
 if (__name__ == '__main__'): # messing with path to make imports work when this is a script
     sys.path.append(os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')))
@@ -105,9 +106,40 @@ class HMM:
             if phone==sil:
                 self.A[i][i] = p
 
+    def compute_mfcc(self):
+        """
+        Load wav file to temporary storage. Compute MFCC and attach it to this object.
+        """
+        waveform, fs = torchaudio.load(self.wav)
+        self.mfcc = torchaudio.compliance.kaldi.mfcc(waveform, sample_frequency=fs) # default 16kHz is correct for this file
+
+    def __init__(self, sentence=None, wav=None):
+        """
+        Create HMM model for a training sentence.
+        """
+        #print(f"{sentence=}")
+        args.ctu_phone_symbols = True # TODO: use other mechanism than global args
+        args.all_begins = False
+        args.all_ends = False
+
+        sen = sentence.strip()
+        sg = process(sen, all_begins=args.all_begins, all_ends=args.all_ends)
+        sg = [{"|"}] + sg + [{"|"}]
+        sg = factor_out_common_begins(sg)
+        sg = factor_out_common_ends(sg)
+        sg = sausages_replacement_rules(explicit_spaces, sg)
+        self.add_sausages(sg)
+        self.orto = sen
+        self.pretty_pron = prettyprint_sausage([{"PRON: "}] + sg)
+        self.wav = wav
+        if wav:
+            self.compute_mfcc()
+            print(f"Computed mfcc, {self.mfcc.size()=}")
 
 
-if (__name__ == '__main__'):
+if (__name__ == '__main__' and len(sys.argv)>1 and sys.argv[1]=="--in-jupyter"):
+    print("hmm_pron.py library - generate Czech pron HMM. Included to this notebook.")
+elif __name__ == '__main__':
     print("Test of the hmm_pron library - generate Czech pron HMM")
 
     # simulate some prak_prongen options - we also imported it's args object and can modify it here
