@@ -62,7 +62,11 @@ def plot_fun(x, frame_sample_rate=100):
     figure.canvas.footer_visible = False
 
 
-def plot_matrix(x, cmap='PuOr', figsize=(20,3)):
+def plot_matrix(x, cmap='PuOr', figsize=(20,3), footer=False):
+    """
+    Plot matrix as image. Setting footer=True activates measurement
+    of mouse coordinates in the matrix.
+    """
     figure = plt.figure(figsize=figsize)
     plt.imshow(x.T, cmap=cmap)
     plt.tick_params(axis="x",direction="in", pad=-12)
@@ -70,6 +74,7 @@ def plot_matrix(x, cmap='PuOr', figsize=(20,3)):
     plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
     plt.show(block=False)
     figure.canvas.header_visible = False
-    figure.canvas.footer_visible = False
+    if not footer:
+        figure.canvas.footer_visible = False
 
 

@@ -92,6 +92,21 @@ class HMM:
         self.b = b
         return self # for any chaining with other ops (like add cepstrum etc.)
 
+    def change_sil_loops(self, sil="|", p=0):
+        """
+        Disable self-loops in all sil states except the first and last state.
+        This is intended to help B-W take off when internal sil states are
+        mostly displaced and only slow down learning the sound of silence
+        based on the edge regions.
+        Loops can be re-instantiated by using p=1.
+        """
+        _, *inner, _ = enumerate(self.b)
+        for i, phone in inner:
+            if phone==sil:
+                self.A[i][i] = p
+
+
+
 if (__name__ == '__main__'):
     print("Test of the hmm_pron library - generate Czech pron HMM")
 
