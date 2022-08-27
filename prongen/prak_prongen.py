@@ -169,6 +169,12 @@ balkon balkon balkón
 stadion stadyon stadyón
 
 ### very foreign words
++hyje+ hyjé
++messenger+ mesendžr mesindžr
++game+ gejm
++room+ rům
+### can be English or French
++nation+ nejšn nasion
 washington vošingtn
 t-mobile týmobajl
 siemens símens
@@ -177,6 +183,7 @@ interview intervjů
 ###+usa+ úesá ú=es=á <-- not needed like this
 +usa+ ú=es=á
 windows vindous
+
 
 ### TODO: CIA in capitals should work here:
 +cia+ síajej
@@ -187,6 +194,7 @@ windows vindous
 +dph+ dé=pé=há
 +pc+ pé=cé
 +cm+ centymetr centymetrů
++čsl+ čéesel
 
 """
 
@@ -311,7 +319,7 @@ def read_replacement_table(filename):
     return table
 
 
-
+interpunction_to_delete = '"'+".,?!„“"
 
 downcase = ("AÁBCČDĎEĚÉFGHIÍJKLĹĽMNŇOÓÔPQRŔŘSŠTŤUÚŮVWXYÝZŽÄÜÖ",
             "aábcčdďeěéfghiíjklĺľmnňoóôpqrŕřsštťuúůvwxyýzžäüö")
@@ -365,6 +373,39 @@ def read_lexirules_table(filename):
         return line_iterable_to_lexirules(file)
 
 
+spelltab = string_to_table("""
+### Czech spelling. This cannot be done well by the main pronunciation rules
+### as dots are already deleted (and letter downcased) by the time we gwet there.
+### So thete is a special early pass just for spelling using this table.
+### This table is incomplete, e.g. Á or W are missing.
+A. á
+B. bé
+C. cé
+D. dé
+E. é
+F. ef
+G. gé
+H. há
+I. í
+J. jé
+K. ká
+L. el
+M. em
+N. en
+O. ó
+P. pé
+Q. kvé
+R. er
+S. es
+T. té
+U. ú
+V. vé
+X. yks
+Y. ypsilon
+Z. zet
+""")
+
+
 phonetizetab = string_to_table("""
 ### Basic replacements to get approx. phone-per-grapheme
 ch H
@@ -384,6 +425,9 @@ ou O
 au A
 ###eu E
 """)
+
+
+interpunctab = [(ch,'') for ch in interpunction_to_delete]
 
 downcasetab = list(zip(*downcase))
 
@@ -1249,7 +1293,8 @@ def process(txt, all_begins=True, all_ends=True):
     all assim
     to final alphabet
     """
-    #TODO: cleanup interpunction etc.
+    txt = transform(spelltab, txt) # B. -> bé  etc.
+    txt = transform(interpunctab, txt) # clean interpunction
     txt = transform(downcasetab, txt)
     txt = glue_prepos(txt)  # multipron will split also on '=' and add more '='
     if all_begins:
