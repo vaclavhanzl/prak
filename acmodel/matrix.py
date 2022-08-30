@@ -7,8 +7,12 @@ import numpy as np
 import torch
 #device = torch.device("cuda:0")
 device = torch.device("cpu")
-dtype = torch.float
+#dtype = torch.float
 #dtype = torch.double
+
+
+torch.set_default_dtype(torch.float64)
+
 
 #x = torch.rand(2, 3, device=device, dtype=dtype)
 #print(x)

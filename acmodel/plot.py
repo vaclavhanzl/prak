@@ -3,6 +3,10 @@
 import matplotlib.pyplot as plt
 #%matplotlib ipympl
 import matplotlib as mpl
+
+from matplotlib import cm
+from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+
 import torch
 import torchaudio
 

@@ -6,6 +6,10 @@
 #   from gmm_model_data import global_var, b_means
 
 
+# Note:
+# Evaluate different versions of b_means by differential analysis: For differing alignments, verify which is better.
+
+
 import torch
 tensor = torch.tensor
 

@@ -11,6 +11,7 @@ This file is part of the https://github.com/vaclavhanzl/prak project
 import sys
 import os
 import torchaudio # for mfcc
+import torch
 
 if (__name__ == '__main__'): # messing with path to make imports work when this is a script
     sys.path.append(os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')))
@@ -111,7 +112,16 @@ class HMM:
         Load wav file to temporary storage. Compute MFCC and attach it to this object.
         """
         waveform, fs = torchaudio.load(self.wav)
-        self.mfcc = torchaudio.compliance.kaldi.mfcc(waveform, sample_frequency=fs) # default 16kHz is correct for this file
+        mfcc = torchaudio.compliance.kaldi.mfcc(waveform, sample_frequency=fs) # default 16kHz is correct for this file
+
+        if True:
+            self.mfcc = mfcc
+        else:
+            mfcc_d = torchaudio.functional.compute_deltas(mfcc)
+            mfcc_a = torchaudio.functional.compute_deltas(mfcc_d)
+            self.mfcc = torch.cat([mfcc, mfcc_d, mfcc_a], dim=1)
+
+
 
     def __init__(self, sentence=None, wav=None):
         """
@@ -134,7 +144,7 @@ class HMM:
         self.wav = wav
         if wav:
             self.compute_mfcc()
-            print(f"Computed mfcc, {self.mfcc.size()=}")
+            #print(f"Computed mfcc, {self.mfcc.size()=}")
 
 
 if (__name__ == '__main__' and len(sys.argv)>1 and sys.argv[1]=="--in-jupyter"):
