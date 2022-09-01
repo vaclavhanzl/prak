@@ -25,6 +25,7 @@ from acmodel import matrix
 # line_iterable_to_lexirules() cannot make this because of space being replaced
 explicit_spaces = {" ": ["", "|"], "_": [""], "=": [""]}
 
+final_cleanup_for_b = {'=': [''], '_': ['']} # remove _ =
 
 class HMM:
     """
@@ -45,7 +46,7 @@ class HMM:
         s += "\n"
         s += "   "+" ".join(self.b)
         for p, row in zip(self.b, self.A):
-            s += "\n " + p + " " + " ".join([[".", "1"][p] for p in row])
+            s += "\n " + p + " " + " ".join(["." if p==0 else "1" if p==1 else "*" for p in row])
         return s
 
 
@@ -81,11 +82,11 @@ class HMM:
             for txt in sorted(s):
                 first_in_txt = True
                 for e in ends:
-                    A[e][row] = 1 # connect to all prev. ends
+                    A[e][row] = 0.1 # connect to all prev. ends
                 for p in txt:
                     A[row][row] = 1 # self loop
                     if not first_in_txt:
-                        A[row-1][row] = 1 # connect phones in txt
+                        A[row-1][row] = 0.1 # connect phones in txt
                     first_in_txt = False
                     row += 1
                 new_ends.append(row-1)
@@ -138,6 +139,7 @@ class HMM:
         sg = factor_out_common_begins(sg)
         sg = factor_out_common_ends(sg)
         sg = sausages_replacement_rules(explicit_spaces, sg)
+        sg = sausages_replacement_rules(final_cleanup_for_b, sg)
         self.add_sausages(sg)
         self.orto = sen
         self.pretty_pron = prettyprint_sausage([{"PRON: "}] + sg)

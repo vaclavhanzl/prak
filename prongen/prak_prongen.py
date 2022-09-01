@@ -319,7 +319,7 @@ def read_replacement_table(filename):
     return table
 
 
-interpunction_to_delete = '"'+".,?!„“"
+interpunction_to_delete = '"'+".,?!„“-=–:;—/_"
 
 downcase = ("AÁBCČDĎEĚÉFGHIÍJKLĹĽMNŇOÓÔPQRŔŘSŠTŤUÚŮVWXYÝZŽÄÜÖ",
             "aábcčdďeěéfghiíjklĺľmnňoóôpqrŕřsštťuúůvwxyýzžäüö")
@@ -424,7 +424,17 @@ dz Z
 ou O
 au A
 ###eu E
+ü u
+ö o
+è e
+ä a
+ï y
 """)
+
+
+
+
+
 
 
 interpunctab = [(ch,'') for ch in interpunction_to_delete]
