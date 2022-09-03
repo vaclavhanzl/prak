@@ -108,23 +108,45 @@ class HMM:
             if phone==sil:
                 self.A[i][i] = p
 
-    def compute_mfcc(self):
+    def compute_mfcc_delete(self, use_DA=False):
         """
         Load wav file to temporary storage. Compute MFCC and attach it to this object.
         """
         waveform, fs = torchaudio.load(self.wav)
         mfcc = torchaudio.compliance.kaldi.mfcc(waveform, sample_frequency=fs) # default 16kHz is correct for this file
 
-        if True:
+        if not use_DA:
             self.mfcc = mfcc
         else:
             mfcc_d = torchaudio.functional.compute_deltas(mfcc)
             mfcc_a = torchaudio.functional.compute_deltas(mfcc_d)
             self.mfcc = torch.cat([mfcc, mfcc_d, mfcc_a], dim=1)
 
+    def compute_mfcc(self, derivatives):
+        """
+        Load wav file to temporary storage. Compute MFCC and attach it to this object.
+        Use DA for derivatives==2 etc. Expected useful range is 0..3.
+        For our simplistic GMMs, derivatives==0 is maybe better than 2.
+        For NNs, 0 works, 2 works as well. We use 3 to get wider view into MFCCs while
+        avoiding complexity of missing data at edges. We hope that traditional approach
+        of repeating edge values as needed before taking each derivative will work better
+        than harsh insertion of zeros or other tricks. Setting 3 is known to make naive
+        GMMs *worse* and only improve things when all that HLDA madness is added. We hope
+        that NN can easily make the HLDA-like transform and that NN does not really care
+        whether the input is a window to MFCCs or MFCC with derivatives.
+        """
+        waveform, fs = torchaudio.load(self.wav)
+        mfcc = torchaudio.compliance.kaldi.mfcc(waveform, sample_frequency=fs) # default 16kHz is correct for CV files
+        mfcc_list = [mfcc]
+        for d in range(derivatives):
+            mfcc = torchaudio.functional.compute_deltas(mfcc)
+            mfcc_list.append(mfcc)
+        self.mfcc = torch.cat(mfcc_list, dim=1)
 
 
-    def __init__(self, sentence=None, wav=None):
+
+
+    def __init__(self, sentence=None, wav=None, derivatives=2):
         """
         Create HMM model for a training sentence.
         """
@@ -145,7 +167,7 @@ class HMM:
         self.pretty_pron = prettyprint_sausage([{"PRON: "}] + sg)
         self.wav = wav
         if wav:
-            self.compute_mfcc()
+            self.compute_mfcc(derivatives)
             #print(f"Computed mfcc, {self.mfcc.size()=}")
 
 
