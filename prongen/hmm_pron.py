@@ -56,6 +56,7 @@ class HMM:
         Elements of b correspond to columns of A.
         A is indexed [from, to]
         """
+        self.sausages = sg # preserve the input, we may need it to make a reverse hmm
         if len(sg[0])!=1:
             print(f"Warning: The very first element has variants (but we can cope with this) {sg=}")
         if len(sg[-1])!=1:
@@ -144,6 +145,19 @@ class HMM:
         self.mfcc = torch.cat(mfcc_list, dim=1)
 
 
+    def add_timrev(self):
+        """
+        Add time-reversed HMM for backward Viterbi. Creates minimum version just for that.
+        Should be used with flipped b() table (NOT with flipped MFCCs as more advanced
+        acoustic models are direction sensitive).
+        """
+        self.timrev = HMM()
+        sg = reversed_sausages(self.sausages)
+        self.timrev.add_sausages(sg)
+        self.timrev.orto = "REV("+self.orto+")"
+        self.timrev.pretty_pron = prettyprint_sausage([{"PRON: "}] + sg)
+        self.timrev.wav = self.wav
+        self.timrev.mfcc = self.mfcc
 
 
     def __init__(self, sentence=None, wav=None, derivatives=2):
@@ -155,16 +169,17 @@ class HMM:
         args.all_begins = False
         args.all_ends = False
 
-        sen = sentence.strip()
-        sg = process(sen, all_begins=args.all_begins, all_ends=args.all_ends)
-        sg = [{"|"}] + sg + [{"|"}]
-        sg = factor_out_common_begins(sg)
-        sg = factor_out_common_ends(sg)
-        sg = sausages_replacement_rules(explicit_spaces, sg)
-        sg = sausages_replacement_rules(final_cleanup_for_b, sg)
-        self.add_sausages(sg)
-        self.orto = sen
-        self.pretty_pron = prettyprint_sausage([{"PRON: "}] + sg)
+        if sentence!=None:
+            sen = sentence.strip()
+            sg = process(sen, all_begins=args.all_begins, all_ends=args.all_ends)
+            sg = [{"|"}] + sg + [{"|"}]
+            sg = factor_out_common_begins(sg)
+            sg = factor_out_common_ends(sg)
+            sg = sausages_replacement_rules(explicit_spaces, sg)
+            sg = sausages_replacement_rules(final_cleanup_for_b, sg)
+            self.add_sausages(sg)
+            self.orto = sen
+            self.pretty_pron = prettyprint_sausage([{"PRON: "}] + sg)
         self.wav = wav
         if wav:
             self.compute_mfcc(derivatives)

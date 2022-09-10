@@ -14,14 +14,12 @@ from torch.utils.data import Dataset
 
 
 from prongen.hmm_pron import HMM
-
+from hmm_acmodel import round_to_two_decimal_digits
 
 from matrix import *
 
-
-
-device = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"Using {device} device")
+#device = "cuda" if torch.cuda.is_available() else "cpu"
+#print(f"Using {device} device")
 
 
 def get_training_hmms(nn_train_tsv_file, derivatives=2):
@@ -149,6 +147,170 @@ def viterbi_align_nn(hmm, nn_model, full_b_set):
         alpha_m[row] = x_m
         x_m = x_m@A*b[row]
     return alpha_m, exponent
+
+
+########### NN INFERENCE ###########
+
+def matrix_extra_edges(A):
+    """
+    Find states with irregular edge structure (not just enter from left and loop)
+    and compute needed correction for token passing.
+    """
+    #A = torch.tensor(hmm.A)
+    extra_edges_from = []
+    extra_edges_to = []
+    for c in range(1, len(A)): # skip the starting state
+        col = A[:,c] # column, how to get to state c
+        #NOTE: We might consider WHOLE column to also allow backward edges. REDO THE CODE BELOW?
+        assert col[c+1:].sum()==0
+        rel = reversed(col[:c+1]) # from diagonal up (we know that below are zeros)
+        rel = rel>0 # just yes/no whether token can come to state c from relative states at the left
+        if len(rel)>1 and rel[0] and rel[1] and rel[2:].sum()==0: # is it the common case of next/loop?
+            continue # nothing to do, common operation will handle this
+        rel = torch.tensor(range(len(rel)))[rel] # get offset for every True
+        
+        # convert to absolute positions:
+        rel = c - rel
+        extra_edges_from.append(rel)
+        extra_edges_to.append(c)
+    return extra_edges_from, torch.tensor(extra_edges_to)
+
+#e_e_f, e_e_t = matrix_extra_edges(torch.tensor(hmm.A))
+#e_e_f, e_e_t
+
+
+def next_x(x, extra_edges):
+    """
+    Pass tokens along edges (incl. loops), taking max() where multiple
+    paths arrive at a common state. (Not adding b()s here, this should
+    be done with x as a next step.)
+    """
+    e_e_from, e_e_to = extra_edges
+    # Step zero - get irregular edges inputs from the yet unchanged x
+    # Save in a vector of values to be put to x later (via scatter)
+    if len(e_e_from):
+        corrections = torch.stack([x[froms].max() for froms in e_e_from])
+        # NOTE: stack hates empty input
+    
+    
+    #loop_boost = 0    
+    # Step 1 - align x and one-state-shifted x and take max():
+    #s = torch.stack([x[:-1], loop_boost+x[1:]])
+    # The stack above can also be made as a special view of x! (not copying any data)
+    # MAGIC:   THIS IS TRICKY, REPEATED VALUES ARE "UNDEFINED"
+    s = x.as_strided((2, len(x)-1), (1, 1))
+
+    x[1:] = s.max(dim=0).values # pass tokens to the next state and via loops
+    # x[0] stays untouched, which corresponds to self-loop
+
+    # Step 2 - put corrections to x
+    if len(e_e_from): # if we needed and prepared any corrections
+        x.scatter_(0, e_e_to, corrections)  # using IN PLACE version of scatter (with _)
+    
+#x = torch.zeros(len(hmm.A))
+#x[0] = 1
+#x[4] = 5
+#next_x(x, (e_e_f, e_e_t))
+
+def compute_hmm_nn_log_b(hmm, nn_model, full_b_set):
+    """
+    For a sentence hmm model with an attached mfcc, compute ln(b()) values
+    for every sound frame and every model state, using NN phone model.
+    """
+    logits = nn_model(hmm.mfcc.double().to(device)).detach()
+    pred_probab = nn.LogSoftmax(dim=1)(logits)
+   
+    # Now select b() columns as needed for this hmm
+    ph_to_i = {ph:i for i, ph in enumerate(full_b_set)} # map phone to column
+    
+    idx = torch.tensor([ph_to_i[ph] for ph in hmm.b])
+    return(pred_probab[:, idx]) # repeat each b() column as needed
+
+
+def viterbi_log_align_nn(hmm, nn_model, full_b_set, timrev=False):
+    """
+    Align hmm states with mfcc, working with logprobs
+    """
+    b = compute_hmm_nn_log_b(hmm, nn_model, full_b_set)
+    if timrev:
+        b = b.flip(0)
+    A = hmm.A
+    tmax = hmm.mfcc.size()[0]
+    len_x = len(A)
+    x_list = [0]+[float('-inf')]*(len_x-1)
+    x = torch.tensor(x_list)
+    alpha = [] #growing list of rows with alpha logprobs
+    A = torch.tensor(hmm.A)
+    e_e_f, e_e_t = matrix_extra_edges(A) # prepare efficient representation of A
+    hmm.optimized_edges = e_e_f, e_e_t  # save it for backward pass - DO THIS ELSEWHERE
+    for row in range(tmax):
+        s = x.max() #renormalize
+        x -= s
+        alpha.append(x.clone())
+        next_x(x, (e_e_f, e_e_t))
+        x += b[row]
+    return torch.stack(alpha)
+
+
+def backward_log_alignment_pass_intervals(hmm, alp):
+    """
+    Backward pass in normalized logprob alpha.
+    Returns alignment intervals to be used for praat.
+    The alp matrix is modified in place to show the best path.
+    """
+    tmax = hmm.mfcc.size()[0]
+    len_x = len(hmm.b)
+    x_list = [1]+[0]*(len_x-1)
+    x = torch.tensor(list(reversed(x_list)))
+    frameskip = 0.01 # how many seconds of audio each mfcc row represents
+    e_e_f, e_e_t = hmm.optimized_edges
+    back = [] # list of backward edges
+    back.append(torch.tensor([0])) # just self-loop for the first state
+    for i in range(1, len_x):
+        back.append(torch.tensor([i, i-1])) # loop and forward edge on the rest of diagonal
+    # Now overwrite the irregular ones
+    for f, t in zip(e_e_f, e_e_t):
+        back[t] = f
+    marker = alp.max()+70 # best path marker, just for the image
+    last_i = len_x-1        
+    end_time = tmax*frameskip
+    intervals = []
+    for row in range(tmax-1,0-1,-1):
+        where_from = back[last_i] # where from we possibly came?
+        source_probs = alp[row][where_from] # what logprobs were at source cells?
+        ii = source_probs.max(0).indices # find best one among these
+        i = back[i][ii] # map it to index in full row
+        alp[row, last_i] = marker # indication of the best path in the image
+
+        if i!=last_i: # HMM state change
+            phone = hmm.b[last_i]
+            begin_time = row*frameskip
+            intervals.append((round_to_two_decimal_digits(begin_time), round_to_two_decimal_digits(end_time), phone))
+            end_time = begin_time
+            last_i = i
+            
+    phone = hmm.b[0]
+    begin_time = 0
+    intervals.append((round_to_two_decimal_digits(begin_time), round_to_two_decimal_digits(end_time), phone))
+    intervals.reverse()
+    return intervals
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
