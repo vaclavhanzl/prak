@@ -11,7 +11,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
-
+from collections import Counter
 
 from prongen.hmm_pron import HMM
 from hmm_acmodel import round_to_two_decimal_digits
@@ -212,14 +212,16 @@ def next_x(x, extra_edges):
 #x[4] = 5
 #next_x(x, (e_e_f, e_e_t))
 
-def compute_hmm_nn_log_b(hmm, nn_model, full_b_set):
+def compute_hmm_nn_log_b(hmm, nn_model, full_b_set, b_log_corr=None):
     """
     For a sentence hmm model with an attached mfcc, compute ln(b()) values
     for every sound frame and every model state, using NN phone model.
     """
     logits = nn_model(hmm.mfcc.double().to(device)).detach()
     pred_probab = nn.LogSoftmax(dim=1)(logits)
-   
+    if b_log_corr!=None:
+        pred_probab += b_log_corr[None]
+
     # Now select b() columns as needed for this hmm
     ph_to_i = {ph:i for i, ph in enumerate(full_b_set)} # map phone to column
     
@@ -227,11 +229,27 @@ def compute_hmm_nn_log_b(hmm, nn_model, full_b_set):
     return(pred_probab[:, idx]) # repeat each b() column as needed
 
 
-def viterbi_log_align_nn(hmm, nn_model, full_b_set, timrev=False):
+
+
+
+def b_log_corrections(tsv_file):
+    """
+    Compute log(b()) additive correction needed to suppress very frequent
+    phones and boost rare ones.
+    """
+    df = pd.read_csv(tsv_file, sep="\t", keep_default_na=False)
+    c=Counter("".join([s for s in df.targets.values]))
+    return -torch.tensor([count for phone, count in sorted(i for i in c.items())]).log()
+
+
+
+
+
+def viterbi_log_align_nn(hmm, nn_model, full_b_set, timrev=False, b_log_corr=None):
     """
     Align hmm states with mfcc, working with logprobs
     """
-    b = compute_hmm_nn_log_b(hmm, nn_model, full_b_set)
+    b = compute_hmm_nn_log_b(hmm, nn_model, full_b_set, b_log_corr)
     if timrev:
         b = b.flip(0)
     A = hmm.A
