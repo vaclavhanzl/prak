@@ -14,6 +14,10 @@ from torch.utils.data import Dataset
 from collections import Counter
 
 from prongen.hmm_pron import HMM
+# line above fails in pytest, need some other setup
+#from .prongen.hmm_pron import HMM
+
+
 from hmm_acmodel import round_to_two_decimal_digits
 
 from matrix import *
@@ -354,6 +358,31 @@ def group_tripled_intervals(intervals):
         assert phone == p2 == p3
         result.append((beg, end, phone))
     return result
+
+
+
+def mfcc_add_sideview(mfcc, sideview=9):
+    """
+    Add few fake frames before and after MFCC so as the window-input NN
+    can be computed anywhere.
+    At the moment, we fake initial frames by taking frames from the end
+    and vice versa (so the MFCC becomes cyclic-like).
+    """
+    if sideview==0:
+        return mfcc
+    return torch.cat([mfcc[-sideview:], mfcc, mfcc[0:sideview]], 0)
+
+def mfcc_win_view(mfcc, sideview=9):
+    """
+    View MFCC as a sequence of NN input windows, sliding window of the
+    size 2*sideview+1 over it. The MFCC is expected to be augmented at sides
+    using mfcc_add_sideview().
+    """
+    frames, numceps = mfcc.size()
+    winsize = sideview+1+sideview
+    sizes = (frames-winsize+1, winsize, numceps)
+    strides = numceps, numceps, 1
+    return mfcc.as_strided(sizes, strides)
 
 
 
