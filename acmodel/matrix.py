@@ -6,7 +6,7 @@ import numpy as np
 
 import torch
 #device = torch.device("cuda:0")
-device = torch.device("cpu")
+#device = torch.device("cpu")
 #dtype = torch.float
 #dtype = torch.double
 

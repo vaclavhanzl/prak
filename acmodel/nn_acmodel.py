@@ -18,7 +18,7 @@ from hmm_acmodel import round_to_two_decimal_digits
 
 from matrix import *
 
-#device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cuda" if torch.cuda.is_available() else "cpu"
 #print(f"Using {device} device")
 
 
@@ -63,17 +63,17 @@ class SpeechDataset(Dataset):
 
 
 class NeuralNetwork(nn.Module):
-    def __init__(self, in_size, out_size):
+    def __init__(self, in_size, out_size, mid_size=512):
         super(NeuralNetwork, self).__init__()
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(in_size, 512),
+            nn.Linear(in_size, mid_size),
             nn.ReLU(),
-            nn.Linear(512, 512),
+            nn.Linear(mid_size, mid_size),
             nn.ReLU(),
-            nn.Linear(512, 512),
+            nn.Linear(mid_size, mid_size),
             nn.ReLU(),
-            nn.Linear(512, out_size)
+            nn.Linear(mid_size, out_size)
         )
 
     def forward(self, x):
@@ -217,7 +217,8 @@ def compute_hmm_nn_log_b(hmm, nn_model, full_b_set, b_log_corr=None):
     For a sentence hmm model with an attached mfcc, compute ln(b()) values
     for every sound frame and every model state, using NN phone model.
     """
-    logits = nn_model(hmm.mfcc.double().to(device)).detach()
+    #logits = nn_model(hmm.mfcc.double().to(device)).detach()
+    logits = nn_model(hmm.mfcc.double().to(device)).detach().to('cpu')
     pred_probab = nn.LogSoftmax(dim=1)(logits)
     if b_log_corr!=None:
         pred_probab += b_log_corr[None]
@@ -315,7 +316,44 @@ def backward_log_alignment_pass_intervals(hmm, alp):
 
 
 
+def triple_sausage_states(sg):
+    """
+    Triple each phone state in a sausage. This is intended as a primitive duration model
+    forcing a minimum duration of phones. Should be complemented by a corresponding
+    coalescence of alignment intervals after Viterbi decoding.
+    """
+    result = []
+    for s in sg:
+        out_s = set()
+        for txt in s:
+            txt = "".join(p*3 for p in txt)
+            out_s.add(txt)
+        result.append(out_s)
+    return result
+   
+#triple_sausage_states([{"abc", 'd'}, {'ee'}])
 
+def triple_hmm_states(hmm):
+    """
+    Triple each phone state in a HMM. This is intended as a primitive duration model
+    forcing a minimum duration of phones. Should be complemented by a corresponding
+    coalescence of alignment intervals after Viterbi decoding.
+    Expects previously added sausages in HMM. Recomputes A and b.
+    """
+    hmm.add_sausages(triple_sausage_states(hmm.sausages))
+
+#triple_sausage_states(hmm.sausages)
+
+def group_tripled_intervals(intervals):
+    """
+    Fix tripling of decoded intervals caused by triple_hmm_states()
+    """
+    result = []
+    while intervals:
+        (beg, _, phone), (_, _, p2), (_, end, p3), *intervals = intervals
+        assert phone == p2 == p3
+        result.append((beg, end, phone))
+    return result
 
 
 

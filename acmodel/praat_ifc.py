@@ -51,7 +51,7 @@ def textgrid_file_text(tiers):
     """
     txt_tiers = ""
     for tier_n, (tier_name, tier_intervals) in enumerate(tiers.items(), start=1): # tier_n and tier_intervals also used after this loop
-        print(f"{tier_n, (tier_name, tier_intervals)=}")
+        #print(f"{tier_n, (tier_name, tier_intervals)=}")
         txt_tiers += textgrid_tier(tier_n, tier_name, tier_intervals)
     _, xmax, _ = tier_intervals[-1] # use end of last interval of last tier - SHOULD USE MAX OF ALL TIERS?
     txt = textgrid_file_intro(xmax, tier_n)
@@ -59,12 +59,12 @@ def textgrid_file_text(tiers):
     return txt
 
 
-
+# To be used in Jupyter notebook:
+"""
 from IPython.core.magic import register_line_cell_magic
-
 @register_line_cell_magic
 def writetemplate(line, cell):
     with open(line, 'w') as f:
         f.write(cell.format(**globals()))
-
+"""
 
