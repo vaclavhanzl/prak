@@ -48,9 +48,10 @@ def collect_training_material(hmms):
 
 
 class SpeechDataset(Dataset):
-    def __init__(self, all_mfcc, all_targets, b_set):
+    def __init__(self, all_mfcc, all_targets, b_set, sideview = 9):
         self.all_mfcc = all_mfcc
         self.all_targets = all_targets
+        self.sideview = sideview
         
         self.wanted_outputs = torch.eye(len(b_set), device=device).double()
         self.output_map = {}
@@ -58,10 +59,11 @@ class SpeechDataset(Dataset):
             self.output_map[b] = self.wanted_outputs[i] # prepare outputs with one 1 at the right place
 
     def __len__(self):
-        return len(self.all_targets)
+        return len(self.all_targets) - 2*self.sideview
 
     def __getitem__(self, idx):
-        return self.all_mfcc[idx], self.output_map[self.all_targets[idx]]
+        idx += self.sideview
+        return self.all_mfcc[idx-self.sideview:idx+self.sideview+1], self.output_map[self.all_targets[idx]]
 
 
 
@@ -386,7 +388,16 @@ def mfcc_win_view(mfcc, sideview=9):
 
 
 
-
+def align_hmm(hmm, model, x_set, b_log_corr, group_tripled=True):
+    alp = viterbi_log_align_nn(hmm, model, x_set, b_log_corr=b_log_corr*1.0)
+    hmm.intervals = backward_log_alignment_pass_intervals(hmm, alp) # also modifies alp
+    hmm.indices = i = alp.max(1).indices
+    #s = "".join([hmm.b[ii] for ii in i])
+    #hmm.troubling = troubling_alignmet(s) # not working anymore with triple states
+    hmm.targets = "".join([hmm.b[ii] for ii in i])
+    if group_tripled:
+        hmm.intervals = group_tripled_intervals(hmm.intervals)
+    return alp # just for debuging, the real result is in hmm.intervals
 
 
 
