@@ -47,11 +47,36 @@ def collect_training_material(hmms):
     return all_mfcc, all_targets, b_set
 
 
+def mfcc_make_speaker_vector(mfcc):
+    """
+    Create simple speaker/environment/mic describing vectors for adaptation.
+    Make average cepstra over the recording (very simple i-vector like approach).
+    Split MFCC to 3 groups according to log-energy (above average is one group,
+    below average is further split into two groups the same way) and stack these
+    3 vectors to a matrix (which can be concatenated with a MFCC window).
+    """
+    energy = mfcc[:, 0]
+    mean = energy.mean()
+    low_mean = energy[energy<mean].mean()
+    high_mean = energy[energy>=mean].mean()
+
+    mfcc_lowest = mfcc[energy<low_mean].mean(dim=0)
+    mfcc_lower = mfcc[(energy>=low_mean)&(energy<mean)].mean(dim=0)
+    mfcc_higher = mfcc[(energy>=mean)&(energy<high_mean)].mean(dim=0)
+    mfcc_highest = mfcc[energy>=high_mean].mean(dim=0)
+
+    return torch.stack([mfcc_lowest, mfcc_lower, mfcc_higher, mfcc_highest])
+    # NOTE: This acts as ONE s-vector, even if formed 4*13
+
+
+
+
 class SpeechDataset(Dataset):
-    def __init__(self, all_mfcc, all_targets, b_set, sideview = 9):
+    def __init__(self, all_mfcc, all_targets, b_set, sideview = 9, speaker_vectors = None):
         self.all_mfcc = all_mfcc
         self.all_targets = all_targets
         self.sideview = sideview
+        self.speaker_vectors = speaker_vectors
         
         self.wanted_outputs = torch.eye(len(b_set), device=device).double()
         self.output_map = {}
@@ -63,8 +88,15 @@ class SpeechDataset(Dataset):
 
     def __getitem__(self, idx):
         idx += self.sideview
-        return self.all_mfcc[idx-self.sideview:idx+self.sideview+1], self.output_map[self.all_targets[idx]]
+        mfcc_window = self.all_mfcc[idx-self.sideview:idx+self.sideview+1]
 
+        nn_input = mfcc_window
+        
+        if self.speaker_vectors!=None:
+            speaker_vector = self.speaker_vectors[idx]
+            nn_input = torch.cat([mfcc_window, speaker_vector])
+    
+        return nn_input, self.output_map[self.all_targets[idx]]
 
 
 
@@ -218,13 +250,38 @@ def next_x(x, extra_edges):
 #x[4] = 5
 #next_x(x, (e_e_f, e_e_t))
 
+
+
+def make_nn_input_from_mfcc_and_s_vec(mfcc, s_vec):
+    """
+    Create NN batch-input from MFCC and speaker vector. The MFCC can be either
+    a plain len*13 matrix or a tensor view simulating MFCC windows.
+    Currently only the second option is supported.
+    """
+    # s_vec has torch.Size([4, 13])
+    # s_vec[None] has torch.Size([1, 4, 13])
+    # torch.cat() does not broadcast, we need explicit torch.expand()
+    #
+    #                             mfcc can have e.g. torch.Size([432, 19, 13])
+    ex = s_vec[None].expand(len(mfcc),-1, -1) # e.g. torch.Size([432,  4, 13])
+    return torch.cat([mfcc, ex], dim=1) #       e.g. torch.Size([432, 23, 13])
+
+
+
+
 def compute_hmm_nn_log_b(hmm, nn_model, full_b_set, b_log_corr=None):
     """
     For a sentence hmm model with an attached mfcc, compute ln(b()) values
     for every sound frame and every model state, using NN phone model.
     """
     #logits = nn_model(hmm.mfcc.double().to(device)).detach()
-    logits = nn_model(hmm.mfcc.double().to(device)).detach().to('cpu')
+
+    if hmm.speaker_vector==None:
+        nn_input = hmm.mfcc
+    else:
+        nn_input = make_nn_input_from_mfcc_and_s_vec(hmm.mfcc, hmm.speaker_vector)
+
+    logits = nn_model(nn_input.double().to(device)).detach().to('cpu')
     pred_probab = nn.LogSoftmax(dim=1)(logits)
     if b_log_corr!=None:
         pred_probab += b_log_corr[None]
@@ -392,8 +449,6 @@ def align_hmm(hmm, model, x_set, b_log_corr, group_tripled=True):
     alp = viterbi_log_align_nn(hmm, model, x_set, b_log_corr=b_log_corr*1.0)
     hmm.intervals = backward_log_alignment_pass_intervals(hmm, alp) # also modifies alp
     hmm.indices = i = alp.max(1).indices
-    #s = "".join([hmm.b[ii] for ii in i])
-    #hmm.troubling = troubling_alignmet(s) # not working anymore with triple states
     hmm.targets = "".join([hmm.b[ii] for ii in i])
     if group_tripled:
         hmm.intervals = group_tripled_intervals(hmm.intervals)
