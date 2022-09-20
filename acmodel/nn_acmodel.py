@@ -1,4 +1,6 @@
 
+# Copyright © 2022 Václav Hanžl. Part of MIT-licensed https://github.com/vaclavhanzl/prak
+
 # NN acoustic models
 
 #from matrix import *
@@ -393,6 +395,30 @@ def triple_sausage_states(sg):
             out_s.add(txt)
         result.append(out_s)
     return result
+
+
+# Number of states for phones. Groups separated by dots get min. durations 1, 2(j), 3, ..., 9(á)
+phone_min_duration_string = ".j.?GNdehlnoruvyň.abfgmtúý.Hpz|ďŘřž.Zkséóšť.AŽ.OEcč.á"
+
+phone_num_states = {}
+for num_states, phones in enumerate(phone_min_duration_string.split('.'), 1):
+    for p in phones:
+        phone_num_states[p] = num_states
+
+def multiply_sausage_states(sg, phone_num_states=phone_num_states):
+    """
+    Multiply each phone state in a sausage according to a minimum acceptable duration, e.g.
+    to disallow short lengths in a 5% quantile in hand-labeled data. Should be complemented
+    by a corresponding coalescence of alignment intervals after Viterbi decoding.
+    """
+    result = []
+    for s in sg:
+        out_s = set()
+        for txt in s:
+            txt = "".join(p*phone_num_states[p] for p in txt)
+            out_s.add(txt)
+        result.append(out_s)
+    return result
    
 #triple_sausage_states([{"abc", 'd'}, {'ee'}])
 
@@ -405,6 +431,16 @@ def triple_hmm_states(hmm):
     """
     hmm.add_sausages(triple_sausage_states(hmm.sausages))
 
+def multiply_hmm_states(hmm, phone_num_states=phone_num_states):
+    """
+    Multiply each phone state in a HMM according to a minimum acceptable duration, e.g.
+    to disallow short lengths in a 5% quantile in hand-labeled data. This is intended as
+    a primitive duration model forcing a minimum duration of phones. Should be complemented
+    by a corresponding coalescence of alignment intervals after Viterbi decoding.
+    Expects previously added sausages in HMM. Recomputes A and b.
+    """
+    hmm.add_sausages(multiply_sausage_states(hmm.sausages, phone_num_states))
+
 #triple_sausage_states(hmm.sausages)
 
 def group_tripled_intervals(intervals):
@@ -415,6 +451,21 @@ def group_tripled_intervals(intervals):
     while intervals:
         (beg, _, phone), (_, _, p2), (_, end, p3), *intervals = intervals
         assert phone == p2 == p3
+        result.append((beg, end, phone))
+    return result
+
+def group_multiplied_intervals(intervals, phone_num_states=phone_num_states):
+    """
+    Fix multiplication of decoded intervals caused by multiply_hmm_states()
+    """
+    result = []
+    while intervals:
+        (beg, end, phone), *intervals = intervals
+        for _ in range(1, phone_num_states[phone]):
+            (b2, e2, p2), *intervals = intervals
+            assert p2==phone
+            assert b2==end
+            end = e2
         result.append((beg, end, phone))
     return result
 
@@ -453,14 +504,6 @@ def align_hmm(hmm, model, x_set, b_log_corr, group_tripled=True):
     if group_tripled:
         hmm.intervals = group_tripled_intervals(hmm.intervals)
     return alp # just for debuging, the real result is in hmm.intervals
-
-
-
-
-
-
-
-
 
 
 
