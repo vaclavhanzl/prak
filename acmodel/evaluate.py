@@ -18,7 +18,7 @@ def dist_matrix_for_strings(vertical_string, horizontal_string):
     return (horizontal[None]!=vertical[:,None]).int()
 
 
-def dtw_forward_pass(dist):
+def dtw_forward_pass(dist, costs_dia_top_right=None):
     """
     Dynamic Time Warping (in fact string index warping) forward pass.
     Given distance matrix, produce cumulated paths costs matrix and
@@ -28,6 +28,10 @@ def dtw_forward_pass(dist):
     made by torch.diagonal() - this dictates rather unusual starting
     point in top-right corner of the matrix, going to bottom-left.
     """
+    if costs_dia_top_right!=None:
+        costs_dia_top_right = torch.tensor(costs_dia_top_right)[:,None]
+        print("costs_dia_top_right feature is unfinished!")
+
     cum = dist*0-1  # cumulative sums (in fact last 2 diagonals would suffice)
     idx = dist*0-1  # backtracking directions (0=up, 1=up-right, 2=right, -1=start reached)
     rows, cols = dist.size()
@@ -60,6 +64,14 @@ def dtw_forward_pass(dist):
                           d_1[:-1], # from top        1
                           d_1[1:]   # from right      2
                          ])
+
+        if costs_dia_top_right!=None:
+            #print(f"{st.size()=}")
+            #print(f"{costs_dia_top_right.size()=}")
+            #print(f"{st=}")
+            st += costs_dia_top_right
+            #print(f"after +, {st=}")
+
         min_idx = st.min(dim=0) # central point of all this, vectorized min()
         target_cum[:] = min_idx.values
         target_idx[:] = min_idx.indices
@@ -72,3 +84,80 @@ def dtw_forward_pass(dist):
             target_idx_full[-1] = 1        # index
         target_cum_full[:] += dist.diagonal(i) # second of the two vectorized ops used here
     return idx, cum
+
+
+
+
+def dtw_backward_pass(idx):
+    """
+    Backtrack best alignment path using idx returned by dtw_forward_pass().
+    Return vector of directions encountered along the best path from the top right
+    corner to the bottom left corner (path is reversed after backtracking).
+    Directions are encoded like this: 0=vertical, 1=diagonal, 2=horizontal,
+    -1=no furthure move (path ends here).
+    """
+    path = []
+    rows, cols = idx.size()
+    r, c = rows-1, 0 # starting in lower left corner
+    while (direction := idx[r,c])!=-1:
+        path.append(int(direction))
+        match direction:
+            case 1: # up
+                r -= 1
+            case 0: # up-right
+                r -= 1
+                c += 1
+            case 2: # right
+                c += 1
+    assert (r, c) == (0, cols-1)
+    path.reverse()
+    path.append(-1)
+    return path
+
+
+
+def align_strings(string_1, string_2, fill_char='.'):
+    """
+    Insert fill_char into strings 1 and 2 so as they are the same length
+    and alignment cost is minimum. Cost includes 1 for every position in
+    aligned strings where characters do not match or one of them is fill_char
+    (meaning substitution or deletion/insertion).
+    """
+    dist = dist_matrix_for_strings(string_1, string_2) # vertical, horizontal
+    idx, cum = dtw_forward_pass(dist, costs_dia_top_right=[0, 0, 0])
+    path = dtw_backward_pass(idx)
+    #print(f"{path=}")
+    #print(f"{dist=}")
+    #print(f"{idx=}")
+    #print(f"{cum=}")
+    aligned_1 = ""
+    aligned_2 = ""
+    mismatch = 0
+    g_1 = (c for c in string_1) # vertical
+    g_2 = (c for c in string_2) # horizontal
+    for direction in path:
+        match direction:
+            case 1: # vertical move (insert/delete)
+                aligned_1 += next(g_1)
+                aligned_2 += fill_char
+                mismatch += 1
+            case 0|-1: # diagonal move or path end (match or substitute)
+                aligned_1 += (c_1 := next(g_1))
+                aligned_2 += (c_2 := next(g_2))
+                if c_1!=c_2:
+                    mismatch += 1
+            case 2: # horizontal move (insert/delete)
+                aligned_1 += fill_char
+                aligned_2 += next(g_2)
+                mismatch += 1
+    return aligned_1, aligned_2, mismatch
+
+
+
+
+
+
+
+
+
+
