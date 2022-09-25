@@ -13,19 +13,19 @@ def test0_dtw_forward_pass():
 def test1_dtw_forward_pass():
     dist = torch.tensor([[1, 2], [3, 4]])
     idx, cum = dtw_forward_pass(dist)
-    assert idx.equal(torch.tensor([[2, -1], [1, 0]]))
+    assert idx.equal(torch.tensor([[2, -1], [0, 1]]))
     assert cum.equal(torch.tensor([[3, 2], [5, 6]]))
 
 def test2_dtw_forward_pass():
     dist = torch.tensor([[1, 0], [0, 4]])
     idx, cum = dtw_forward_pass(dist)
-    assert idx.equal(torch.tensor([[2, -1], [1, 0]]))
+    assert idx.equal(torch.tensor([[2, -1], [0, 1]]))
     assert cum.equal(torch.tensor([[1, 0], [0, 4]]))
 
 def test3_dtw_forward_pass():
     dist = torch.tensor([[1, 0], [0, 4], [0, 7]])
     idx, cum = dtw_forward_pass(dist)
-    assert idx.equal(torch.tensor([[2, -1], [1, 0], [0, 0]]))
+    assert idx.equal(torch.tensor([[2, -1], [0, 1], [1, 1]]))
     assert cum.equal(torch.tensor([[1, 0], [0, 4], [0, 11]]))
 
 def test4_dtw_forward_pass():
@@ -33,7 +33,7 @@ def test4_dtw_forward_pass():
                          [1, 2, 3]])
     idx, cum = dtw_forward_pass(dist)
     assert idx.equal(torch.tensor([[ 2,  2, -1],
-                                   [ 2,  1,  0]]))
+                                   [ 2,  0,  1]]))
     assert cum.equal(torch.tensor([[16,  9,  1],
                                    [ 4,  3,  4]]))
 
@@ -72,10 +72,10 @@ def test6_dtw_forward_pass():
 
 
 
-test0_dtw_forward_pass()
-test1_dtw_forward_pass()
-test2_dtw_forward_pass()
-test3_dtw_forward_pass()
-test4_dtw_forward_pass()
-test5_dtw_forward_pass()
-test6_dtw_forward_pass()
+#test0_dtw_forward_pass()
+#test1_dtw_forward_pass()
+#test2_dtw_forward_pass()
+#test3_dtw_forward_pass()
+#test4_dtw_forward_pass()
+#test5_dtw_forward_pass()
+#test6_dtw_forward_pass()

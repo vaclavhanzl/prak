@@ -6,6 +6,16 @@
 
 import torch
 
+def dist_matrix_for_strings(vertical_string, horizontal_string):
+    """
+    Create tensor with 0 where characters match and 1 where not.
+    The vertical_string is going top-down along the matrix.
+    The horizontal_string is going RIGHT-LEFT along the matrix.
+    (Right-left allows use of torch.diagonal() in efficient DWT.)
+    """
+    vertical = torch.tensor([ord(c) for c in vertical_string]) # top down
+    horizontal = torch.tensor([ord(c) for c in reversed(horizontal_string)]) # right left
+    return (horizontal[None]!=vertical[:,None]).int()
 
 
 def dtw_forward_pass(dist):
@@ -46,8 +56,8 @@ def dtw_forward_pass(dist):
         if ii<-1:
             d_2 = d_2[:-1] # strip last element
     
-        st = torch.stack([d_1[:-1], # from top        0
-                          d_2,      # from top-right  1
+        st = torch.stack([d_2,      # from top-right  0  (most prefered if equal mins)
+                          d_1[:-1], # from top        1
                           d_1[1:]   # from right      2
                          ])
         min_idx = st.min(dim=0) # central point of all this, vectorized min()
@@ -59,6 +69,6 @@ def dtw_forward_pass(dist):
             target_idx_full[0] = 2         # index
         if ii>=0:
             target_cum_full[-1] = d_1[-1]  # right line
-            target_idx_full[-1] = 0        # index
+            target_idx_full[-1] = 1        # index
         target_cum_full[:] += dist.diagonal(i) # second of the two vectorized ops used here
     return idx, cum
