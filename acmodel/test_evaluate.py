@@ -1,7 +1,7 @@
 
 import torch
 
-from evaluate import dtw_forward_pass
+from evaluate import dtw_forward_pass, fix_ins_del_alignment_in_s1
 
 
 def test0_dtw_forward_pass():
@@ -66,16 +66,10 @@ def test6_dtw_forward_pass():
 
 
 
-#test 1x1
-
-
-
-
-
-#test0_dtw_forward_pass()
-#test1_dtw_forward_pass()
-#test2_dtw_forward_pass()
-#test3_dtw_forward_pass()
-#test4_dtw_forward_pass()
-#test5_dtw_forward_pass()
-#test6_dtw_forward_pass()
+def test1_fix_ins_del_alignment_in_s1():
+    assert fix_ins_del_alignment_in_s1("", "")==""
+    assert fix_ins_del_alignment_in_s1("..a", "abc")=="a.."
+    assert fix_ins_del_alignment_in_s1("x..a", "xabc")=="xa.."
+    assert fix_ins_del_alignment_in_s1("x..abc", "xabcbc")=="xa..bc"
+    assert fix_ins_del_alignment_in_s1(".a", "ab")=="a."
+    assert fix_ins_del_alignment_in_s1("hello.amello", "helloabmello")=="helloa.mello"

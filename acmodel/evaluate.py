@@ -116,6 +116,33 @@ def dtw_backward_pass(idx):
 
 
 
+def fix_ins_del_alignment_in_s1(string_1, string_2, fill_char='.'):
+    """
+    Scan string_1 for sequences like "..x" and reposition 'x' among dots if
+    this achieves correspondance with character in string_2.
+    (If no correspondence is found, 'x' is moved in front of dots ("x..") - this
+    is a side effect of the simple algorithm used and we do not care.)
+    """
+    assert len(string_1)==len(string_2)
+    string_1 = [*string_1] # convert to list to make it writable
+    for i in range(len(string_1)-2, -1, -1): # skip last character, we could not swap
+        if string_1[i]==fill_char and string_1[i+1]!=string_2[i+1]: # if not kept by equality
+            string_1[i], string_1[i+1] = string_1[i+1], string_1[i] # swap
+    return "".join(string_1) # convert back from list to string
+
+
+def fix_ins_del_alignment(string_1, string_2, fill_char='.'):
+    """
+    Scan strings for corresponding sequences like "..x" and "abc" (which do
+    occur on the output of DTW alignment) and reposition 'x' among dots if
+    it corresponds with any character in "abc".
+    """
+    string_1 = fix_ins_del_alignment_in_s1(string_1, string_2, fill_char=fill_char)
+    string_2 = fix_ins_del_alignment_in_s1(string_2, string_1, fill_char=fill_char)
+    return string_1, string_2
+
+
+
 def align_strings(string_1, string_2, fill_char='.'):
     """
     Insert fill_char into strings 1 and 2 so as they are the same length
@@ -126,13 +153,12 @@ def align_strings(string_1, string_2, fill_char='.'):
     dist = dist_matrix_for_strings(string_1, string_2) # vertical, horizontal
     idx, cum = dtw_forward_pass(dist, costs_dia_top_right=[0, 0, 0])
     path = dtw_backward_pass(idx)
-    #print(f"{path=}")
-    #print(f"{dist=}")
-    #print(f"{idx=}")
-    #print(f"{cum=}")
+    print(f"{path=}")
+    print(f"{dist=}")
+    print(f"{idx=}")
+    print(f"{cum=}")
     aligned_1 = ""
     aligned_2 = ""
-    mismatch = 0
     g_1 = (c for c in string_1) # vertical
     g_2 = (c for c in string_2) # horizontal
     for direction in path:
@@ -140,16 +166,17 @@ def align_strings(string_1, string_2, fill_char='.'):
             case 1: # vertical move (insert/delete)
                 aligned_1 += next(g_1)
                 aligned_2 += fill_char
-                mismatch += 1
             case 0|-1: # diagonal move or path end (match or substitute)
                 aligned_1 += (c_1 := next(g_1))
                 aligned_2 += (c_2 := next(g_2))
-                if c_1!=c_2:
-                    mismatch += 1
             case 2: # horizontal move (insert/delete)
                 aligned_1 += fill_char
                 aligned_2 += next(g_2)
-                mismatch += 1
+    aligned_1, aligned_2 = fix_ins_del_alignment(aligned_1, aligned_2, fill_char=fill_char)
+    mismatch = 0
+    for c1, c2 in zip(aligned_1, aligned_2):
+        if c1!=c2:
+            mismatch += 1
     return aligned_1, aligned_2, mismatch
 
 
