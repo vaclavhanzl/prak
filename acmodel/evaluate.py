@@ -151,12 +151,12 @@ def align_strings(string_1, string_2, fill_char='.'):
     (meaning substitution or deletion/insertion).
     """
     dist = dist_matrix_for_strings(string_1, string_2) # vertical, horizontal
-    idx, cum = dtw_forward_pass(dist, costs_dia_top_right=[0, 0, 0])
+    idx, cum = dtw_forward_pass(dist)
     path = dtw_backward_pass(idx)
-    print(f"{path=}")
-    print(f"{dist=}")
-    print(f"{idx=}")
-    print(f"{cum=}")
+    #print(f"{path=}")
+    #print(f"{dist=}")
+    #print(f"{idx=}")
+    #print(f"{cum=}")
     aligned_1 = ""
     aligned_2 = ""
     g_1 = (c for c in string_1) # vertical
@@ -181,10 +181,59 @@ def align_strings(string_1, string_2, fill_char='.'):
 
 
 
+def prune_tiers_to_comparable_intervals(tier1, tier2):
+    """
+    Align phone strings by DTW and keep just intervals which have the same
+    phone in both tiers. This alignment is based purely on phone text,
+    disregarding times. All phones should have exactly one-character names.
+    """
+    s1 = "".join([p for _, _, p in tier1])
+    s2 = "".join([p for _, _, p in tier2])
+    s1, s2, dif = align_strings(s1, s2)
+    print(f"{dif=}, {len(s1)=}, {len(tier1)=}")
+    assert len(s1)==len(s2)
+    g1 = (f_t_p for f_t_p in tier1)
+    g2 = (f_t_p for f_t_p in tier2)
+    out1 = []
+    out2 = []
+    for p1, p2 in zip(s1, s2):
+        assert p1!='.' or p2!='.' # dot marks deletion in the other string, cannot be in both
+        if p1=='.':
+            _,_,p = next(g2) # discard in tier2 what corresponds to dot in (aligned) s1
+            assert p==p2
+            continue
+        if p2=='.':
+            _,_,p = next(g1) # dtto vice versa
+            assert p==p1
+            continue
+        if p1!=p2:
+            _,_,pg1 = next(g1) # discard both if aligned phones differ (substitution)
+            _,_,pg2 = next(g2)
+            assert pg1==p1
+            assert pg2==p2
+            continue
+        out1.append(next(g1))
+        out2.append(next(g2))
+    return out1, out2
 
 
-
-
+def compare_tier_times(tier1, tier2):
+    """
+    Compare times of two tiers with identical phones
+    """
+    dif = 0
+    mid_dif = 0
+    for i, ((b1, e1, p1), (b2, e2, p2)) in enumerate(zip(tier1, tier2)):
+        #print((p1, p2))
+        #assert p1==p2
+        if p1!=p2:
+            #print(f"{i} phones matched, then '{p1}'!='{p2}'")
+            break
+        dif += abs(b1-b2)+abs(e1-e2)
+        mid_dif += abs((b1+e1)/2-(b2+e2)/2)
+    if i==0:
+        return 0, 100, 100, 'xx'
+    return i, mid_dif/i, dif/i/2, p1+p2
 
 
 
