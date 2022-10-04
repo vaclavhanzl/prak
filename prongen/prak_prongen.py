@@ -1294,6 +1294,20 @@ def sausages_replacement_rules(repl_rules, sausages):
     return result
 
 
+def sausages_remove_nonphones(sausages, phones="?AEGHNOZabcdefghjklmnoprstuvyz|áéóúýčďňŘřšťŽž"):
+    """
+    Remove any out-of-phonetic-alphabet phones.
+    Parameter 'phones' can be either string or set.
+    """
+    result = []
+    for s in sausages:
+        s_out = set()
+        for txt in s:
+            s_out.add("".join([p for p in txt if p in phones]))
+        result.append(s_out)
+    return result
+
+
 def process(txt, all_begins=True, all_ends=True):
     """
     Convert text to pronunciation, using these tables/procedures:

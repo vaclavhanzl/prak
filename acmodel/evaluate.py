@@ -6,6 +6,11 @@
 
 import torch
 
+from praat_ifc import desampify_dict, read_word_tier_from_textgrid_file, read_phone_tier_from_textgrid_file, textgrid_file_text, desampify_phone_tier
+
+from nn_acmodel import align_wav_file_using_model
+
+
 def dist_matrix_for_strings(vertical_string, horizontal_string):
     """
     Create tensor with 0 where characters match and 1 where not.
@@ -190,7 +195,7 @@ def prune_tiers_to_comparable_intervals(tier1, tier2):
     s1 = "".join([p for _, _, p in tier1])
     s2 = "".join([p for _, _, p in tier2])
     s1, s2, dif = align_strings(s1, s2)
-    print(f"{dif=}, {len(s1)=}, {len(tier1)=}")
+    #print(f"{dif=}, {len(s1)=}, {len(tier1)=}")
     assert len(s1)==len(s2)
     g1 = (f_t_p for f_t_p in tier1)
     g2 = (f_t_p for f_t_p in tier2)
@@ -214,7 +219,7 @@ def prune_tiers_to_comparable_intervals(tier1, tier2):
             continue
         out1.append(next(g1))
         out2.append(next(g2))
-    return out1, out2
+    return out1, out2, dif
 
 
 def compare_tier_times(tier1, tier2):
@@ -234,6 +239,130 @@ def compare_tier_times(tier1, tier2):
     if i==0:
         return 0, 100, 100, 'xx'
     return i, mid_dif/i, dif/i/2, p1+p2
+
+
+
+def compare_tiers(manual, auto):
+    """
+    Compare tier times for intervals matched by DTW on phonestring.
+    """
+    p_auto, p_manual = prune_tiers_to_comparable_intervals(auto, manual)
+    return compare_tier_times(p_auto, p_manual)
+
+
+
+
+
+
+
+def evaluate_model_on_wav_file(wav_file, model, desampify_dict=desampify_dict):
+    """
+    Evaluate alignment by model on wav file with corresponding
+    manually aligned textgrid file.
+    """
+    gi = align_wav_file_using_model(wav_file, model)
+    
+    suffix = ".wav"
+    assert wav_file.endswith(suffix)
+    filename_base = wav_file[:-len(suffix)]
+    phone_tier = read_phone_tier_from_textgrid_file(filename_base+".TextGrid")
+    phone_tier = desampify_phone_tier(phone_tier, desampify_dict)
+    
+    compare_tiers_detailed(phone_tier, gi, model.par)
+
+
+
+# AH Milanek special encoding:
+demil_dict = {}
+
+for p in '?AEGHNOZabcdefghjklmnoprstuvyz|áéóúýčďňŘřšťŽž':
+    demil_dict[p] = p
+    
+for mil_phone, our_phone in "Iy iy íý xH ə@ XH ůú".split(" "):
+    demil_dict[mil_phone] = our_phone
+
+demil_dict[''] = "|"
+demil_dict['ou'] = "O"
+demil_dict['ts'] = "c"
+demil_dict['eu'] = "E"
+demil_dict['tš'] = "č"
+demil_dict['dž'] = "Ž"
+demil_dict['au'] = "A"
+demil_dict['dz'] = "Z"
+demil_dict['eu'] = "E"
+
+
+def compare_tier_times_detailed(tier1, tier2, dif, info):
+    """
+    Compare times of two tiers with identical phones
+    """
+    absdif = 0 # abs value
+    bdif = 0 # incl. sign, just begins
+    mid_dif = 0
+    max_mid_dif = 0
+    cnt_misplaced = 0
+    for i, ((b1, e1, p1), (b2, e2, p2)) in enumerate(zip(tier1, tier2)):
+        #print((p1, p2))
+        assert p1==p2
+        absdif += abs(b1-b2)+abs(e1-e2)
+        bdif += b1-b2
+        mid_dif_now = abs((b1+e1)/2-(b2+e2)/2)
+        mid_dif += mid_dif_now
+        if mid_dif_now>max_mid_dif:
+            max_mid_dif = mid_dif_now
+        if mid_dif_now>0.1:
+            cnt_misplaced += 1
+    
+    if i==0:
+        return 0, 100, 100, 'xx'
+    absdif /= 2*i
+    bdif /= i
+    mid_dif /= i
+
+    print(f"{info.filename_base:30}: {dif=}, "
+          f"{absdif=:.3}, "
+          f"{bdif=:.3}, "
+          f"{mid_dif=:.3}, "
+          f"{max_mid_dif=:.3}, "
+          f"{cnt_misplaced=}")
+
+
+def compare_tiers_detailed(manual, auto, info):
+    """
+    Compare tier times for intervals matched by DTW on phonestring.
+    """
+    p_auto, p_manual, dif = prune_tiers_to_comparable_intervals(auto, manual)
+    return compare_tier_times_detailed(p_auto, p_manual, dif, info)
+
+
+
+def make_auto_textgrid_file_from_wav_file(wav_file, model, out_textgrid_file, desampify_dict=desampify_dict):
+    """
+    Read wav file and textgrid with words tier, make automatic phone tier.
+    """
+    print(f"{wav_file} -> {out_textgrid_file}")
+    auto_phone_tier = align_wav_file_using_model(wav_file, model)
+    
+    suffix = ".wav"
+    assert wav_file.endswith(suffix)
+    filename_base = wav_file[:-len(suffix)]
+    phone_tier = read_phone_tier_from_textgrid_file(filename_base+".TextGrid")
+    phone_tier = desampify_phone_tier(phone_tier, desampify_dict)
+    word_tier = read_word_tier_from_textgrid_file(filename_base+".TextGrid")
+    compare_tiers_detailed(phone_tier, auto_phone_tier, model.par)
+    
+    tg_txt = textgrid_file_text(dict(words=word_tier, phones=phone_tier, auto_p=auto_phone_tier))
+    #print(tg_txt)
+    #evaluate_model_on_wav_file(wav, 
+    with open(out_textgrid_file, 'w') as f:
+        f.write(tg_txt)
+
+
+
+
+
+
+
 
 
 

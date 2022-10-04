@@ -109,19 +109,6 @@ class HMM:
             if phone==sil:
                 self.A[i][i] = p
 
-    def compute_mfcc_delete(self, use_DA=False):
-        """
-        Load wav file to temporary storage. Compute MFCC and attach it to this object.
-        """
-        waveform, fs = torchaudio.load(self.wav)
-        mfcc = torchaudio.compliance.kaldi.mfcc(waveform, sample_frequency=fs) # default 16kHz is correct for this file
-
-        if not use_DA:
-            self.mfcc = mfcc
-        else:
-            mfcc_d = torchaudio.functional.compute_deltas(mfcc)
-            mfcc_a = torchaudio.functional.compute_deltas(mfcc_d)
-            self.mfcc = torch.cat([mfcc, mfcc_d, mfcc_a], dim=1)
 
     def compute_mfcc(self, derivatives):
         """
@@ -137,7 +124,11 @@ class HMM:
         whether the input is a window to MFCCs or MFCC with derivatives.
         """
         waveform, fs = torchaudio.load(self.wav)
-        mfcc = torchaudio.compliance.kaldi.mfcc(waveform, sample_frequency=fs) # default 16kHz is correct for CV files
+        if fs!=16000:
+            transform = torchaudio.transforms.Resample(orig_freq=fs)
+            waveform = transform(waveform)
+        #mfcc = torchaudio.compliance.kaldi.mfcc(waveform, sample_frequency=fs)
+        mfcc = torchaudio.compliance.kaldi.mfcc(waveform) # default fs is 16kHz
         mfcc_list = [mfcc]
         for d in range(derivatives):
             mfcc = torchaudio.functional.compute_deltas(mfcc)
@@ -177,6 +168,9 @@ class HMM:
             sg = factor_out_common_ends(sg)
             sg = sausages_replacement_rules(explicit_spaces, sg)
             sg = sausages_replacement_rules(final_cleanup_for_b, sg)
+
+            sg = sausages_remove_nonphones(sg)
+
             self.add_sausages(sg)
             self.orto = sen
             self.pretty_pron = prettyprint_sausage([{"PRON: "}] + sg)

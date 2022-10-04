@@ -114,6 +114,21 @@ def read_phone_tier_from_textgrid_file(filename):
         return tiers["segmenty"]
     return None
 
+def read_word_tier_from_textgrid_file(filename):
+    """
+    Read TextGrid file and return a word tier, which may have
+    name "Word" or "word".
+    """
+    tiers = read_interval_tiers_from_textgrid_file(filename)
+    assert "word" in tiers or "Word" in tiers or "slova" in tiers
+    if "word" in tiers:
+        return tiers["word"]
+    if "Word" in tiers:
+        return tiers["Word"]
+    if "slova" in tiers:
+        return tiers["slova"]
+    return None
+
 
 desampify_list =[ # First, regular equivalence with our internal phone set
  ('e', 'e'),  ('a', 'a'),  ('o', 'o'),  ('t', 't'),  ('s', 's'),  ('l', 'l'),  ('n', 'n'),

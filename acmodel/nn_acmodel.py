@@ -24,8 +24,16 @@ from hmm_acmodel import round_to_two_decimal_digits
 
 from matrix import *
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+from praat_ifc import read_word_tier_from_textgrid_file
+
+# COMMENTED OUT BELOW FOR TEXTGRID TESTS
+#device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cpu"
+
 #print(f"Using {device} device")
+
+
+b_set = [*"?AEGHNOZabcdefghjklmnoprstuvyz|áéóúýčďňŘřšťŽž"] # phones used by our AC models (not a set in fact)
 
 
 def get_training_hmms(nn_train_tsv_file, derivatives=2):
@@ -504,6 +512,97 @@ def align_hmm(hmm, model, x_set, b_log_corr, group_tripled=True):
     if group_tripled:
         hmm.intervals = group_tripled_intervals(hmm.intervals)
     return alp # just for debuging, the real result is in hmm.intervals
+
+
+
+
+
+class Dotaccess():
+    """
+    Primitive class allowing .x access instead of ["x"]
+    Should be created from a dictionary.
+    """
+    def __init__(self, d):
+        self.__dict__ = d
+
+
+
+inference_device = "cpu"
+
+
+def load_nn_acoustic_model(filename_base, mid_size=100, varstates=True, morestates=True, adapt=True):
+    """
+    Prepare everything needed for decoding with a given NN AM.
+    Using most common defaults from latest good trainings. (These
+    should rather be stored with the NN model.)
+    'morestates' means triple or variable states
+    """
+    sideview = 9
+    if adapt:
+        s_vector_size = 4
+    else:
+        s_vector_size = 0
+    mfcc_size = 13
+    in_size = (sideview+1+sideview + s_vector_size)*mfcc_size
+    out_size = len(b_set)
+    b_log_corr = b_log_corrections(filename_base+".tsv")
+    loc = locals() # Snapshot arguments and additional interesting parameters
+    
+    model = NeuralNetwork(in_size, out_size, mid_size).to(inference_device)
+    model.par = Dotaccess(loc) # Later we can get e.g.: model.par.mid_size
+    
+    model.load_state_dict(torch.load(filename_base+".pth"))
+    model.eval()
+    return model
+
+
+
+show_hmm = None # temporary debug tool, to be removed later
+
+def align_wav_file_using_model(wav_file, model):
+    """
+    Read wav file and corresponding textgrid, get text from word tier,
+    compute our own phone alignment using given NN model, evaluate.
+    """
+    suffix = ".wav"
+    assert wav_file.endswith(suffix)
+    filename_base = wav_file[:-len(suffix)]
+    word_tier = read_word_tier_from_textgrid_file(filename_base+".TextGrid")
+    txt = " ".join(word for _, _, word in word_tier)
+    hmm = HMM(txt, wav_file, derivatives=0)
+    if model.par.varstates:
+        multiply_hmm_states(hmm)
+    elif model.par.morestates:
+        triple_hmm_states(hmm)
+    if model.par.adapt:
+        hmm.speaker_vector = mfcc_make_speaker_vector(hmm.mfcc)
+    else:
+        hmm.speaker_vector = None
+    hmm.mfcc = mfcc_win_view(mfcc_add_sideview(hmm.mfcc, sideview=model.par.sideview), sideview=model.par.sideview)
+
+    alp = align_hmm(hmm, model, b_set, b_log_corr=model.par.b_log_corr*1.0, group_tripled=model.par.morestates and not model.par.varstates)
+    if model.par.varstates:
+        hmm.intervals = group_multiplied_intervals(hmm.intervals)
+
+    global show_hmm; show_hmm = hmm
+
+    return hmm.intervals
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
