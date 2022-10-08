@@ -32,8 +32,23 @@ device = "cpu"
 
 #print(f"Using {device} device")
 
+b1_string  = "?AEGHNOZabcdefghjklmnoprstuvyz|áéóúýčďňŘřšťŽž" # phones used by our AC models
+b2_string = "ȜĀĒĜĤŅŌŹāƃȼƌēƒĝħĵĸłƜńōƤŕşŦūɅȳź|ǎĕŏŭƿĉȢǹŔȑŝţȤȥ" # names for state 2
+b3_string = "ȝĂĖĠĦŃǑŻȃƀċđėſġĥȷķļȸņȯƥŗșŧȗɄƴż|ąęőũŷćƍŉŖȓśțǮǯ" # names for state 3 (note that '|' is repeated in all 3)
+b123_string = b1_string+(b2_string+b3_string).replace('|','')
 
-b_set = [*"?AEGHNOZabcdefghjklmnoprstuvyz|áéóúýčďňŘřšťŽž"] # phones used by our AC models (not a set in fact)
+b1_set = [*b1_string] # (not a set in fact)
+b2_set = [*b2_string]
+b3_set = [*b3_string]
+b123_set = [*b123_string] # replacement for b_set in untied tristate models (phone composed of 3 different states, only '|' has 3 tied states)
+
+phone_states = {} # maps phone to string of states (for untied tristate models)
+for p, p2, p3 in zip(b1_set, b2_set, b3_set):
+    phone_states[p] = p+p2+p3
+
+b_set = b1_set # Default 45 phone set, can be changed to 133 state b123_set
+
+
 
 
 def get_training_hmms(nn_train_tsv_file, derivatives=2):
@@ -47,14 +62,14 @@ def get_training_hmms(nn_train_tsv_file, derivatives=2):
 
 
 def collect_training_material(hmms):
-    b_set = sorted({*"".join([hmm.b for hmm in hmms ])}) # make sorted set of all phone names in the training set
-    out_size = len(b_set)
-    in_size = hmms[0].mfcc.size(1)
+    #b_set = sorted({*"".join([hmm.b for hmm in hmms ])}) # make sorted set of all phone names in the training set
+    #out_size = len(b_set)
+    #in_size = hmms[0].mfcc.size(1)
     all_targets = "".join([hmm.targets for hmm in hmms])
     train_len = len(all_targets)
     all_mfcc = torch.cat([hmm.mfcc for hmm in hmms]).double().to(device)
     assert all_mfcc.size()[0]==train_len
-    return all_mfcc, all_targets, b_set
+    return all_mfcc, all_targets #, b_set # FIXED: Do not return b_set, we do not compute it here anymore
 
 
 def mfcc_make_speaker_vector(mfcc):
@@ -285,7 +300,6 @@ def compute_hmm_nn_log_b(hmm, nn_model, full_b_set, b_log_corr=None):
     for every sound frame and every model state, using NN phone model.
     """
     #logits = nn_model(hmm.mfcc.double().to(device)).detach()
-
     if hmm.speaker_vector==None:
         nn_input = hmm.mfcc
     else:
@@ -306,16 +320,18 @@ def compute_hmm_nn_log_b(hmm, nn_model, full_b_set, b_log_corr=None):
 
 
 
-def b_log_corrections(tsv_file):
+def b_log_corrections(tsv_file, b_set=b1_set):
     """
     Compute log(b()) additive correction needed to suppress very frequent
     phones and boost rare ones.
     """
     df = pd.read_csv(tsv_file, sep="\t", keep_default_na=False)
     c=Counter("".join([s for s in df.targets.values]))
-    return -torch.tensor([count for phone, count in sorted(i for i in c.items())]).log()
 
+    #xxx = sorted(i for i in c.items()) # get order of b_set
+    #return -torch.tensor([count for phone, count in xxx]).log()
 
+    return -torch.tensor([c[phone] for phone in b_set]).log()
 
 
 
@@ -389,17 +405,21 @@ def backward_log_alignment_pass_intervals(hmm, alp):
 
 
 
-def triple_sausage_states(sg):
+def triple_sausage_states(sg, untied=False):
     """
     Triple each phone state in a sausage. This is intended as a primitive duration model
     forcing a minimum duration of phones. Should be complemented by a corresponding
     coalescence of alignment intervals after Viterbi decoding.
+    For untied=True, the 3 states get individual b()s, except '|' which is still tied.
     """
     result = []
     for s in sg:
         out_s = set()
         for txt in s:
-            txt = "".join(p*3 for p in txt)
+            if not untied:
+                txt = "".join(p*3 for p in txt)
+            else:
+                txt = "".join(phone_states[p] for p in txt)
             out_s.add(txt)
         result.append(out_s)
     return result
@@ -430,14 +450,15 @@ def multiply_sausage_states(sg, phone_num_states=phone_num_states):
    
 #triple_sausage_states([{"abc", 'd'}, {'ee'}])
 
-def triple_hmm_states(hmm):
+def triple_hmm_states(hmm, untied=False):
     """
     Triple each phone state in a HMM. This is intended as a primitive duration model
     forcing a minimum duration of phones. Should be complemented by a corresponding
     coalescence of alignment intervals after Viterbi decoding.
     Expects previously added sausages in HMM. Recomputes A and b.
+    For untied=True, non-silent phones get 3 different untied states.
     """
-    hmm.add_sausages(triple_sausage_states(hmm.sausages))
+    hmm.add_sausages(triple_sausage_states(hmm.sausages, untied))
 
 def multiply_hmm_states(hmm, phone_num_states=phone_num_states):
     """
@@ -458,7 +479,7 @@ def group_tripled_intervals(intervals):
     result = []
     while intervals:
         (beg, _, phone), (_, _, p2), (_, end, p3), *intervals = intervals
-        assert phone == p2 == p3
+        #assert phone == p2 == p3    # THIS ASSERT SHOULD BE AVOIDED FOR UNTIED TRISTATE CASE
         result.append((beg, end, phone))
     return result
 
@@ -530,12 +551,15 @@ class Dotaccess():
 inference_device = "cpu"
 
 
-def load_nn_acoustic_model(filename_base, mid_size=100, varstates=True, morestates=True, adapt=True):
+def load_nn_acoustic_model(filename_base, mid_size=100, varstates=True, morestates=True, adapt=True, corr_weight=1.0, special_corr=None, b_set=b1_set):
     """
     Prepare everything needed for decoding with a given NN AM.
     Using most common defaults from latest good trainings. (These
     should rather be stored with the NN model.)
     'morestates' means triple or variable states
+    'corr_weight' is weight of correction based on phone frame statistic
+    'special_corr' is a dict with some alternative correction
+    Specify b_set=b123_set for untied tristate models.
     """
     sideview = 9
     if adapt:
@@ -545,7 +569,10 @@ def load_nn_acoustic_model(filename_base, mid_size=100, varstates=True, morestat
     mfcc_size = 13
     in_size = (sideview+1+sideview + s_vector_size)*mfcc_size
     out_size = len(b_set)
-    b_log_corr = b_log_corrections(filename_base+".tsv")
+    if special_corr is None:
+        b_log_corr = b_log_corrections(filename_base+".tsv")
+    else:
+        b_log_corr = special_corr
     loc = locals() # Snapshot arguments and additional interesting parameters
     
     model = NeuralNetwork(in_size, out_size, mid_size).to(inference_device)
@@ -580,7 +607,7 @@ def align_wav_file_using_model(wav_file, model):
         hmm.speaker_vector = None
     hmm.mfcc = mfcc_win_view(mfcc_add_sideview(hmm.mfcc, sideview=model.par.sideview), sideview=model.par.sideview)
 
-    alp = align_hmm(hmm, model, b_set, b_log_corr=model.par.b_log_corr*1.0, group_tripled=model.par.morestates and not model.par.varstates)
+    alp = align_hmm(hmm, model, b_set, b_log_corr=model.par.b_log_corr*model.par.corr_weight, group_tripled=model.par.morestates and not model.par.varstates)
     if model.par.varstates:
         hmm.intervals = group_multiplied_intervals(hmm.intervals)
 

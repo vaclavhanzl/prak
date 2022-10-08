@@ -31,7 +31,7 @@ def compute_hmm_b(hmm, means_dict):
     For a sentence hmm model with an attached mfcc, compute b() values
     for every sound frame and every model state.
     """
-    b_set = sorted({*hmm.b}) # which phone's b()s will we need
+    b_set = sorted({*hmm.b}) # which phone's b()s will we need - LOCAL SUBSET of b_set!
     #print(b_set)
     
     b_set_means = torch.cat([b_means[ph][None] for ph in b_set]) # matrix of all needed means

@@ -130,7 +130,7 @@ def read_word_tier_from_textgrid_file(filename):
     return None
 
 
-desampify_list =[ # First, regular equivalence with our internal phone set
+desampify_regular =[ # First, regular equivalence with our internal phone set
  ('e', 'e'),  ('a', 'a'),  ('o', 'o'),  ('t', 't'),  ('s', 's'),  ('l', 'l'),  ('n', 'n'),
  ('', '|'),  ('i', 'y'),  ('m', 'm'),  ('v', 'v'),  ('i:', 'ý'),  ('r', 'r'),  ('k', 'k'),
  ('p', 'p'),  ('d', 'd'),  ('j', 'j'),  ('u', 'u'), ('a:', 'á'),  ('?', '?'),  ('J', 'ň'),
@@ -138,8 +138,9 @@ desampify_list =[ # First, regular equivalence with our internal phone set
  ('c', 'ť'),  ('t_S', 'č'),  ('Z', 'ž'),  ('o_u', 'O'),  ('f', 'f'),  ('P\\', 'ř'),  ('u:', 'ú'),
  ('J\\', 'ď'),  ('Q\\', 'Ř'),  ('g', 'g'), ('N', 'N'),  ('o:', 'ó'),  ('a_u', 'A'),  ('G', 'G'),
  ('d_z', 'Z'), ('d_Z', 'Ž'),  
- ('e_u', 'E'), # e_u has strangely low frequency\
+ ('e_u', 'E')] # e_u has strangely low frequency\
 
+desampify_list = desampify_regular+[
  # guess-fixing errors, where it likely should have been one of our regular phones:
  (' ?', '?'),  ('ʔ', '?'),   ('e ', 'e'),  ('a ', 'a'),  ('S ', 'š'),   (' p', 'p'),  ('š', 'š'),
  ('č', 'č'),  ('é', 'é'),  ('ə', '@'), ('h\\ ', 'h'),  (' x', 'H'),  (' t', 't'),  ('r ', 'r'),
@@ -163,6 +164,11 @@ desampify_list =[ # First, regular equivalence with our internal phone set
 
 # Full list of our phones (all are used above):
 # '? A E G H N O Z a b c d e f g h j k l m n o p r s t u v y z | á é ó ú ý č ď ň Ř ř š ť Ž ž'
+
+sampify_dict = {}
+for sampa_phone, phone in desampify_regular:
+    sampify_dict[phone] = sampa_phone
+
 
 desampify_dict = {}
 for sampa_phone, phone in desampify_list:
