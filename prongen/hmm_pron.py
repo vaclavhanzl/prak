@@ -163,13 +163,24 @@ class HMM:
         if sentence!=None:
             sen = sentence.strip()
             sg = process(sen, all_begins=args.all_begins, all_ends=args.all_ends)
+            self.words = sg.words # smuggled here via MarkableList trick
+            self.words_glued = sg.words_glued
+
+
+
             sg = [{"|"}] + sg + [{"|"}]
             sg = factor_out_common_begins(sg)
             sg = factor_out_common_ends(sg)
+
+            self.sg_snap = sg # snapshot for constructing word tier
+
+
             sg = sausages_replacement_rules(explicit_spaces, sg)
             sg = sausages_replacement_rules(final_cleanup_for_b, sg)
 
             sg = sausages_remove_nonphones(sg)
+
+            self.sg_snap2 = sg # another snapshot for constructing word tier
 
             self.add_sausages(sg)
             self.orto = sen

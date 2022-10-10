@@ -558,7 +558,8 @@ def glue_prepos(text):
         out += word
         if word in prepos:
             #out += "_"
-            out += "="     # bez uzardění - needs to know there is a seam
+            #out += "="     # bez uzardění - needs to know there is a seam
+            out += "~"      # need char different from marker used in composed words
         else:
             out += " "
     return out.strip()
@@ -638,7 +639,7 @@ def glottal_stop_insert(phone, context):
         context &= ~maystop
         return [("_", context), (" ?", context)]
 
-    if phone=="=" and context&maystop: # seam
+    if phone in "=~" and context&maystop: # seam ('~' variant is from glue_prepos())
         context &= ~maystop
         return [(phone, context), (phone+"?", context)]
 
@@ -670,8 +671,8 @@ def voicing_assim(phone, context):
     #                  act like voicing to the left word
     #                  act like DEVOICING to the left (!! really: "mroš_mrznul")
 
-    if phone == '=': # composed word seam, just pass on the context
-        return [('=', context)]
+    if phone in '=~': # composed word seam, just pass on the context
+        return [(phone, context)]
 
     if phone == "*": # special 'phone', disappears but leaves both voicing possiblities
         return [('', context_d), ('', context_v)]
@@ -1259,7 +1260,7 @@ def text_to_multipron_sausage(txt):
     Return sausage with word-level alternatives.
     """
     result = []
-    for sep, word in zsplit(txt, " _|=&*"): #NOTE: the only '='s now are from glue_prepos
+    for sep, word in zsplit(txt, " _|=~&*"): #NOTE: the only '='s now are from glue_prepos
         if sep!="":
             result.append({sep})
         if word!="":
@@ -1308,6 +1309,21 @@ def sausages_remove_nonphones(sausages, phones="?AEGHNOZabcdefghjklmnoprstuvyz|�
     return result
 
 
+
+class MarkableString(str):
+    """
+    Like normal string but can smuggle additional information
+    in atributes (added ad libitum).
+    """
+    pass
+
+class MarkableList(list):
+    """
+    Like normal list but can smuggle additional information
+    in atributes (added ad libitum).
+    """
+    pass
+
 def process(txt, all_begins=True, all_ends=True):
     """
     Convert text to pronunciation, using these tables/procedures:
@@ -1317,10 +1333,29 @@ def process(txt, all_begins=True, all_ends=True):
     all assim
     to final alphabet
     """
+
+    words = transform(interpunctab, txt) # clean interpunction (skipped spelltab)
+
+    words_glued = transform(downcasetab, words)
+    words_glued = glue_prepos(words_glued)
+
+    words = words.split()
+    words_glued = words_glued.split()
+
+
+
+
     txt = transform(spelltab, txt) # B. -> bé  etc.
     txt = transform(interpunctab, txt) # clean interpunction
     txt = transform(downcasetab, txt)
+
+
+
     txt = glue_prepos(txt)  # multipron will split also on '=' and add more '='
+
+
+
+
     if all_begins:
         txt = "&"+txt # the "&" forces both versions in maybe-glottal-stop situations at start
     else:
@@ -1333,6 +1368,12 @@ def process(txt, all_begins=True, all_ends=True):
     ssgs = sausages_transform(phonetizetab, ssgs) # convert to internal phonetic alphabet
     ssgs = sausages_transform(rr_forward_assim, ssgs) # do that little bit of forward assimilations
     ssgs = sausages_replacement_rules(phone_merging, ssgs) # do it here while we have unbroken words
+
+
+    #if mark_words:
+    #    ...
+
+
     ssgs = ssgs_process_phones(ssgs) # do assimilations working backward (and related processing)
 
     # Phonetic processing is done by now, below we just optimize/prettify the graph
@@ -1348,7 +1389,13 @@ def process(txt, all_begins=True, all_ends=True):
     if len(ssgs)>0 and ssgs[0]=={'|'}: # it is that imaginary pause we faked in above
         ssgs = ssgs[1:]                # remove it to make things tidy
 
-    ssgs = join_simple_sausages(ssgs)    
+    ssgs = join_simple_sausages(ssgs)
+
+
+    ssgs = MarkableList(ssgs) # add ability to smugle along words
+    ssgs.words = words
+    ssgs.words_glued = words_glued
+
     return ssgs
 
 
