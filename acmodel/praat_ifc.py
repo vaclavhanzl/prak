@@ -190,7 +190,11 @@ def desampify_phone_tier(tier, desampify_dict=desampify_dict):
 
 
 
-
+def sampify_tier(tier):
+    """
+    Convert phone tier from our internal phone alphabet to SAMPA
+    """
+    return desampify_phone_tier(tier, desampify_dict=sampify_dict)
 
 
 

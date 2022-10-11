@@ -45,6 +45,8 @@ b123_set = [*b123_string] # replacement for b_set in untied tristate models (pho
 phone_states = {} # maps phone to string of states (for untied tristate models)
 for p, p2, p3 in zip(b1_set, b2_set, b3_set):
     phone_states[p] = p+p2+p3
+phone_states['_'] = '___' # hand-fix beeded for untied tristate phones and word separators introduced for word tier
+
 
 b_set = b1_set # Default 45 phone set, can be changed to 133 state b123_set
 
@@ -570,7 +572,7 @@ def load_nn_acoustic_model(filename_base, mid_size=100, varstates=True, morestat
     in_size = (sideview+1+sideview + s_vector_size)*mfcc_size
     out_size = len(b_set)
     if special_corr is None:
-        b_log_corr = b_log_corrections(filename_base+".tsv")
+        b_log_corr = b_log_corrections(filename_base+".tsv", b_set=b_set)
     else:
         b_log_corr = special_corr
     loc = locals() # Snapshot arguments and additional interesting parameters
@@ -616,7 +618,111 @@ def align_wav_file_using_model(wav_file, model):
     return hmm.intervals
 
 
+def generator_is_empty(gen):
+    """
+    Return True if nothing is left in the generator.
+    Intended for use in assert. Test is destructive,
+    cannot be used when any remaining value is needed.
+    """
+    try:
+        next(gen)
+        return False
+    except StopIteration:
+        return True
 
+def compute_word_tier(hmm):
+    """
+    For aligned HMM with phone tier, compute also the word tier.
+    """
+    # This procedure is awfuly tricky. We simplified things elsewhere by
+    # not using non-emitting states and not using any wFST infrastructure.
+    # Overall the balance is still positive but here we pay the debt.
+    # For each state in hmm.b, we know to which word in sequence it belongs.
+    # This is not exactly an easy-to-work-with form of word information
+    # but we clench our teeth and do it here!
+    
+    
+    #last_idx = 0 # FIXME: when state-alignment slight occasional discrepancy if fixed, we may need a change here
+    last_p_i = None
+    last_w_i = None
+    wi_begin = None
+    wi_word = None
+    
+    phone_intervals = (p_i for p_i in hmm.intervals)
+    word_intervals = []
+    
+    # NOTE: Times should be approx. i/100 but we rather derive them from times already computed for phones.
+    #       This way e.g. cepstrum-based focusing will propagate to word times as well.
+    for i, idx in enumerate(hmm.indices):
+        idx = int(idx) # mainly to avoid torch warning about floordiv
+        phone = hmm.b[idx]
+        w_i = hmm.word_indices[idx]//3  # FIXME: ONLY WORKS FOR TRIPLED STATES
+        
+        if phone=='|':
+            word = ""
+            w_i = -1 # '|' has w_i of the following word but we want it to be treated as a separate word instead
+        else:
+            word = hmm.words[w_i]
+            
+        p_i = idx//3  # FIXME: ONLY WORKS FOR TRIPLED STATES
+            
+        if p_i!=last_p_i: # HMM state change
+            pi_begin, pi_end, pi_phone = next(phone_intervals) # consume phone intervals in sync with state changes
+            #print((pi_begin, pi_end, pi_phone))
+            last_p_i = p_i    
+        
+            if w_i!=last_w_i or pi_phone=='|': # just coming phone interval already belongs to a new word or silence interval
+                if wi_begin!=None: # we have preceding word interval to finish
+                    wi_end = pi_begin
+                    word_intervals.append((wi_begin, wi_end, wi_word)) # complete another word tier interval
+                    #print(("--------------", wi_begin, wi_end, wi_word))
+        
+                wi_begin = pi_begin
+                last_w_i = w_i
+
+        #print(i, idx, p_i, w_i, phone, word)
+        wi_word = word # remember last word in case we need to emit it the next time
+
+    
+    word_intervals.append((wi_begin, pi_end, wi_word)) # complete last silence in the word tier interval
+    #print(("--------------", wi_begin, pi_end, wi_word))
+    assert generator_is_empty(phone_intervals)
+    hmm.word_intervals = word_intervals
+
+#compute_word_tier(show_hmm)
+
+def align_wav_and_text_using_model(wav_file, txt, model):
+    """
+    Read wav file and align it with text.
+    """
+    suffix = ".wav"
+    assert wav_file.endswith(suffix)
+    filename_base = wav_file[:-len(suffix)]
+    #word_tier = read_word_tier_from_textgrid_file(filename_base+".TextGrid")
+    #txt = " ".join(word for _, _, word in word_tier)
+    hmm = HMM(txt, wav_file, derivatives=0)
+    global show_hmm; show_hmm = hmm
+
+    if model.par.out_size>45:  # FIXME, HACK
+        triple_hmm_states(hmm, untied=True)
+        hmm.b_set = b123_set # FINISHME
+    elif model.par.varstates:
+        multiply_hmm_states(hmm)
+    elif model.par.morestates:
+        triple_hmm_states(hmm)
+    if model.par.adapt:
+        hmm.speaker_vector = mfcc_make_speaker_vector(hmm.mfcc)
+    else:
+        hmm.speaker_vector = None
+    hmm.mfcc = mfcc_win_view(mfcc_add_sideview(hmm.mfcc, sideview=model.par.sideview), sideview=model.par.sideview)
+
+    alp = align_hmm(hmm, model, hmm.b_set, b_log_corr=model.par.b_log_corr*model.par.corr_weight, group_tripled=model.par.morestates and not model.par.varstates)
+    if model.par.varstates:
+        hmm.intervals = group_multiplied_intervals(hmm.intervals)
+
+    compute_word_tier(hmm)
+        
+    return hmm.intervals, hmm.word_intervals
 
 
 

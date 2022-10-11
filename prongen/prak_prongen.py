@@ -544,7 +544,7 @@ def all_substrings(txt):
             retval.add(txt[pos:pos+subs_len])
     return retval
 
-
+# FINISHME  do ?   Anebo ani od ?
 prepos = set("od bez nad pod před ob z v s u k".split())
 
 def glue_prepos(text):

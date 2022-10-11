@@ -23,9 +23,22 @@ from acmodel import matrix
 
 
 # line_iterable_to_lexirules() cannot make this because of space being replaced
-explicit_spaces = {" ": ["", "|"], "_": [""], "=": [""]}
+#explicit_spaces = {" ": ["", "|"], "_": [""], "=": [""]}
+#final_cleanup_for_b = {'=': [''], '_': ['']} # remove _ =
 
-final_cleanup_for_b = {'=': [''], '_': ['']} # remove _ =
+# FINISHME
+
+explicit_spaces = {" ": ["_", "|"], "~": ["_"], "=": ["_"]}
+#final_cleanup_for_b = {'=': [''], '_': ['']} # remove _ =
+
+
+
+def anonate_sg_with_words(sg, words):  # FINISHME
+    """
+    Add words to branches with '_' and '|'     remove '_'
+    """
+    ...
+
 
 class HMM:
     """
@@ -50,7 +63,7 @@ class HMM:
         return s
 
 
-    def add_sausages(self, sg):
+    def add_sausages(self, sg):     # FINISHME process '_|' use smugled word anotations
         """
         Create transition matrix A and string of phone labels b.
         Elements of b correspond to columns of A.
@@ -71,7 +84,12 @@ class HMM:
         for s in sg:
             for txt in sorted(s):
                 for p in txt:
-                    b += p
+                    if p!='_': # do not insert non-emiting zero-length word separator
+                        b += p
+
+        word_indices = [] # maps states in b to words they belong to
+        w_i = -1 # index of word to which current phone belongs (moves forth and back on branches)
+        # (we expect '|' as the very first phone and the word after it should have w_i==0)
 
         A = [[0 for c in b] for r in b] # both rows and columns are as many as phones in b
 
@@ -80,20 +98,40 @@ class HMM:
         ends = [0] # [] would mostly do but fake this in case sg starts by multivariant
         for s in sg:
             new_ends = [] # collect all variant ends here for later connection
+            w_i_snap = w_i # start all branches from this same words index snapshot
+            w_i_for_assert = None
             for txt in sorted(s):
+                w_i = w_i_snap # count words in this branch starting from branching point snapshot
                 first_in_txt = True
                 for e in ends:
                     A[e][row] = 0.1 # connect to all prev. ends
                 for p in txt:
+                    if p in "|_":
+                        w_i += 1 # move to the next word (w_i marks word AND '|' before the word)
+                    if p=='_':
+                        continue # zero-size word separator moves to the next word but marks no phone
+                    assert w_i>=0 # make sure that the very initial '|' was present
+                    word_indices.append(w_i) # mark current phone as belonging to word with index w_i
+
                     A[row][row] = 1 # self loop
                     if not first_in_txt:
                         A[row-1][row] = 0.1 # connect phones in txt
                     first_in_txt = False
                     row += 1
                 new_ends.append(row-1)
+
+            # now the last w_i will become the starting w_i for all branches of the next section
+            # (in all branches of the just ending section, w_i should have been the same)
+            if w_i_for_assert is None:
+                w_i_for_assert = w_i # first branch
+            else:
+                assert w_i_for_assert==w_i
+
+
             ends = new_ends # in the next variant list, each begin will be connected to these
         self.A = A
         self.b = b
+        self.word_indices = word_indices # marks each state with index of word it belongs to
         return self # for any chaining with other ops (like add cepstrum etc.)
 
     def change_sil_loops(self, sil="|", p=0):
@@ -172,15 +210,26 @@ class HMM:
             sg = factor_out_common_begins(sg)
             sg = factor_out_common_ends(sg)
 
-            self.sg_snap = sg # snapshot for constructing word tier
+            self.sg_snap = sg # snapshot for constructing word tier CLEANUP HERE
 
 
             sg = sausages_replacement_rules(explicit_spaces, sg)
-            sg = sausages_replacement_rules(final_cleanup_for_b, sg)
+            #sg = sausages_replacement_rules(final_cleanup_for_b, sg)
 
-            sg = sausages_remove_nonphones(sg)
+            #sg = sausages_remove_nonphones(sg)
+            # KEEP also '_'
+            # sg = sausages_remove_nonphones(sg, keep_also="_")
 
-            self.sg_snap2 = sg # another snapshot for constructing word tier
+
+
+            self.sg_snap2 = sg # another snapshot for constructing word tier CLEANUP HERE
+
+
+            # FINISHME: Annotate sg with words here (and if necessary, expand sg a bit more)
+
+
+            #print(f"{sg=}")
+            
 
             self.add_sausages(sg)
             self.orto = sen
