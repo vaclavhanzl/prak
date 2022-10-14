@@ -5,38 +5,45 @@ of phones and their position in time.
 Design goals:
 * Fully opensource, avoiding dependencies which would restrict academic and/or comercial use in 
 any way. Original code was written for this project from scratch to avoid any legal limits and
-allow others co continue this work.
+allow others to continue this work.
 * Usable on Linux, Mac and Windows.
 * More precise than similar tools, specifically targeting needs of the Czech phoneticians.
 
 ## Instalation
-Prerequisities:
-* [python3](https://www.python.org/)
+First, get **prak** source code:
+```
+git clone https://github.com/vaclavhanzl/prak.git
+```
+(You can also just download a zip file - click on the green "Code" button.)
 
-For in-depth experiments and development, you may also want:
-* [praat](https://www.fon.hum.uva.nl/praat/)
-* [kaldi](https://kaldi-asr.org/)
-* [CommonVoice](https://commonvoice.mozilla.org/en/datasets) Czech data
+Then install prerequisities:
+* [python3](https://www.python.org/)
+* [PyTorch](https://pytorch.org/) with **torchaudio** (CPU version is enough, choose Conda or Pip)
+
+That's it! If you feel scared, look down for detailed instructions.
 
 ## Usage
-To get an idea about pronunciation variants being considered, run this first:
+To get an idea about pronunciation variants being considered, run this first (being in the **prak** folder):
 ```
 prongen/prak_prongen.py
 ```
-The tool will nicely help you. Look at [prongen/README.md](prongen/README.md) for details about
-this pronunciation generator.
+The tool will nicely help you. To see generated Czech pronunciation, try this:
+```
+prongen/prak_prongen.py -p
+```
+and then type Czech sentences in terminal (finish each with Enter, press Ctrl+D to stop).
+(Look at [prongen/README.md](prongen/README.md) for details.) If this works, **python** is installed OK.
 
-You will need a Czech voice recording and a corresponding utf8 Czech plain text transcript. The transcript can
-contain usual interpunction (as a secretary would transcribe it) but should be precise even at disfluencies - 
-if the recording contains a repeated word, so should the transcript.
+For alignment with audio, you will need a Czech voice recording (wav) and a corresponding utf8 Czech plain text
+transcript (in txt or TextGrid).
+The transcript can contain usual interpunction (as a secretary would transcribe it) but should be precise even at
+disfluencies - if the recording contains a repeated word, so should the transcript.
 
-Feed the transcript to pronunciation generator and look whether the generated pronunciation variants likely
-contain what is in the audio. Multiple variants are OK, the acoustic model will hopefully choose the right
+Multiple pronunciation variants are considered, the acoustic model will hopefully choose the right
 one. You may need to learn the tool some additional foreign words or tell it about important seams in composite
 words.
 
-If pronunciation looks mostly OK, let the acoustic model to match it against the audio, select variants and
-delimit phones in time.
+
 
 ## About the name
 Some Czech phonetitians call similar tools "nastřelovač" as these tools position phones and their time stamps
