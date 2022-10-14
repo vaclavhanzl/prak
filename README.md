@@ -64,7 +64,7 @@ For scientific work, **conda** package manager might be better than **pip**. In 
 You likely do not want the huge Anaconda but rather the more free and modular conda forge. To get it working, you still have 
 multiple options from which [**mambaforge**](https://mamba.readthedocs.io/en/latest/installation.html) (faster conda) looks quite good. With this general guidance, it is now easy to google your way.
 
-Big part of pytorch instalation complexity stems from the CUDA GPU drivers instalation.
+Big part of pytorch installation complexity stems from the CUDA GPU drivers installation.
 If you do not plan training big neural networks or do not have a decent GPU, you may very well
 use pytorch just on the CPU. **Prak** only uses CPU for phone alignment and even acoustic model
 can be reasonably trained on just the CPU.
