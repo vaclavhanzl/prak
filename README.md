@@ -60,8 +60,9 @@ can be reasonably trained on just the CPU.
 
 ## Details of Mac instalation
 To get python, you may first install [brew](https://brew.sh/).
+Then you may go on with [**mambaforge**](https://mamba.readthedocs.io/en/latest/installation.html).
 
-If you have have a Mac with the new M1 chip, you may try [Metal](https://developer.apple.com/metal/) via [MPS backend for PyTorch](https://pytorch.org/blog/introducing-accelerated-pytorch-training-on-mac/). See also this [blog post]().
+If you have have a Mac with the new M1 chip, you may try [Metal](https://developer.apple.com/metal/) via [MPS backend for PyTorch](https://pytorch.org/blog/introducing-accelerated-pytorch-training-on-mac/).
 
 ## Details of Windows instalation
 It *should* work but we did not try yet. (Try mambaforge?)
