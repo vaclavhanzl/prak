@@ -17,13 +17,12 @@ First, get **prak** source code:
 ```
 git clone https://github.com/vaclavhanzl/prak.git
 ```
-(You can also just download a zip file - click on the green "Code" button.)
+Or you can instead download a zip file - click on the green "Code" button (up and right on this page).
 
-Then install prerequisities:
-* [python3](https://www.python.org/)
-* [PyTorch](https://pytorch.org/) with **torchaudio** (CPU version is enough, choose Conda or Pip)
+Than you need to install python3, pytorch and torchaudio, e.g. using
+[mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
 
-That's it! If you feel scared, look down for detailed instructions.
+If you feel scared, look down for detailed instructions.
 
 ## Usage
 To get an idea about pronunciation variants being considered, run this first (being in the **prak** folder):
@@ -46,6 +45,13 @@ Multiple pronunciation variants are considered, the acoustic model will hopefull
 one. You may need to teach the tool some additional foreign words or tell it about important seams in composite
 words.
 
+## Common details of installation for all the platforms
+You need to install these prerequisities:
+* [python3](https://www.python.org/)
+* [PyTorch](https://pytorch.org/) with **torchaudio** (CPU version is enough, choose Conda or Pip)
+
+There are many ways to do it and the sites above document them very well. But you may just follow our step-by-step
+guides below.
 ## Details of Linux installation
 If you just need **prak** working and do not otherwise care about pytorch, maybe this could be a good start (on Debian):
 ```
