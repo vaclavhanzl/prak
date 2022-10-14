@@ -12,7 +12,7 @@ allow others to continue this work.
 * Usable on Linux, Mac and Windows.
 * More precise than similar tools, specifically targeting needs of the Czech phoneticians.
 
-## Instalation
+## Installation
 First, get **prak** source code:
 ```
 git clone https://github.com/vaclavhanzl/prak.git
@@ -46,11 +46,13 @@ Multiple pronunciation variants are considered, the acoustic model will hopefull
 one. You may need to teach the tool some additional foreign words or tell it about important seams in composite
 words.
 
-## Details of Linux instalation
-If you just need **prak** working and do not otherwise care about pytorch, maybe this will suffice (on Debian):
+## Details of Linux installation
+If you just need **prak** working and do not otherwise care about pytorch, maybe this could be a good start (on Debian):
 ```
 apt-get install python3-torch
 ```
+but you still need **torchaudio** which likely is not available this way, so you may as well directly try the way described below.
+
 If you want to enjoy python and pytorch a bit more, you most likely want python's own package management and virtual environments.
 For scientific work, **conda** package manager might be better than **pip**. In the conda world, there are still many options.
 You likely do not want the huge Anaconda but rather the more free and modular conda forge. To get it working, you still have 
@@ -61,7 +63,33 @@ If you do not plan training big neural networks or do not have a decent GPU, you
 use pytorch just on the CPU. **Prak** only uses CPU for phone alignment and even acoustic model
 can be reasonably trained on just the CPU.
 
-## Details of Mac instalation
+## Details of Mac installation
+Good start is [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
+Choose and download installation file [here](https://github.com/conda-forge/miniforge#mambaforge), either
+[Mambaforge-MacOSX-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh)
+for older Intel-based Macs or
+[Mambaforge-MacOSX-arm64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-arm64.sh)
+for new Macs with Apple M1 chips. Then make the downloaded file executable and run it in the terminal, for example (for Intel Mac):
+```
+chmod +x Downloads/Mambaforge-MacOSX-x86_64.sh 
+Downloads/Mambaforge-MacOSX-x86_64.sh
+```
+Answer few questions (likely **yes** or just Enter but you must explicitly type **yes** where needed). Then QUIT TERMINAL COMPLETELY and run it again. The prompt will now start with "(base)" and you can install python packages we need:
+```
+mamba install pytorch torchaudio -c pytorch
+```
+Than you can verify that packages are really available. Run python:
+```
+python3
+```
+and at the ">>>" prompt type:
+```
+import torch
+import torchaudio
+```
+If no errors appear, you won! Quit python with Ctrl+D and try **prak**.
+
+#### Alternative ways of Mac installation
 To get python, you may first install [brew](https://brew.sh/):
 ```
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -70,9 +98,11 @@ Then you may go on with [**mambaforge**](https://mamba.readthedocs.io/en/latest/
 ```
 brew install --cask micromamba
 ```
+When you try to use **micromamba**, you will likely get complaints about unidentified developer.
+
 If you have have a Mac with the new M1 chip, you may try [Metal](https://developer.apple.com/metal/) via [MPS backend for PyTorch](https://pytorch.org/blog/introducing-accelerated-pytorch-training-on-mac/).
 
-## Details of Windows instalation
+## Details of Windows installation
 It *should* work but we did not try yet. (Try mambaforge?)
 
 ## Prak updates
