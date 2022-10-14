@@ -53,11 +53,18 @@ For scientific work, **conda** package manager might be better than **pip**. In 
 You likely do not want the huge Anaconda but rather the more free and modular conda forge. To get it working, you still have 
 multiple options from which [**mambaforge**](https://mamba.readthedocs.io/en/latest/installation.html) (faster conda) looks quite good. With this general guidance, it is now easy to google your way.
 
+Great part of pytorch instalation complexity stems from the CUDA GPU drivers instalation.
+If you do not plan training big neural networks or do not have a decent GPU, you may very well
+use pytorch just on the CPU. **Prak** only uses CPU for phone alignment and even acoustic model
+can be reasonably trained on just the CPU.
+
 ## Details of Mac instalation
 To get python, you may first install [brew](https://brew.sh/).
 
+If you have have a Mac with the new M1 chip, you may try [Metal](https://developer.apple.com/metal/) via [MPS backend for PyTorch](https://pytorch.org/blog/introducing-accelerated-pytorch-training-on-mac/). See also this [blog post]().
+
 ## Details of Windows instalation
-It *should* work but we did not try yet.
+It *should* work but we did not try yet. (Try mambaforge?)
 
 ## About the name
 Some Czech phonetitians call similar tools "nastřelovač" as these tools position phones and their time stamps
