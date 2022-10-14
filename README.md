@@ -70,6 +70,12 @@ If you have have a Mac with the new M1 chip, you may try [Metal](https://develop
 ## Details of Windows instalation
 It *should* work but we did not try yet. (Try mambaforge?)
 
+## Prak updates
+If you used **git** to download **prak**, it is easy. Go to the **prak** folder and run:
+```
+git pull
+```
+(If you went with the zip option, download a new zip the same way.)
 ## About the name
 Some Czech phonetitians call similar tools "nastřelovač" as these tools position phones and their time stamps
 in a fast but rather unprecise manner, like positioning objects by shooting them where they should be.
