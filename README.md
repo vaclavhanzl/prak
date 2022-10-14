@@ -1,4 +1,7 @@
 # prak: Czech phonetic alignment tool
+
+# WORK IN PROGRESS, PLEASE WAIT FEW DAYS...
+
 Given a Czech voice recording and corresponding text transcript, this tool can guess a sequence
 of phones and their position in time.
 
