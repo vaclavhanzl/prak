@@ -703,6 +703,7 @@ def align_wav_and_text_using_model(wav_file, txt, model):
     hmm = HMM(txt, wav_file, derivatives=0)
     global show_hmm; show_hmm = hmm
 
+    hmm.b_set = b_set
     if model.par.out_size>45:  # FIXME, HACK
         triple_hmm_states(hmm, untied=True)
         hmm.b_set = b123_set # FINISHME
