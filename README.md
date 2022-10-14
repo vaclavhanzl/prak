@@ -59,7 +59,10 @@ use pytorch just on the CPU. **Prak** only uses CPU for phone alignment and even
 can be reasonably trained on just the CPU.
 
 ## Details of Mac instalation
-To get python, you may first install [brew](https://brew.sh/).
+To get python, you may first install [brew](https://brew.sh/):
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 Then you may go on with [**mambaforge**](https://mamba.readthedocs.io/en/latest/installation.html).
 
 If you have have a Mac with the new M1 chip, you may try [Metal](https://developer.apple.com/metal/) via [MPS backend for PyTorch](https://pytorch.org/blog/introducing-accelerated-pytorch-training-on-mac/).
