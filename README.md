@@ -40,9 +40,23 @@ The transcript can contain usual interpunction (as a secretary would transcribe 
 disfluencies - if the recording contains a repeated word, so should the transcript.
 
 Multiple pronunciation variants are considered, the acoustic model will hopefully choose the right
-one. You may need to learn the tool some additional foreign words or tell it about important seams in composite
+one. You may need to teach the tool some additional foreign words or tell it about important seams in composite
 words.
 
+## Details of Linux instalation
+If you just need **prak** working and do not otherwise care about pytorch, maybe this will suffice (on Debian):
+```
+apt-get install python3-torch
+```
+If you want to enjoy python and pytorch a bit more, you most likely want python's own package management and virtual environments.
+For scientific work, **conda** package manager might be better than **pip**. In the conda world, there are still many options.
+You likely do not want the huge Anaconda but rather the more free and modular conda forge. To get it working, you still have 
+multiple options from which **mamba forge** (faster conda) looks quite good. With this general guidance, it is now easy to google your way.
+
+## Details of Mac instalation
+To get python, you may first install [brew](https://brew.sh/).
+
+## Details of Windows instalation
 
 
 ## About the name
