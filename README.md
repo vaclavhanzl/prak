@@ -1,6 +1,6 @@
 # prak: Czech phonetic alignment tool
 
-# WORK IN PROGRESS, PLEASE WAIT FEW DAYS...
+# WORK IN PROGRESS, PLEASE WAIT A FEW DAYS...
 
 Given a Czech voice recording and corresponding text transcript, this tool can guess a sequence
 of phones and their position in time.
@@ -38,7 +38,7 @@ and then type Czech sentences in terminal (finish each with Enter, press Ctrl+D 
 
 For alignment with audio, you will need a Czech voice recording (wav) and a corresponding utf8 Czech plain text
 transcript (in txt or TextGrid).
-The transcript can contain usual interpunction (as a secretary would transcribe it) but should be precise even at
+The transcript can contain usual punctuation (as a secretary would transcribe it) but should be precise even at
 disfluencies - if the recording contains a repeated word, so should the transcript.
 
 Multiple pronunciation variants are considered, the acoustic model will hopefully choose the right
@@ -71,7 +71,7 @@ can be reasonably trained on just the CPU.
 
 ## Details of Mac installation
 Good start is [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
-Choose and download installation file [here](https://github.com/conda-forge/miniforge#mambaforge), either
+Choose and download the installation file [here](https://github.com/conda-forge/miniforge#mambaforge), either
 [Mambaforge-MacOSX-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh)
 for older Intel-based Macs or
 [Mambaforge-MacOSX-arm64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-arm64.sh)
@@ -80,7 +80,7 @@ for new Macs with Apple M1 chips. Then make the downloaded file executable and r
 chmod +x Downloads/Mambaforge-MacOSX-x86_64.sh 
 Downloads/Mambaforge-MacOSX-x86_64.sh
 ```
-Answer few questions (likely **yes** or just Enter but you must explicitly type **yes** where needed). Then QUIT TERMINAL COMPLETELY and run it again. The prompt will now start with "(base)" and you can install python packages we need:
+Answer a few questions (likely **yes** or just Enter but you must explicitly type **yes** where needed). Then QUIT TERMINAL COMPLETELY and run it again. The prompt will now start with "(base)" and you can install python packages we need:
 ```
 mamba install pytorch torchaudio -c pytorch
 ```
