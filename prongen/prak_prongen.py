@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 intro = """
-prak_prongen.py - generate possible Czech proninciations from text transcript
+prak_prongen.py - generate possible Czech pronunciations from text transcript
 
 Copyright (c) 2022 Vaclav Hanzl. This is a free software (see the MIT license).
 

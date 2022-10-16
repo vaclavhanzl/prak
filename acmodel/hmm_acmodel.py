@@ -1,10 +1,10 @@
 
 # GMM acoustic models - b() functions, Baum-Welch, Viterbi etc.
 
-from matrix import *
+from .matrix import *
 import math  # for pi
 
-from gmm_model_data import global_var, b_means
+from .gmm_model_data import global_var, b_means
 
 
 def compute_b(ref_means, ref_vars, means):

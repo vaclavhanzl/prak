@@ -15,16 +15,31 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from collections import Counter
 
+
+#print(f"{__name__=}")
+#print(f"{__package__=}")
+
+#from ..prongen.hmm_pron import HMM
 from prongen.hmm_pron import HMM
+
+
+
+
 # line above fails in pytest, need some other setup
 #from .prongen.hmm_pron import HMM
 
 
-from hmm_acmodel import round_to_two_decimal_digits
+#from hmm_acmodel import round_to_two_decimal_digits
+#from matrix import *
+#from praat_ifc import read_word_tier_from_textgrid_file
 
-from matrix import *
 
-from praat_ifc import read_word_tier_from_textgrid_file
+from .hmm_acmodel import round_to_two_decimal_digits
+from .matrix import *
+from .praat_ifc import read_word_tier_from_textgrid_file
+
+
+
 
 # COMMENTED OUT BELOW FOR TEXTGRID TESTS
 #device = "cuda" if torch.cuda.is_available() else "cpu"
