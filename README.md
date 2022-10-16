@@ -1,7 +1,13 @@
 # prak: Czech phonetic alignment tool
 
-# WORK IN PROGRESS, PLEASE WAIT A FEW DAYS...
-
+## I just want it, now!
+OK. Get **prak** source code and python3.10 with pytorch and torchaudio. Record wav, make phrase
+tier with text and **prak** will find phone and word times: 
+```
+prak -i pocasi.textgrid -w pocasi.wav -o pocasi.out.textgrid
+```
+Enjoy!
+## Well, not so fast. Explain it all nicely.
 Given a Czech voice recording and corresponding text transcript, this tool can guess a sequence
 of phones and their position in time.
 
@@ -19,7 +25,7 @@ git clone https://github.com/vaclavhanzl/prak.git
 ```
 Or you can instead download a zip file - click on the green "Code" button (up and right on this page).
 
-Than you need to install python3, pytorch and torchaudio, e.g. using
+Than you need to install python3.10, pytorch and torchaudio, e.g. using
 [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
 
 If you feel scared, look down for detailed instructions.
@@ -117,6 +123,10 @@ If you used **git** to download **prak**, it is easy. Go to the **prak** folder 
 git pull
 ```
 (If you went with the zip option, download a new zip the same way.)
+
+## Speed
+1 minute audio was phone-aligned in 18 seconds on a 2014 Mac Air, in 5 seconds on a decent 2020 Intel linux box.
+
 ## About the name
 Some Czech phonetitians call similar tools "nastřelovač" as these tools position phones and their time stamps
 in a fast but rather unprecise manner, like positioning objects by shooting them where they should be.
