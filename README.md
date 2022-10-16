@@ -6,6 +6,7 @@ tier with text and **prak** will find phone and word times:
 ```
 prak -i pocasi.textgrid -w pocasi.wav -o pocasi.out.textgrid
 ```
+![example phone tier](prongen/doc/images/tiers_example.png)
 Enjoy!
 ## Well, not so fast. Explain it all nicely.
 Given a Czech voice recording and corresponding text transcript, this tool can guess a sequence
@@ -45,11 +46,15 @@ and then type Czech sentences in terminal (finish each with Enter, press Ctrl+D 
 For alignment with audio, you will need a Czech voice recording (wav) and a corresponding utf8 Czech plain text
 transcript (in txt or TextGrid).
 The transcript can contain usual punctuation (as a secretary would transcribe it) but should be precise even at
-disfluencies - if the recording contains a repeated word, so should the transcript.
-
+disfluencies - if the recording contains a repeated word, so should the transcript. If you used **praat** to
+make a phrase tier with transcript and saved it to file ```pocasi.textgrid```, you can use **prak** to guess
+pronunciations and time align all phones and words. Run this in terminal:
+```
+prak -i pocasi.textgrid -w pocasi.wav -o pocasi.out.textgrid
+```
 Multiple pronunciation variants are considered, the acoustic model will hopefully choose the right
 one. You may need to teach the tool some additional foreign words or tell it about important seams in composite
-words.
+words. Using a simple binding praat script, you can also do all this directly from the **praat** GUI.
 
 ## Common details of installation for all the platforms
 You need to install these prerequisities:
