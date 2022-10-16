@@ -136,3 +136,14 @@ git pull
 Some Czech phonetitians call similar tools "nastřelovač" as these tools position phones and their time stamps
 in a fast but rather unprecise manner, like positioning objects by shooting them where they should be.
 The Czech word "prak" means "sling", a common shooting toy.
+
+## Work in progress
+We are currently testing and tuning installation for all the platforms so this page is still changing quickly.
+The main branch in git has working pronunciation generator. For the acoustic alignment, you currently have to resort
+to the develop branch:
+```
+git checkout develop
+```
+and manually add the trained neural model, which is not in the repo. Just ask Vaclav Hanzl :) We will certainly
+improve these deployment details soon...
+
