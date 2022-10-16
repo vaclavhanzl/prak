@@ -595,7 +595,7 @@ def load_nn_acoustic_model(filename_base, mid_size=100, varstates=True, morestat
     model = NeuralNetwork(in_size, out_size, mid_size).to(inference_device)
     model.par = Dotaccess(loc) # Later we can get e.g.: model.par.mid_size
     
-    model.load_state_dict(torch.load(filename_base+".pth"))
+    model.load_state_dict(torch.load(filename_base+".pth", map_location=torch.device('cpu')))
     model.eval()
     return model
 
