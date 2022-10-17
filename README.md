@@ -151,3 +151,5 @@ improve these deployment details soon...
 You can discuss hacktrack in public here in [Discussions](https://github.com/vaclavhanzl/prak/discussions).
 If you want to tell me more personally that you love this or hate this, message @vaclav512 on Twitter.
 
+## Thanks
+I'd like to thank all the nice people from [Fonetický ústav FFUK](https://fonetika.ff.cuni.cz/) and equally nice young people from [FňUK](https://www.facebook.com/profile.php?id=100057425272524) who inspired me by their charming approach to science and life.
