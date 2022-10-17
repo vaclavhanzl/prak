@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 intro = """
-prak_prongen.py - generate possible Czech proninciations from text transcript
+prak_prongen.py - generate possible Czech pronunciations from text transcript
 
 Copyright (c) 2022 Vaclav Hanzl. This is a free software (see the MIT license).
 
@@ -169,6 +169,12 @@ balkon balkon balkón
 stadion stadyon stadyón
 
 ### very foreign words
++hyje+ hyjé
++messenger+ mesendžr mesindžr
++game+ gejm
++room+ rům
+### can be English or French
++nation+ nejšn nasion
 washington vošingtn
 t-mobile týmobajl
 siemens símens
@@ -177,6 +183,7 @@ interview intervjů
 ###+usa+ úesá ú=es=á <-- not needed like this
 +usa+ ú=es=á
 windows vindous
+
 
 ### TODO: CIA in capitals should work here:
 +cia+ síajej
@@ -187,6 +194,7 @@ windows vindous
 +dph+ dé=pé=há
 +pc+ pé=cé
 +cm+ centymetr centymetrů
++čsl+ čéesel
 
 """
 
@@ -311,7 +319,7 @@ def read_replacement_table(filename):
     return table
 
 
-
+interpunction_to_delete = '"'+".,?!„“-=–:;—/_"
 
 downcase = ("AÁBCČDĎEĚÉFGHIÍJKLĹĽMNŇOÓÔPQRŔŘSŠTŤUÚŮVWXYÝZŽÄÜÖ",
             "aábcčdďeěéfghiíjklĺľmnňoóôpqrŕřsštťuúůvwxyýzžäüö")
@@ -365,6 +373,39 @@ def read_lexirules_table(filename):
         return line_iterable_to_lexirules(file)
 
 
+spelltab = string_to_table("""
+### Czech spelling. This cannot be done well by the main pronunciation rules
+### as dots are already deleted (and letter downcased) by the time we gwet there.
+### So thete is a special early pass just for spelling using this table.
+### This table is incomplete, e.g. Á or W are missing.
+A. á
+B. bé
+C. cé
+D. dé
+E. é
+F. ef
+G. gé
+H. há
+I. í
+J. jé
+K. ká
+L. el
+M. em
+N. en
+O. ó
+P. pé
+Q. kvé
+R. er
+S. es
+T. té
+U. ú
+V. vé
+X. yks
+Y. ypsilon
+Z. zet
+""")
+
+
 phonetizetab = string_to_table("""
 ### Basic replacements to get approx. phone-per-grapheme
 ch H
@@ -383,7 +424,20 @@ dz Z
 ou O
 au A
 ###eu E
+ü u
+ö o
+è e
+ä a
+ï y
 """)
+
+
+
+
+
+
+
+interpunctab = [(ch,'') for ch in interpunction_to_delete]
 
 downcasetab = list(zip(*downcase))
 
@@ -490,7 +544,7 @@ def all_substrings(txt):
             retval.add(txt[pos:pos+subs_len])
     return retval
 
-
+# FINISHME  do ?   Anebo ani od ?
 prepos = set("od bez nad pod před ob z v s u k".split())
 
 def glue_prepos(text):
@@ -504,7 +558,8 @@ def glue_prepos(text):
         out += word
         if word in prepos:
             #out += "_"
-            out += "="     # bez uzardění - needs to know there is a seam
+            #out += "="     # bez uzardění - needs to know there is a seam
+            out += "~"      # need char different from marker used in composed words
         else:
             out += " "
     return out.strip()
@@ -584,7 +639,7 @@ def glottal_stop_insert(phone, context):
         context &= ~maystop
         return [("_", context), (" ?", context)]
 
-    if phone=="=" and context&maystop: # seam
+    if phone in "=~" and context&maystop: # seam ('~' variant is from glue_prepos())
         context &= ~maystop
         return [(phone, context), (phone+"?", context)]
 
@@ -616,8 +671,8 @@ def voicing_assim(phone, context):
     #                  act like voicing to the left word
     #                  act like DEVOICING to the left (!! really: "mroš_mrznul")
 
-    if phone == '=': # composed word seam, just pass on the context
-        return [('=', context)]
+    if phone in '=~': # composed word seam, just pass on the context
+        return [(phone, context)]
 
     if phone == "*": # special 'phone', disappears but leaves both voicing possiblities
         return [('', context_d), ('', context_v)]
@@ -977,6 +1032,8 @@ def to_final_alfabet(txt):
     Convert phonetic symbols to the final alphabet selected
     for presentation.
     """
+    if args.ctu_phone_symbols:
+        return txt # keep our internal CTU phone symbols as the output format
     return transform(to_cz_transcription, txt)
 
 
@@ -1203,7 +1260,7 @@ def text_to_multipron_sausage(txt):
     Return sausage with word-level alternatives.
     """
     result = []
-    for sep, word in zsplit(txt, " _|=&*"): #NOTE: the only '='s now are from glue_prepos
+    for sep, word in zsplit(txt, " _|=~&*"): #NOTE: the only '='s now are from glue_prepos
         if sep!="":
             result.append({sep})
         if word!="":
@@ -1238,6 +1295,35 @@ def sausages_replacement_rules(repl_rules, sausages):
     return result
 
 
+def sausages_remove_nonphones(sausages, phones="?AEGHNOZabcdefghjklmnoprstuvyz|áéóúýčďňŘřšťŽž"):
+    """
+    Remove any out-of-phonetic-alphabet phones.
+    Parameter 'phones' can be either string or set.
+    """
+    result = []
+    for s in sausages:
+        s_out = set()
+        for txt in s:
+            s_out.add("".join([p for p in txt if p in phones]))
+        result.append(s_out)
+    return result
+
+
+
+class MarkableString(str):
+    """
+    Like normal string but can smuggle additional information
+    in atributes (added ad libitum).
+    """
+    pass
+
+class MarkableList(list):
+    """
+    Like normal list but can smuggle additional information
+    in atributes (added ad libitum).
+    """
+    pass
+
 def process(txt, all_begins=True, all_ends=True):
     """
     Convert text to pronunciation, using these tables/procedures:
@@ -1247,9 +1333,29 @@ def process(txt, all_begins=True, all_ends=True):
     all assim
     to final alphabet
     """
-    #TODO: cleanup interpunction etc.
+
+    words = transform(interpunctab, txt) # clean interpunction (skipped spelltab)
+
+    words_glued = transform(downcasetab, words)
+    words_glued = glue_prepos(words_glued)
+
+    words = words.split()
+    words_glued = words_glued.split()
+
+
+
+
+    txt = transform(spelltab, txt) # B. -> bé  etc.
+    txt = transform(interpunctab, txt) # clean interpunction
     txt = transform(downcasetab, txt)
+
+
+
     txt = glue_prepos(txt)  # multipron will split also on '=' and add more '='
+
+
+
+
     if all_begins:
         txt = "&"+txt # the "&" forces both versions in maybe-glottal-stop situations at start
     else:
@@ -1262,6 +1368,12 @@ def process(txt, all_begins=True, all_ends=True):
     ssgs = sausages_transform(phonetizetab, ssgs) # convert to internal phonetic alphabet
     ssgs = sausages_transform(rr_forward_assim, ssgs) # do that little bit of forward assimilations
     ssgs = sausages_replacement_rules(phone_merging, ssgs) # do it here while we have unbroken words
+
+
+    #if mark_words:
+    #    ...
+
+
     ssgs = ssgs_process_phones(ssgs) # do assimilations working backward (and related processing)
 
     # Phonetic processing is done by now, below we just optimize/prettify the graph
@@ -1277,10 +1389,19 @@ def process(txt, all_begins=True, all_ends=True):
     if len(ssgs)>0 and ssgs[0]=={'|'}: # it is that imaginary pause we faked in above
         ssgs = ssgs[1:]                # remove it to make things tidy
 
-    ssgs = join_simple_sausages(ssgs)    
+    ssgs = join_simple_sausages(ssgs)
+
+
+    ssgs = MarkableList(ssgs) # add ability to smugle along words
+    ssgs.words = words
+    ssgs.words_glued = words_glued
+
     return ssgs
 
 
+class a:
+    pass
+args = a() # if we are used as a library, this object can be used to pass us global options
 
 
 if (__name__ == '__main__'):
@@ -1304,6 +1425,9 @@ if (__name__ == '__main__'):
 
     parser.add_argument('-e', '--all-ends', action='store_true',
                         help='Also create variants which may arise if other speech immediately follows')
+
+    parser.add_argument('-c', '--ctu-phone-symbols', action='store_true',
+                        help='Use CTU phone symbols to print pronunciations')
 
 
     args = parser.parse_args()
