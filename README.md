@@ -23,6 +23,7 @@ allow others to continue this work.
 First, get **prak** source code:
 ```
 git clone https://github.com/vaclavhanzl/prak.git
+cd prak
 git checkout v1
 ```
 Or you can instead download a zip file - change "main" to "v1" up left, click on the green "Code" button up right on this page.
