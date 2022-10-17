@@ -3,17 +3,16 @@
 
 # NN acoustic models
 
-#from matrix import *
-#import numpy as np
-#import torch
-
-import pandas as pd
 
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from collections import Counter
+
+# We need pandas only for NN AM training. Avoid dependency for just the inference
+# using a standard model. FIXME, get rid of the need to comment/uncomment.
+#import pandas as pd
 
 
 #print(f"{__name__=}")
@@ -27,11 +26,6 @@ from prongen.hmm_pron import HMM
 
 # line above fails in pytest, need some other setup
 #from .prongen.hmm_pron import HMM
-
-
-#from hmm_acmodel import round_to_two_decimal_digits
-#from matrix import *
-#from praat_ifc import read_word_tier_from_textgrid_file
 
 
 from .hmm_acmodel import round_to_two_decimal_digits
@@ -342,12 +336,18 @@ def b_log_corrections(tsv_file, b_set=b1_set):
     Compute log(b()) additive correction needed to suppress very frequent
     phones and boost rare ones.
     """
+
+    if tsv_file.endswith("sv200c-100_training_0024.tsv"): # avoid dependency on tsv and pandas
+        return torch.tensor([-11.1186,  -7.9824,  -7.1365,  -9.1255, -10.7120,  -8.5094, -10.6577,
+                             -7.4565, -12.0110, -11.0539, -11.4070, -11.4735, -12.1724, -10.4384,
+                             -9.7028, -10.7073, -11.6203, -11.7481, -11.9372, -11.5911, -11.9380,
+                             -12.0138, -11.6192, -11.7821, -12.4654, -12.0538, -11.4064, -11.7344,
+                             -11.9744, -11.5930, -14.1668, -11.7700, -11.0398,  -7.3505, -10.6392,
+                             -11.8518, -11.1380, -10.3673, -11.5502, -10.7025, -10.2276, -10.9719,
+                             -10.6571,  -5.9738, -10.7126])
+
     df = pd.read_csv(tsv_file, sep="\t", keep_default_na=False)
     c=Counter("".join([s for s in df.targets.values]))
-
-    #xxx = sorted(i for i in c.items()) # get order of b_set
-    #return -torch.tensor([count for phone, count in xxx]).log()
-
     return -torch.tensor([c[phone] for phone in b_set]).log()
 
 
