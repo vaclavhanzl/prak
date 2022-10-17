@@ -23,8 +23,9 @@ allow others to continue this work.
 First, get **prak** source code:
 ```
 git clone https://github.com/vaclavhanzl/prak.git
+git checkout v1
 ```
-Or you can instead download a zip file - click on the green "Code" button (up and right on this page).
+Or you can instead download a zip file - change "main" to "v1" up left, click on the green "Code" button up right on this page.
 
 Than you need to install python3.10, pytorch and torchaudio, e.g. using
 [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
@@ -139,14 +140,15 @@ The Czech word "prak" means "sling", a common shooting toy.
 
 ## Work in progress
 We are currently testing and tuning installation for all the platforms so this page is still changing quickly.
-The main branch in git has working pronunciation generator. For the acoustic alignment, you currently have to resort
-to the develop branch:
-```
-git checkout develop
-```
-and manually add the trained neural model, which is not in the repo. Just ask Vaclav Hanzl :) We will certainly
-improve these deployment details soon...
 
+The main branch has all the code but NOT the trained acoustic model. We still search for a good and easy way to
+deliver it to you. Currently the model is added in the **v1** branch. So do not forget:
+```
+git checkout v1
+```
+(This trickery should avoid cumulation of old models in prak git repo. Branch can be deleted on github. Commit in main cannot.)
+
+The binding script for praat is NOT in this repository yet. Please use command line from the terminal, as described above.
 ## Discussions and Contact
 You can discuss hacktrack in public here in [Discussions](https://github.com/vaclavhanzl/prak/discussions).
 If you want to tell me more personally that you love this or hate this, message @vaclav512 on Twitter.
