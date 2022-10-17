@@ -147,3 +147,7 @@ git checkout develop
 and manually add the trained neural model, which is not in the repo. Just ask Vaclav Hanzl :) We will certainly
 improve these deployment details soon...
 
+## Discussions and Contact
+You can discuss hacktrack in public here in [Discussions](https://github.com/vaclavhanzl/prak/discussions).
+If you want to tell me more personally that you love this or hate this, message @vaclav512 on Twitter.
+
