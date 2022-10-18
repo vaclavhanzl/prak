@@ -121,6 +121,14 @@ git pull
 ## Speed
 1 minute audio was phone-aligned in 18 seconds on a 2014 Mac Air, in 3.6 seconds on a 2020 M1 Mac Air, in 5 seconds on a decent 2020 Intel linux box.
 
+## Training data
+The acoustic model was trained solely on the Czech [CommonVoice](https://commonvoice.mozilla.org/en/datasets) recordings.
+I am also immensly grateful to [Fonetický ústav FFUK](https://fonetika.ff.cuni.cz/) for the possibility to compare
+their hand labeled (and phone-level time aligned) data with prak's automatic labeling, this helps a lot. However, training
+of the prak's acoustic model currently does not involve any hand-aligned data. (CommonVoice data consist of recorded sentences with
+corresponding ortographic transcriprion. No human-decided time alignment on the level of words or phones is used for training,
+these alignments are purely machine made.)
+
 ## About the name
 Some Czech phonetitians call similar tools "nastřelovač" as these tools position phones and their time stamps
 in a fast but rather unprecise manner, like positioning objects by shooting them where they should be.
