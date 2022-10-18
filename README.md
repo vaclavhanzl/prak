@@ -52,7 +52,7 @@ disfluencies - if the recording contains a repeated word, so should the transcri
 make a phrase tier with transcript and saved it to file ```pocasi.textgrid```, you can use **prak** to guess
 pronunciations and time align all phones and words. Run this in terminal:
 ```
-prak -i pocasi.textgrid -w pocasi.wav -o pocasi.out.textgrid
+~/prak/prak.py -i pocasi.textgrid -w pocasi.wav -o pocasi.out.textgrid
 ```
 Multiple pronunciation variants are considered, the acoustic model will hopefully choose the right
 one. You may need to teach the tool some additional foreign words or tell it about important seams in composite
@@ -93,7 +93,7 @@ for new Macs with Apple M1 chips. Then make the downloaded file executable and r
 chmod +x Downloads/Mambaforge-MacOSX-x86_64.sh 
 Downloads/Mambaforge-MacOSX-x86_64.sh
 ```
-Answer a few questions (likely **yes** or just Enter but you must explicitly type **yes** where needed). Then QUIT TERMINAL COMPLETELY and run it again. The prompt will now start with "(base)" and you can install python packages we need:
+Answer a few questions (likely **yes** or just Enter but you must explicitly type **yes** where needed). If the licence agreement is too long to show, press spacebar untill you reach the end, then agree (yes). After installing mambaforge successfully, QUIT TERMINAL COMPLETELY and run it again. The prompt will now start with "(base)" and you can install python packages we need:
 ```
 mamba install pytorch torchaudio -c pytorch
 ```
@@ -132,7 +132,7 @@ git pull
 (If you went with the zip option, download a new zip the same way.)
 
 ## Speed
-1 minute audio was phone-aligned in 18 seconds on a 2014 Mac Air, in 5 seconds on a decent 2020 Intel linux box.
+1 minute audio was phone-aligned in 18 seconds on a 2014 Mac Air, in 3.6 seconds on a 2020 M1 Mac Air, in 5 seconds on a decent 2020 Intel linux box.
 
 ## About the name
 Some Czech phonetitians call similar tools "nastřelovač" as these tools position phones and their time stamps
@@ -151,7 +151,7 @@ git checkout v1
 
 The binding script for praat is NOT in this repository yet. Please use command line from the terminal, as described above.
 ## Discussions and Contact
-You can discuss hacktrack in public here in [Discussions](https://github.com/vaclavhanzl/prak/discussions).
+You can discuss prak in public here in [Discussions](https://github.com/vaclavhanzl/prak/discussions).
 If you want to tell me more personally that you love this or hate this, message @vaclav512 on Twitter.
 
 ## Thanks
