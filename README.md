@@ -88,7 +88,7 @@ Choose and download the installation file [here](https://github.com/conda-forge/
 [Mambaforge-MacOSX-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh)
 for older Intel-based Macs or
 [Mambaforge-MacOSX-arm64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-arm64.sh)
-for new Macs with Apple M1 chips. Then make the downloaded file executable and run it in the terminal, for example (for Intel Mac):
+for new Macs with Apple M1 chips. Then make the downloaded file executable (using chmod) and run it in the terminal, for example (for Intel Mac):
 ```
 chmod +x Downloads/Mambaforge-MacOSX-x86_64.sh 
 Downloads/Mambaforge-MacOSX-x86_64.sh
@@ -107,19 +107,6 @@ import torch
 import torchaudio
 ```
 If no errors appear, you won! Quit python with Ctrl+D and try **prak**.
-
-#### Alternative ways of Mac installation
-To get python, you may first install [brew](https://brew.sh/):
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-Then you may go on with [**mambaforge**](https://mamba.readthedocs.io/en/latest/installation.html):
-```
-brew install --cask micromamba
-```
-But when you try to use **micromamba**, you will likely get complaints about unidentified developer (you would have to loosen security settings to get over this).
-
-If you have have a Mac with the new M1 chip, you may try [Metal](https://developer.apple.com/metal/) via [MPS backend for PyTorch](https://pytorch.org/blog/introducing-accelerated-pytorch-training-on-mac/).
 
 ## Details of Windows installation
 It *should* work but we did not try yet. (Try mambaforge?)
