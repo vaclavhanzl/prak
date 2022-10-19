@@ -8,7 +8,7 @@ snd = selected("Sound")
 tg = selected("TextGrid")
 tg_name$ = selected$("TextGrid")
 
-# Save it ti prak's temporary directory
+# Save it to prak's temporary directory
 select 'snd'
 Save as WAV file: "~/prak/tmp/tmp_phrase_align.wav"
 select 'tg'
