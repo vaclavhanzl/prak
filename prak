@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# prak - generate possible Czech pronunciations from text transcript
+#
+# Copyright (c) 2022 Vaclav Hanzl. This is a free software (see the MIT license).
+# This file is part of the https://github.com/vaclavhanzl/prak project.
+#
+# Just a wrapper for prak.py, trying to run it in python virtual environment.
+
+export BASE=${0%/*} # where this script resides
+
+# This is where both linux and mac usually have it after mambaforge install:
+MAMBA=~/mambaforge/condabin/mamba
+if test -x "$MAMBA"; then
+    if test -d ~/mambaforge/envs/prak; then
+	# Good, we have our own virtual environment prak, use it
+	exec "$MAMBA" --no-banner run -n prak "$BASE/prak.py" "$@"
+    else
+	#echo "No mamba environment 'prak', trying to run in base environment"
+	exec "$MAMBA" --no-banner run "$BASE/prak.py" "$@"
+    fi
+fi
+
+# mamba not found where following README.md would put it, maybe it is on PATH?
+if which mamba >>/dev/null; then
+    if test -d ~/mambaforge/envs/prak; then
+	# Good, we have our own virtual environment prak, use it
+	exec mamba --no-banner run -n prak "$BASE/prak.py" "$@"
+    else
+	#echo "No mamba environment prak, trying to run in base environment"
+	exec mamba --no-banner run "$BASE/prak.py" "$@"
+    fi
+fi
+
+#echo "No mamba found, trying to run prak without python virtual environment"
+exec "$BASE/prak.py" "$@"
