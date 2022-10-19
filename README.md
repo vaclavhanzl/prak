@@ -32,6 +32,8 @@ Than you need to install python3.10, pytorch and torchaudio, e.g. using
 [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
 
 If you feel scared, look down for detailed instructions.
+### Integration to praat GUI
+Open script **prak.praat** and add it to menu. Set read/write to UTF-8.
 
 ## Usage
 To get an idea about pronunciation variants being considered, run this first (being in the **prak** folder):
@@ -144,7 +146,7 @@ git checkout v1
 ```
 (This trickery should avoid cumulation of old models in prak git repo. Branch can be deleted on github. Commit in main cannot.)
 
-The binding script for praat is NOT in this repository yet. Please use command line from the terminal, as described above.
+On Windows, we need to add some slightly modified variant of the prak->prak.py envelope script. But you likely can use prak.py directly.
 ## Discussions and Contact
 You can discuss prak in public here in [Discussions](https://github.com/vaclavhanzl/prak/discussions).
 If you want to tell me more personally that you love this or hate this, message @vaclav512 on Twitter.
