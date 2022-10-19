@@ -52,7 +52,7 @@ disfluencies - if the recording contains a repeated word, so should the transcri
 make a phrase tier with transcript and saved it to file ```pocasi.textgrid```, you can use **prak** to guess
 pronunciations and time align all phones and words. Run this in terminal:
 ```
-prak -i pocasi.textgrid -w pocasi.wav -o pocasi.out.textgrid
+~/prak/prak.py -i pocasi.textgrid -w pocasi.wav -o pocasi.out.textgrid
 ```
 Multiple pronunciation variants are considered, the acoustic model will hopefully choose the right
 one. You may need to teach the tool some additional foreign words or tell it about important seams in composite
@@ -88,12 +88,12 @@ Choose and download the installation file [here](https://github.com/conda-forge/
 [Mambaforge-MacOSX-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh)
 for older Intel-based Macs or
 [Mambaforge-MacOSX-arm64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-arm64.sh)
-for new Macs with Apple M1 chips. Then make the downloaded file executable and run it in the terminal, for example (for Intel Mac):
+for new Macs with Apple M1 chips. Then make the downloaded file executable (using chmod) and run it in the terminal, for example (for Intel Mac):
 ```
 chmod +x Downloads/Mambaforge-MacOSX-x86_64.sh 
 Downloads/Mambaforge-MacOSX-x86_64.sh
 ```
-Answer a few questions (likely **yes** or just Enter but you must explicitly type **yes** where needed). Then QUIT TERMINAL COMPLETELY and run it again. The prompt will now start with "(base)" and you can install python packages we need:
+Answer a few questions (likely **yes** or just Enter but you must explicitly type **yes** where needed). If the licence agreement is too long to show, press spacebar untill you reach the end, then agree (yes). After installing mambaforge successfully, QUIT TERMINAL COMPLETELY and run it again. The prompt will now start with "(base)" and you can install python packages we need:
 ```
 mamba install pytorch torchaudio -c pytorch
 ```
@@ -108,19 +108,6 @@ import torchaudio
 ```
 If no errors appear, you won! Quit python with Ctrl+D and try **prak**.
 
-#### Alternative ways of Mac installation
-To get python, you may first install [brew](https://brew.sh/):
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-Then you may go on with [**mambaforge**](https://mamba.readthedocs.io/en/latest/installation.html):
-```
-brew install --cask micromamba
-```
-But when you try to use **micromamba**, you will likely get complaints about unidentified developer (you would have to loosen security settings to get over this).
-
-If you have have a Mac with the new M1 chip, you may try [Metal](https://developer.apple.com/metal/) via [MPS backend for PyTorch](https://pytorch.org/blog/introducing-accelerated-pytorch-training-on-mac/).
-
 ## Details of Windows installation
 It *should* work but we did not try yet. (Try mambaforge?)
 
@@ -132,7 +119,15 @@ git pull
 (If you went with the zip option, download a new zip the same way.)
 
 ## Speed
-1 minute audio was phone-aligned in 18 seconds on a 2014 Mac Air, in 5 seconds on a decent 2020 Intel linux box.
+1 minute audio was phone-aligned in 18 seconds on a 2014 Mac Air, in 3.6 seconds on a 2020 M1 Mac Air, in 5 seconds on a decent 2020 Intel linux box.
+
+## Training data
+The acoustic model was trained solely on the Czech [CommonVoice](https://commonvoice.mozilla.org/en/datasets) recordings.
+I am also immensly grateful to [Fonetický ústav FFUK](https://fonetika.ff.cuni.cz/) for the possibility to compare
+their hand labeled (and phone-level time aligned) data with prak's automatic labeling, this helps a lot. However, training
+of the prak's acoustic model currently does not involve any hand-aligned data. (CommonVoice data consist of recorded sentences with
+corresponding ortographic transcriprion. No human-decided time alignment on the level of words or phones is used for training,
+these alignments are purely machine made.)
 
 ## About the name
 Some Czech phonetitians call similar tools "nastřelovač" as these tools position phones and their time stamps
@@ -151,7 +146,7 @@ git checkout v1
 
 The binding script for praat is NOT in this repository yet. Please use command line from the terminal, as described above.
 ## Discussions and Contact
-You can discuss hacktrack in public here in [Discussions](https://github.com/vaclavhanzl/prak/discussions).
+You can discuss prak in public here in [Discussions](https://github.com/vaclavhanzl/prak/discussions).
 If you want to tell me more personally that you love this or hate this, message @vaclav512 on Twitter.
 
 ## Thanks
