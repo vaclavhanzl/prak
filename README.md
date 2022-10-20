@@ -47,8 +47,7 @@ prongen/prak_prongen.py -p
 and then type Czech sentences in terminal (finish each with Enter, press Ctrl+D to stop).
 (Look at [prongen/README.md](prongen/README.md) for details.) If this works, **python** is installed OK.
 
-For alignment with audio, you will need a Czech voice recording (wav) and a corresponding utf8 Czech plain text
-transcript (in txt or TextGrid).
+For alignment with audio, you will need a Czech voice recording (wav) and a corresponding Czech transcript (in phrase tier in an utf8 TextGrid).
 The transcript can contain usual punctuation (as a secretary would transcribe it) but should be precise even at
 disfluencies - if the recording contains a repeated word, so should the transcript. If you used **praat** to
 make a phrase tier with transcript and saved it to file ```pocasi.textgrid```, you can use **prak** to guess
