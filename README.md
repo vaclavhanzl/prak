@@ -108,7 +108,7 @@ and at the ">>>" prompt type:
 import torch
 import torchaudio
 ```
-If no errors appear, you won! Quit python with Ctrl+D and try **prak**.
+If no errors appear, you won! Quit python with Ctrl+D (^D) and try **prak**.
 
 ## Details of Windows installation
 It *should* work but we did not try yet. (Try mambaforge?)
