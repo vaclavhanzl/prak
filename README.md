@@ -147,6 +147,14 @@ git checkout v1
 (This trickery should avoid cumulation of old models in prak git repo. Branch can be deleted on github. Commit in main cannot.)
 
 On Windows, we need to add some slightly modified variant of the prak->prak.py envelope script. But you likely can use prak.py directly.
+
+## Can I contribute to prak?
+Of yourse! You are welcome! You can contribute in many ways:
+* Try to install and use prak and report any issues, e.g. in [Discussions](https://github.com/vaclavhanzl/prak/discussions)
+* [Become a developer](https://github.com/vaclavhanzl/prak/wiki/Developer's-guide)
+* Add pronunciations of foreign words or help for harder Czech words, like composed Czech words with vowel after seam.
+
+
 ## Discussions and Contact
 You can discuss prak in public here in [Discussions](https://github.com/vaclavhanzl/prak/discussions).
 If you want to tell me more personally that you love this or hate this, message @vaclav512 on Twitter.
