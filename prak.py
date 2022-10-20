@@ -97,7 +97,7 @@ if (__name__ == '__main__'):
     #print(phone_tier)
     sampa_phone_tier = acmodel.praat_ifc.sampify_tier(phone_tier)
 
-    tg_txt = acmodel.praat_ifc.textgrid_file_text(dict(phones=sampa_phone_tier, words=word_tier, phrase=phrase_tier))
+    tg_txt = acmodel.praat_ifc.textgrid_file_text(dict(phone=sampa_phone_tier, word=word_tier, phrase=phrase_tier))
     #print(tg_txt)
 
 
