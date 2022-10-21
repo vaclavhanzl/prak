@@ -49,12 +49,54 @@ tiercount = Get number of tiers
 
 if tiercount = 1
 	tier1name$ = Get tier name: 1
-	if not tier1name$ = "phrase" or tier1name$ = "Phrase"
+	if not tier1name$ = "phrase"
 		beginPause: "identify text"
 			comment: "No 'phrase' tier in '" + tg_name$ + "'. Use '" + tier1name$ + "' as source text?"
 		textSource = endPause: "Yes, use it!", "No, let me check.", 2, 2
 		if textSource = 1
 			Set tier name: 1, "phrase"
+		endif
+		if textSource = 2
+			printline
+			printline !!! alignment interrupted at 'tg_name$' (source text issue)
+			exitScript ( )
+		endif
+	endif
+else
+	phrasetierCount = 0
+	for tierz from 1 to tiercount
+		tierZname$ = Get tier name: tierz
+		if tierZname$ = "phrase" or tierZname$ = "Phrase"
+			phrasetierCount = phrasetierCount + 1
+		endif
+	endfor
+	if not phrasetierCount = 1
+		printline identify source text in 'tg_name$'
+		for tierw from 1 to tiercount
+			tierWname$ = Get tier name: tierw
+			printline tier 'tierw': 'tierWname$'
+		endfor
+		if phrasetierCount = 0
+			beginPause: "identify text"
+				comment: "No 'phrase' tier in '" + tg_name$ + "'. Which tier is source text?"
+				natural: "source text tier", tiercount
+			textSource = endPause: "Continue", "What? Stop alignment!", 1, 2
+			if textSource = 1
+				Set tier name: source_text_tier, "phrase"
+			endif
+		elsif phrasetierCount > 1
+			beginPause: "identify text"
+				comment: "Multiple 'phrase' tiers in '" + tg_name$ + "'. Which tier is source text?"		
+				natural: "source text tier", tiercount
+			textSource = endPause: "Continue", "What?? Stop alignment!", 1, 2
+			if textSource = 1
+				Set tier name: source_text_tier, "phrase"
+				tg_rm = tg
+				tg = Extract one tier: source_text_tier
+				select 'tg_rm'
+				Remove
+				select 'tg'
+			endif
 		endif
 		if textSource = 2
 			printline
