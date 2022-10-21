@@ -218,8 +218,8 @@ class HMM:
 
             #sg = sausages_remove_nonphones(sg)
             # KEEP also '_'
-            # sg = sausages_remove_nonphones(sg, keep_also="_")
-
+            sg = sausages_remove_nonphones(sg, keep_also="_")
+            #print(f"{sg=}")
 
 
             self.sg_snap2 = sg # another snapshot for constructing word tier CLEANUP HERE

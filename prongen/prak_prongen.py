@@ -147,7 +147,7 @@ nihil nyhil
 +neexi neegzi
 
 
-# Some Czech peculiarities
+### Some Czech peculiarities
 +dcer cer
 +srdc src
 
@@ -1295,16 +1295,15 @@ def sausages_replacement_rules(repl_rules, sausages):
     return result
 
 
-def sausages_remove_nonphones(sausages, phones="?AEGHNOZabcdefghjklmnoprstuvyz|áéóúýčďňŘřšťŽž"):
+def sausages_remove_nonphones(sausages, phones="?AEGHNOZabcdefghjklmnoprstuvyz|áéóúýčďňŘřšťŽž", keep_also=""):
     """
     Remove any out-of-phonetic-alphabet phones.
-    Parameter 'phones' can be either string or set.
     """
     result = []
     for s in sausages:
         s_out = set()
         for txt in s:
-            s_out.add("".join([p for p in txt if p in phones]))
+            s_out.add("".join([p for p in txt if p in phones+keep_also]))
         result.append(s_out)
     return result
 
