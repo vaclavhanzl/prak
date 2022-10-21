@@ -67,13 +67,8 @@ You need to install these prerequisities:
 There are many ways to do it and the sites above document them very well. But you may just follow our step-by-step
 guides below.
 ## Details of Linux installation
-If you just need **prak** working and do not otherwise care about pytorch, maybe this could be a good start (on Debian):
-```
-apt-get install python3-torch
-```
-but you still need **torchaudio** which likely is not available this way, so you may as well directly try the way described below.
+Things happen too fast in the python world for apt package managers to keep up. So you most likely want a special package manager just for python, and there are really great tools to choose from.
 
-If you want to enjoy python and pytorch a bit more, you most likely want python's own package management and virtual environments.
 For scientific work, **conda** package manager might be better than **pip**. In the conda world, there are still many options.
 You likely do not want the huge Anaconda but rather the more free and modular conda forge. To get it working, you still have 
 multiple options from which [**mambaforge**](https://mamba.readthedocs.io/en/latest/installation.html) (faster conda) looks quite good. With this general guidance, it is now easy to google your way.
