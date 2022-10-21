@@ -33,7 +33,7 @@ Than you need to install python3.10, pytorch and torchaudio, e.g. using
 
 If you feel scared, look down for detailed instructions.
 ### Integration to praat GUI
-Open script **prak.praat** and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak). Set read/write to UTF-8.
+Open script **prak_align_phrase.praat** and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak). Set read/write to UTF-8.
 
 ## Usage
 To get an idea about pronunciation variants being considered, run this first (being in the **prak** folder):
