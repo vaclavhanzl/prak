@@ -677,8 +677,11 @@ def compute_word_tier(hmm):
             word = ""
             w_i = -1 # '|' has w_i of the following word but we want it to be treated as a separate word instead
         else:
-            word = hmm.words[w_i]
-            
+            if w_i<len(hmm.words):
+                word = hmm.words[w_i]
+            else:
+                word = "ERROR" # Our word list got out of sync with the pron list!!! FIXME
+
         p_i = idx//3  # FIXME: ONLY WORKS FOR TRIPLED STATES
             
         if p_i!=last_p_i: # HMM state change
