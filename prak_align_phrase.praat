@@ -5,6 +5,60 @@
 
 clearinfo
 
+### Assess input data
+tg_inputCount = numberOfSelected ("TextGrid")
+snd_inputCount = numberOfSelected ("Sound")
+
+for t from 1 to tg_inputCount
+	tgInput't' = selected ("TextGrid",t)
+endfor
+
+for s from 1 to snd_inputCount
+	sndInput's' = selected ("Sound",s)
+endfor
+
+reuse_tg = 0
+
+### Prevent item count mismatch / decide on source text usage
+
+if not tg_inputCount = snd_inputCount
+
+	if tg_inputCount = 1
+		select tgInput1
+		tgtoReuse$ = selected$ ("TextGrid")
+		beginPause: "item count mismatch"
+			comment: "Use textgrid '" + tgtoReuse$ + "' to align " + string$(snd_inputCount) + " sounds?"
+		reuse_tg = endPause: "Yes please!", "No, stop alignment.", 1, 2
+		if reuse_tg = 2
+			printline
+			printline !!! alignment interrupted (item mismatch)
+			exitScript ( )
+		endif
+	else
+		beginPause: "item count mismatch"
+			comment: "Cannot align " + string$(snd_inputCount) + " sounds using " + string$(tg_inputCount) + " textgrids."
+		mismatch = endPause: "Ok, I'll fix it.", 1, 1
+		printline
+		printline !!! alignment interrupted (item count mismatch)
+		exitScript ( )
+	endif
+endif
+
+#printline item mismatch controll ok
+
+### Script repetition for multiple alignments (endfor at the end of script)
+
+for runNum from 1 to snd_inputCount
+	if reuse_tg = 1
+		tgInput=tgInput1
+	else
+		tgInput=tgInput'runNum'
+	endif
+	sndInput=sndInput'runNum'
+	select tgInput
+	plus sndInput
+
+
 ### Take input data from praat
 snd = selected("Sound")
 snd_name$ = selected$("Sound")
@@ -12,6 +66,7 @@ tg = selected("TextGrid")
 tg_name$ = selected$("TextGrid")
 
 #printline input data in
+
 
 ### Scale times of imput items
 select 'tg'
@@ -29,14 +84,16 @@ tiercount = Get number of tiers
 		tiername$ = Get tier name: tierx
 		if tiername$ = "phone" or tiername$ = "Phone"
 			intervalcount = Get number of intervals: 1
-			if intervalcount > 1
-				beginPause: "phone tier clash"
-					comment: "Non-empty 'phone' tier in '" + tg_name$ + "'. Overwrite it?"
-				clashResponse = endPause: "Yes, continue.", "No, stop.", 2, 2
-				if clashResponse = 2
-					printline
-					printline !!! alignment interrupted at 'tg_name$' ("phone" tier clash)
-					exitScript ( )
+			if reuse_tg = 0
+				if intervalcount > 1
+					beginPause: "phone tier clash"
+						comment: "Non-empty 'phone' tier in '" + tg_name$ + "'. Overwrite it?"
+					clashResponse = endPause: "Yes, continue.", "No, stop.", 2, 2
+					if clashResponse = 2
+						printline
+						printline !!! alignment interrupted at 'snd_name$' ("phone" tier clash)
+						exitScript ( )
+					endif
 				endif
 			endif
 		endif
@@ -58,7 +115,7 @@ if tiercount = 1
 		endif
 		if textSource = 2
 			printline
-			printline !!! alignment interrupted at 'tg_name$' (source text issue)
+			printline !!! alignment interrupted at 'snd_name$' (source text issue)
 			exitScript ( )
 		endif
 	endif
@@ -95,12 +152,12 @@ else
 				tg = Extract one tier: source_text_tier
 				select 'tg_rm'
 				Remove
-				select 'tg'
+				tgInput1 = tg
 			endif
 		endif
 		if textSource = 2
 			printline
-			printline !!! alignment interrupted at 'tg_name$' (source text issue)
+			printline !!! alignment interrupted at 'snd_name$' (source text issue)
 			exitScript ( )
 		endif
 	endif
@@ -132,10 +189,15 @@ tg_out = selected("TextGrid")
 
 
 ### Replace our input textgrid (phrase, whatever else) with the output one (phone, word, phrase)
-select 'tg'
-Remove
+if reuse_tg = 0
+	select 'tg'
+	Remove
+endif
 select 'tg_out'
 Rename... 'snd_name$'
+
+### End of alignment repetition
+endfor
 
 printline aligned!!
 
