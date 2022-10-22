@@ -342,7 +342,8 @@ def read_replacement_table(filename):
     return table
 
 
-interpunction_to_delete = '"'+".,?!„“-=–:;—/_"
+interpunction_to_delete = '"'+".,?!„“-=–:;—/_|~"  # Maybe '_|' should rather map to '=' (seam) ?
+# IDEA: We might rather map ANY interpunction to seam and then remove seams next to spaces
 
 downcase = ("AÁBCČDĎEĚÉFGHIÍJKLĹĽMNŇOÓÔPQRŔŘSŠTŤUÚŮVWXYÝZŽÄÜÖ",
             "aábcčdďeěéfghiíjklĺľmnňoóôpqrŕřsštťuúůvwxyýzžäüö")
