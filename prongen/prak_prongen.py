@@ -254,11 +254,34 @@ vrti vrti\nxti xty\nydi ydy\nzni zni\násti ásti\nédi édy\níti íti\nódi ó
 """
 
 
+# seam inventory:
+#
+# ' ' ... can become '|' or '_'
+# '|'
+# '_'
+# '~' ... used by glue_prepos()
+############ those above separate words, those below DO NOT
+# '='    použ po=už
+
+
+# '-'  not used as seam (?)
+# '+'
+
+# What touches seams:
+
+#  glue_prepos() glues by '~'
+#  deleted interpunction:   '"'+".,?!„“-=–:;—/_"
+
+#  align_wav_and_text_using_model() ???????
+
 
 
 import argparse
 import sys
 from glob import glob
+
+#print("Remove inport here")
+#from hmm_pron import HMM
 
 
 def transform(table, text):
@@ -559,9 +582,9 @@ def glue_prepos(text):
         if word in prepos:
             #out += "_"
             #out += "="     # bez uzardění - needs to know there is a seam
-            out += "~"      # need char different from marker used in composed words
+            out += '~'      # need char different from marker used in composed words
         else:
-            out += " "
+            out += ' '
     return out.strip()
 
 # Word separation: '_' .. glued together, '|' .. separated by a (short) pause, ' ' .. not
@@ -1260,7 +1283,7 @@ def text_to_multipron_sausage(txt):
     Return sausage with word-level alternatives.
     """
     result = []
-    for sep, word in zsplit(txt, " _|=~&*"): #NOTE: the only '='s now are from glue_prepos
+    for sep, word in zsplit(txt, " _|=~&*"): #NOTE: the only '~'s now are from glue_prepos
         if sep!="":
             result.append({sep})
         if word!="":
@@ -1341,7 +1364,7 @@ def process(txt, all_begins=True, all_ends=True):
     words = words.split()
     words_glued = words_glued.split()
 
-
+    #print(words)
 
 
     txt = transform(spelltab, txt) # B. -> bé  etc.
@@ -1447,6 +1470,10 @@ if (__name__ == '__main__'):
             else:
                 print(prettyprint_sausage(sg))
             print("")
+
+            #print(HMM(sen)) # would need import
+
+
         sys.exit(0)
 
 

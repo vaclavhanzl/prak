@@ -17,7 +17,8 @@ if (__name__ == '__main__'): # messing with path to make imports work when this 
     sys.path.append(os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')))
 
 from prongen.prak_prongen import *
-from acmodel import matrix
+
+#from acmodel import matrix
 
 
 
@@ -28,7 +29,14 @@ from acmodel import matrix
 
 # FINISHME
 
-explicit_spaces = {" ": ["_", "|"], "~": ["_"], "=": ["_"]}
+#explicit_spaces = {' ': ['_', '|'], '~': ['_'], '=': ['_']}  # ERROR !!!
+explicit_spaces = {' ': ['_', '|'], '~': ['_'], '=': ['']}
+
+
+
+
+
+
 #final_cleanup_for_b = {'=': [''], '_': ['']} # remove _ =
 
 
@@ -60,6 +68,10 @@ class HMM:
         s += "   "+" ".join(self.b)
         for p, row in zip(self.b, self.A):
             s += "\n " + p + " " + " ".join(["." if p==0 else "1" if p==1 else "*" for p in row])
+
+            # s += ...   # we could print index and word this state belongs to FINISHME
+
+
         return s
 
 
@@ -256,6 +268,8 @@ elif __name__ == '__main__':
     sen = "jsou"
     sen = "a a a"
     sen = "k dohodě došlo již dlouho předtím"
+    sen = "n e_u m"
+    #sen = "v nárazech dokonce"
 
     """
     sen = sen + " " + sen
