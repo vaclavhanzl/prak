@@ -32,6 +32,8 @@ Than you need to install python3.10, pytorch and torchaudio, e.g. using
 [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
 
 If you feel scared, look down for detailed instructions.
+### Integration to praat GUI
+Open script **prak_align_phrase.praat** and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak). Set read/write to UTF-8.
 
 ## Usage
 To get an idea about pronunciation variants being considered, run this first (being in the **prak** folder):
@@ -45,8 +47,7 @@ prongen/prak_prongen.py -p
 and then type Czech sentences in terminal (finish each with Enter, press Ctrl+D to stop).
 (Look at [prongen/README.md](prongen/README.md) for details.) If this works, **python** is installed OK.
 
-For alignment with audio, you will need a Czech voice recording (wav) and a corresponding utf8 Czech plain text
-transcript (in txt or TextGrid).
+For alignment with audio, you will need a Czech voice recording (wav) and a corresponding Czech transcript (in phrase tier in an utf8 TextGrid).
 The transcript can contain usual punctuation (as a secretary would transcribe it) but should be precise even at
 disfluencies - if the recording contains a repeated word, so should the transcript. If you used **praat** to
 make a phrase tier with transcript and saved it to file ```pocasi.textgrid```, you can use **prak** to guess
@@ -66,13 +67,8 @@ You need to install these prerequisities:
 There are many ways to do it and the sites above document them very well. But you may just follow our step-by-step
 guides below.
 ## Details of Linux installation
-If you just need **prak** working and do not otherwise care about pytorch, maybe this could be a good start (on Debian):
-```
-apt-get install python3-torch
-```
-but you still need **torchaudio** which likely is not available this way, so you may as well directly try the way described below.
+Things happen too fast in the python world for apt package managers to keep up. So you most likely want a special package manager just for python, and there are really great tools to choose from.
 
-If you want to enjoy python and pytorch a bit more, you most likely want python's own package management and virtual environments.
 For scientific work, **conda** package manager might be better than **pip**. In the conda world, there are still many options.
 You likely do not want the huge Anaconda but rather the more free and modular conda forge. To get it working, you still have 
 multiple options from which [**mambaforge**](https://mamba.readthedocs.io/en/latest/installation.html) (faster conda) looks quite good. With this general guidance, it is now easy to google your way.
@@ -106,7 +102,7 @@ and at the ">>>" prompt type:
 import torch
 import torchaudio
 ```
-If no errors appear, you won! Quit python with Ctrl+D and try **prak**.
+If no errors appear, you won! Quit python with Ctrl+D (^D) and try **prak**.
 
 ## Details of Windows installation
 It *should* work but we did not try yet. (Try mambaforge?)
@@ -144,7 +140,15 @@ git checkout v1
 ```
 (This trickery should avoid cumulation of old models in prak git repo. Branch can be deleted on github. Commit in main cannot.)
 
-The binding script for praat is NOT in this repository yet. Please use command line from the terminal, as described above.
+On Windows, we need to add some slightly modified variant of the prak->prak.py envelope script. But you likely can use prak.py directly.
+
+## Can I contribute to prak?
+Of yourse! You are welcome! You can contribute in many ways:
+* Try to install and use prak and [report any issues](https://github.com/vaclavhanzl/prak/wiki/Reporting-bugs), e.g. in [Discussions](https://github.com/vaclavhanzl/prak/discussions)
+* [Become a developer](https://github.com/vaclavhanzl/prak/wiki/Developer's-guide)
+* Add pronunciations of foreign words or help for harder Czech words, like composed Czech words with vowel after seam.
+
+
 ## Discussions and Contact
 You can discuss prak in public here in [Discussions](https://github.com/vaclavhanzl/prak/discussions).
 If you want to tell me more personally that you love this or hate this, message @vaclav512 on Twitter.
