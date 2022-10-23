@@ -25,6 +25,9 @@ Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html), do
 Run mambaforge console. Should be in Start menu as "Miniforge console" (name of the window is "Miniforge Prompt"). Text prompt must start ```(base)```. (If it does not, you run something else. Find the right one.) Type this:
 ```
 mamba install pytorch torchaudio -c pytorch
+```
+and then this:
+```
 pip install pysoundfile
 ```
 
