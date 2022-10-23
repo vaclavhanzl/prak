@@ -82,24 +82,24 @@ mamba create prak
 mamba activate prak
 mamba install pytorch torchaudio -c pytorch
 ```
-Then run **praat** and add ```prak/prak_align_phrase.praat``` to menu, the same way as described above for Mac.
 
-
-## Installation
-First, get **prak** source code:
+Get **prak** source code via git. If you have a GitHub account and ssh key, clone directly from your home like this:
+```
+git clone git@github.com:vaclavhanzl/prak.git
+cd prak
+git checkout v1
+```
+otherwise resort to https:
 ```
 git clone https://github.com/vaclavhanzl/prak.git
 cd prak
 git checkout v1
 ```
-Or you can instead download a zip file - change "main" to "v1" up left, click on the green "Code" button up right on this page.
 
-Than you need to install python3.10, pytorch and torchaudio, e.g. using
-[mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
+Then run **praat** and add ```prak/prak_align_phrase.praat``` to menu, the same way as described above for Mac.
+If you did not put **mamba** or **prak** directly to your home directory, edit config variables in this script.
 
-If you feel scared, look down for detailed instructions.
-### Integration to praat GUI
-Open script **prak_align_phrase.praat** and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak). Set read/write to UTF-8.
+Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Prak-installation-details) for even more details.
 
 ## Usage
 To get an idea about pronunciation variants being considered, run this first (being in the **prak** folder):
