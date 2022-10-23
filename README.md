@@ -138,31 +138,15 @@ It is automatically used at this default location by the GUI method and you can 
 using the ```-e``` option.
 
 
-
-
-
-
-
-
-
-
-
-## Common details of installation for all the platforms
-You need to install these prerequisities:
-* [python3](https://www.python.org/)
-* [PyTorch](https://pytorch.org/) with **torchaudio** (CPU version is enough, choose Conda or Pip)
-
-There are many ways to do it and the sites above document them very well. But you may just follow our step-by-step
-guides below.
-
-
-
 ## Prak updates
 If you used **git** to download **prak**, it is easy. Go to the **prak** folder and run:
 ```
 git pull
 ```
-(If you went with the zip option, download a new zip the same way.)
+If you went with the zip option, download a new zip the same way.
+
+You certainly want to update, prak is getting better nearly daily!
+We are currently testing and tuning installation for all the platforms so also this README is still changing quickly.
 
 ## Speed
 1 minute audio was phone-aligned in 18 seconds on a 2014 Mac Air, in 3.6 seconds on a 2020 M1 Mac Air, in 5 seconds on a decent 2020 Intel linux box.
@@ -179,16 +163,6 @@ these alignments are purely machine made.)
 Some Czech phonetitians call similar tools "nastřelovač" as these tools position phones and their time stamps
 in a fast but rather unprecise manner, like positioning objects by shooting them where they should be.
 The Czech word "prak" means "sling", a common shooting toy.
-
-## Work in progress
-We are currently testing and tuning installation for all the platforms so this page is still changing quickly.
-
-The main branch has all the code but NOT the trained acoustic model. We still search for a good and easy way to
-deliver it to you. Currently the model is added in the **v1** branch. So do not forget:
-```
-git checkout v1
-```
-(This trickery should avoid cumulation of old models in prak git repo. Branch can be deleted on github. Commit in main cannot.)
 
 ## Can I contribute to prak?
 Of yourse! You are welcome! You can contribute in many ways:
