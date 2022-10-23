@@ -49,6 +49,15 @@ Answer a few questions (likely **yes** or just Enter but you must explicitly typ
 ```
 mamba install pytorch torchaudio -c pytorch
 ```
+
+Get **prak**, preferably using **git** (makes future updates super easy):
+```
+git clone https://github.com/vaclavhanzl/prak.git
+cd prak
+git checkout v1
+```
+(Or you can get zip as described above for Windows and uncompress it in your home folder.)
+
 Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak). Set read/write to UTF-8.
 
 Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Prak-installation-details) if you need to know more.
