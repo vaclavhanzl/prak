@@ -28,11 +28,34 @@ mamba install pytorch torchaudio -c pytorch
 pip install pysoundfile
 ```
 
-Download prak v1 zip file from this page - change "main" to "v1" up left, click on the green "Code" button up right, download zip. Uncompress it directly to ```C:\```, creating ```C:\prak```.
+Download prak v1 zip file from this GitHub page - change "main" to "v1" up left, click on the green "Code" button up right, download zip. Uncompress it directly to ```C:\```, creating ```C:\prak```.
 
 Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak). Set read/write to UTF-8.
 
 Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Prak-installation-details) if you need to know more.
+
+## Installation on Mac
+Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
+Choose and download the installation file [here](https://github.com/conda-forge/miniforge#mambaforge), either
+[Mambaforge-MacOSX-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh)
+for older Intel-based Macs or
+[Mambaforge-MacOSX-arm64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-arm64.sh)
+for new Macs with Apple M1 chips. Then make the downloaded file executable (using chmod) and run it in the terminal, for example (for Intel Mac):
+```
+chmod +x Downloads/Mambaforge-MacOSX-x86_64.sh 
+Downloads/Mambaforge-MacOSX-x86_64.sh
+```
+Answer a few questions (likely **yes** or just Enter but you must explicitly type **yes** where needed). If the licence agreement is too long to show, press spacebar untill you reach the end, then agree (yes). After installing mambaforge successfully, QUIT TERMINAL COMPLETELY and run it again. The prompt will now start with "(base)" and you can install python packages we need:
+```
+mamba install pytorch torchaudio -c pytorch
+```
+Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak). Set read/write to UTF-8.
+
+Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Prak-installation-details) if you need to know more.
+
+
+
+
 
 ## Installation
 First, get **prak** source code:
@@ -93,31 +116,6 @@ If you do not plan training big neural networks or do not have a decent GPU, you
 use pytorch just on the CPU. **Prak** only uses CPU for phone alignment and even acoustic model
 can be reasonably trained on just the CPU.
 
-## Details of Mac installation
-Good start is [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
-Choose and download the installation file [here](https://github.com/conda-forge/miniforge#mambaforge), either
-[Mambaforge-MacOSX-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh)
-for older Intel-based Macs or
-[Mambaforge-MacOSX-arm64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-arm64.sh)
-for new Macs with Apple M1 chips. Then make the downloaded file executable (using chmod) and run it in the terminal, for example (for Intel Mac):
-```
-chmod +x Downloads/Mambaforge-MacOSX-x86_64.sh 
-Downloads/Mambaforge-MacOSX-x86_64.sh
-```
-Answer a few questions (likely **yes** or just Enter but you must explicitly type **yes** where needed). If the licence agreement is too long to show, press spacebar untill you reach the end, then agree (yes). After installing mambaforge successfully, QUIT TERMINAL COMPLETELY and run it again. The prompt will now start with "(base)" and you can install python packages we need:
-```
-mamba install pytorch torchaudio -c pytorch
-```
-Than you can verify that packages are really available. Run python:
-```
-python3
-```
-and at the ">>>" prompt type:
-```
-import torch
-import torchaudio
-```
-If no errors appear, you won! Quit python with Ctrl+D (^D) and try **prak**.
 
 
 
