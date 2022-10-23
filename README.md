@@ -54,7 +54,26 @@ Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu 
 Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Prak-installation-details) if you need to know more.
 
 
+## Installation on Linux
+Things happen too fast in the python world for apt package managers to keep up. So you most likely want a special package manager just for python, and there are really great tools to choose from.
 
+For scientific work, **conda** package manager might be better than **pip**. In the conda world, there are still many options.
+You likely do not want the huge Anaconda but rather the more free and modular conda forge. To get it working, you still have 
+multiple options from which [**mambaforge**](https://mamba.readthedocs.io/en/latest/installation.html) (faster conda) looks quite good. With this general guidance, it is now easy to google your way.
+
+Big part of pytorch installation complexity stems from the CUDA GPU drivers installation.
+If you do not plan training big neural networks or do not have a decent GPU, you may very well
+use pytorch just on the CPU. **Prak** only uses CPU for phone alignment and even acoustic model
+can be reasonably trained on just the CPU.
+
+You need ```pytorch``` and ```torchaudio``` packages. As a linux hacker you likely have other things to do with python so **prak** tries to use its own virtual environment ```prak``` before resorting to ```base``` or even trying to run without a virtual environment
+(this logic is in [prak/prak](https://github.com/vaclavhanzl/prak/blob/main/prak)). Prepare it like this:
+```
+mamba create prak
+mamba activate prak
+mamba install pytorch torchaudio -c pytorch
+```
+Then run **praat** and add ```prak/prak_align_phrase.praat``` to menu, the same way as described above for Mac.
 
 
 ## Installation
@@ -104,18 +123,6 @@ You need to install these prerequisities:
 
 There are many ways to do it and the sites above document them very well. But you may just follow our step-by-step
 guides below.
-## Details of Linux installation
-Things happen too fast in the python world for apt package managers to keep up. So you most likely want a special package manager just for python, and there are really great tools to choose from.
-
-For scientific work, **conda** package manager might be better than **pip**. In the conda world, there are still many options.
-You likely do not want the huge Anaconda but rather the more free and modular conda forge. To get it working, you still have 
-multiple options from which [**mambaforge**](https://mamba.readthedocs.io/en/latest/installation.html) (faster conda) looks quite good. With this general guidance, it is now easy to google your way.
-
-Big part of pytorch installation complexity stems from the CUDA GPU drivers installation.
-If you do not plan training big neural networks or do not have a decent GPU, you may very well
-use pytorch just on the CPU. **Prak** only uses CPU for phone alignment and even acoustic model
-can be reasonably trained on just the CPU.
-
 
 
 
