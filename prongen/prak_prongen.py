@@ -278,6 +278,7 @@ vrti vrti\nxti xty\nydi ydy\nzni zni\násti ásti\nédi édy\níti íti\nódi ó
 
 import argparse
 import sys
+import os
 from glob import glob
 
 #print("Remove inport here")
@@ -385,7 +386,10 @@ def line_iterable_to_lexirules(iterable):
             continue
         if line.startswith('###'):
             continue  # ignore comment lines
-        pattern, *replacements = line.split()
+        line = line.split()
+        if len(line)==0: # e.g. just "\n" when reading from exceptions file
+            continue
+        pattern, *replacements = line
         lexirules[pattern] = replacements
     return lexirules
 
@@ -1443,24 +1447,37 @@ if (__name__ == '__main__'):
     parser.add_argument('--help-symbols', action='store_true',
                         help='Print help for phonetic symbols used in the output')
 
-    parser.add_argument('-b', '--all-begins', action='store_true',
+    parser.add_argument('--all-begins', action='store_true',
                         help='Also create variants which may arise if other speech immediately precedes')
 
-    parser.add_argument('-e', '--all-ends', action='store_true',
+    parser.add_argument('--all-ends', action='store_true',
                         help='Also create variants which may arise if other speech immediately follows')
 
     parser.add_argument('-c', '--ctu-phone-symbols', action='store_true',
                         help='Use CTU phone symbols to print pronunciations')
 
+    parser.add_argument('-e','--exceptions', help='Text file with additional pronunciation rules') 
 
     args = parser.parse_args()
 
+    if args.exceptions!=None and not os.path.exists(args.exceptions):
+        print(f'Pronunciation exceptions file "{args.exceptions}" does not exist.', file=sys.stderr)
+        sys.exit(1)
 
     if args.help_symbols:
         print('"|" .. pause between words, "_" .. no pause, "." .. empty string (in variants), "=" .. seam')
         print(f"List of phone symbols: {[y for x, y in to_cz_transcription]}")
 
     if args.print_prons or args.spartan:
+
+        if args.exceptions!=None:
+            additional_rules = read_lexirules_table(args.exceptions)
+            num_rules_before = len(lexicon_replacements)
+            lexicon_replacements |= additional_rules
+            num_rules_after = len(lexicon_replacements)
+            # print change, so as the user can see number of her own rules, not just examples from exceptions.txt:
+            print(f'{num_rules_after-num_rules_before} more rule(s) got from {args.exceptions}')
+
         print("--- reading stdin, printing possible pronunciations ---")
         for sen in sys.stdin:
             print("")

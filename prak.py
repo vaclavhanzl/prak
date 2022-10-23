@@ -41,8 +41,12 @@ if (__name__ == '__main__'):
     parser.add_argument('-f', '--force', action='store_true',
                         help='Overwrite output file if it already exists, even if it was also an input file')
 
+    parser.add_argument('-e','--exceptions', help='Text file with additional pronunciation rules') 
 
     args = parser.parse_args()
+
+    #print(f"{args.exceptions=}")
+    #print(f"{prongen.hmm_pron.lexicon_replacements=}")
 
     problems = False
 
@@ -61,6 +65,10 @@ if (__name__ == '__main__'):
         print(f'Specify the "-f" or "--force" option to overwrite it.', file=sys.stderr)
         problems = True
 
+    if args.exceptions!=None and not os.path.exists(args.exceptions):
+        print(f'Pronunciation exceptions file "{args.exceptions}" does not exist.', file=sys.stderr)
+        problems = True
+
     if problems:
         print(f'Prak detected problems. Giving up.', file=sys.stderr)
         sys.exit(1)
@@ -68,11 +76,17 @@ if (__name__ == '__main__'):
     print('Prak, the phonetic alignment tool.')
     print(f'        Input wav: "{args.in_wav}"')
     print(f'   Input TextGrid: "{args.in_tg}" (will look for a phrase tier here)')
-    print(f'  Output TextGrid: "{args.out_tg}" (will make phone, word and phrase tiers here)\n')
+    print(f'  Output TextGrid: "{args.out_tg}" (will make phone, word and phrase tiers here)')
 
-
-
-
+    if args.exceptions!=None:
+        print(f'  Exceptions file: "{args.exceptions} (will get there additional pronunciation rules)"')
+        additional_rules = prongen.hmm_pron.read_lexirules_table(args.exceptions)
+        num_rules_before = len(prongen.hmm_pron.lexicon_replacements)
+        prongen.hmm_pron.lexicon_replacements |= additional_rules
+        num_rules_after = len(prongen.hmm_pron.lexicon_replacements)
+        # print change, so as the user can see number of her own rules, not just examples from exceptions.txt:
+        print(f'     (got {len(additional_rules)} rules there, maybe replacing similar or same already known, increasing the total rules number by {num_rules_after-num_rules_before})')
+    print("", flush=True) # 'flush' is just an attempt which may not really flush text out now
 
     model = acmodel.nn_acmodel.load_nn_acoustic_model(f"{base}/acmodel/sv200c-100_training_0024", mid_size=100, varstates=False)
 

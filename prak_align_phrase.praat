@@ -176,7 +176,7 @@ Save as text file: "~/prak/tmp/tmp_phrase_align.TextGrid"
 
 
 ### Run prak alignment
-system ~/prak/prak -i ~/prak/tmp/tmp_phrase_align.TextGrid -w ~/prak/tmp/tmp_phrase_align.wav -o ~/prak/tmp/tmp_phrase_align.out.textgrid --force>~/prak/tmp/prak_invocation.log 2>&1
+system ~/prak/prak -i ~/prak/tmp/tmp_phrase_align.TextGrid -w ~/prak/tmp/tmp_phrase_align.wav -e ~/prak/exceptions.txt -o ~/prak/tmp/tmp_phrase_align.out.textgrid --force>~/prak/tmp/prak_invocation.log 2>&1
 
 #printline prak alignment done
 
