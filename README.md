@@ -19,6 +19,21 @@ allow others to continue this work.
 * Usable on Linux, Mac and Windows.
 * More precise than similar tools, specifically targeting needs of the Czech phoneticians.
 
+## Installation on Windows
+Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html), download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe)). Run it, despite any protests from Windows. Install to ```C:\mambaforge```. This location is the only thing you have to change, otherwise go with default settings in installation dialogs.
+
+Run mambaforge console. Prompt must start ```(base)```. (If it does not, you run something else. Find mambaforge console.) Type this:
+```
+mamba install pytorch torchaudio -c pytorch
+pip install pysoundfile
+```
+
+Download prak v1 zip file from this page - change "main" to "v1" up left, click on the green "Code" button up right, download zip. Uncompress it directly to ```C:\```, creating ```C:\prak```.
+
+Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak). Set read/write to UTF-8.
+
+Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Prak-installation-details) if you need to know more.
+
 ## Installation
 First, get **prak** source code:
 ```
@@ -104,18 +119,7 @@ import torchaudio
 ```
 If no errors appear, you won! Quit python with Ctrl+D (^D) and try **prak**.
 
-## Details of Windows installation
-Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html), download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe)). Run it, despite any protests from Windows. Install to ```C:\mambaforge```. This location is the only thing you have to change, otherwise go with default settings in installation dialogs.
 
-Run mambaforge console. Prompt must start ```(base)```. (If it does not, you run something else. Find mambaforge console.) Type this:
-```
-mamba install pytorch torchaudio -c pytorch
-pip install pysoundfile
-```
-
-Download prak v1 zip file from this page - change "main" to "v1" up left, click on the green "Code" button up right, download zip. Uncompress it directly to ```C:\```, creating ```C:\prak```.
-
-Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak). Set read/write to UTF-8.
 
 ## Prak updates
 If you used **git** to download **prak**, it is easy. Go to the **prak** folder and run:
