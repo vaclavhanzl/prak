@@ -125,6 +125,10 @@ prongen/prak_prongen.py
 ```
 The tool will nicely help you. To see generated Czech pronunciation, try this:
 ```
+prongen/prak_prongen.py -p -s
+```
+or, if you are on Mac or Linux or you somehow got a real terminal in Windows, try much nicer
+```
 prongen/prak_prongen.py -p
 ```
 and then type Czech sentences in terminal (finish each with Enter, press Ctrl+D to stop).
