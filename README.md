@@ -118,7 +118,7 @@ pronunciations and time align all phones and words. Run this in terminal:
 ```
 The **Align using prak** button is in fact using this method internally to do its magic.
 
-### Generate just pronunciations
+### Generate only pronunciations
 To get an idea about pronunciation variants being considered, run this first (being in the **prak** folder):
 ```
 prongen/prak_prongen.py
