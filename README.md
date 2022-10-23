@@ -102,6 +102,23 @@ If you did not put **mamba** or **prak** directly to your home directory, edit c
 Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Prak-installation-details) for even more details.
 
 ## Usage
+### Align from praat GUI
+Select sound and textgrid containing phrase tier, press your new **Align using prak** button.
+
+You can also align multiple sounds using multiple textgrids, or multiple sounds using one input textgrid for all.
+
+### Align from command line
+For alignment with audio, you will need a Czech voice recording (wav) and a corresponding Czech transcript (in phrase tier in an utf8 TextGrid).
+The transcript can contain usual punctuation (as a secretary would transcribe it) but should be precise even at
+disfluencies - if the recording contains a repeated word, so should the transcript. If you used **praat** to
+make a phrase tier with transcript and saved it to file ```pocasi.textgrid```, you can use **prak** to guess
+pronunciations and time align all phones and words. Run this in terminal:
+```
+~/prak/prak.py -i pocasi.textgrid -w pocasi.wav -o pocasi.out.textgrid
+```
+The **Align using prak** button is in fact using this method internally to do its magic.
+
+### Generate just pronunciations
 To get an idea about pronunciation variants being considered, run this first (being in the **prak** folder):
 ```
 prongen/prak_prongen.py
@@ -113,17 +130,20 @@ prongen/prak_prongen.py -p
 and then type Czech sentences in terminal (finish each with Enter, press Ctrl+D to stop).
 (Look at [prongen/README.md](prongen/README.md) for details.) If this works, **python** is installed OK.
 
-For alignment with audio, you will need a Czech voice recording (wav) and a corresponding Czech transcript (in phrase tier in an utf8 TextGrid).
-The transcript can contain usual punctuation (as a secretary would transcribe it) but should be precise even at
-disfluencies - if the recording contains a repeated word, so should the transcript. If you used **praat** to
-make a phrase tier with transcript and saved it to file ```pocasi.textgrid```, you can use **prak** to guess
-pronunciations and time align all phones and words. Run this in terminal:
-```
-~/prak/prak.py -i pocasi.textgrid -w pocasi.wav -o pocasi.out.textgrid
-```
+
 Multiple pronunciation variants are considered, the acoustic model will hopefully choose the right
 one. You may need to teach the tool some additional foreign words or tell it about important seams in composite
-words. Using a simple binding praat script, you can also do all this directly from the **praat** GUI.
+words. Just edit the [prak/exceptions.txt file](https://github.com/vaclavhanzl/prak/blob/main/exceptions.txt).
+
+
+
+
+
+
+
+
+
+
 
 ## Common details of installation for all the platforms
 You need to install these prerequisities:
