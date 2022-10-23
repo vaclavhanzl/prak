@@ -138,7 +138,9 @@ tiercount = Get number of tiers
 
 if tiercount = 1
 	tier1name$ = Get tier name: 1
-	if not tier1name$ = "phrase"
+	if tier1name$ = "Phrase"
+		Set tier name: 1, "phrase"
+	elsif not tier1name$ = "phrase"
 		beginPause: "identify text"
 			comment: "No 'phrase' tier in '" + tg_name$ + "'. Use '" + tier1name$ + "' as source text?"
 		textSource = endPause: "Yes, use it!", "No, let me check.", 2, 2
@@ -155,8 +157,11 @@ else
 	phrasetierCount = 0
 	for tierz from 1 to tiercount
 		tierZname$ = Get tier name: tierz
-		if tierZname$ = "phrase" or tierZname$ = "Phrase"
+		if tierZname$ = "phrase"
 			phrasetierCount = phrasetierCount + 1
+		elsif tierZname$ = "Phrase"
+			phrasetierCount = phrasetierCount + 1
+			Set tier name: tierz, "phrase"
 		endif
 	endfor
 	if not phrasetierCount = 1
