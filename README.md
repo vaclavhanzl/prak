@@ -19,67 +19,29 @@ allow others to continue this work.
 * Usable on Linux, Mac and Windows.
 * More precise than similar tools, specifically targeting needs of the Czech phoneticians.
 
-## Installation
-First, get **prak** source code:
+## Installation on Windows
+Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html), download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe)). Run it, despite any protests from Windows. Install to ```C:\mambaforge```. This location is the only thing you have to change, otherwise go with default settings in installation dialogs.
+
+Run mambaforge console. Should be in Start menu as "Miniforge console" (name of the window is "Miniforge Prompt"). Text prompt must start ```(base)```. (If it does not, you ran something else. Find the right one.) Type this (and hit Enter):
 ```
-git clone https://github.com/vaclavhanzl/prak.git
-cd prak
-git checkout v1
+mamba install pytorch torchaudio -c pytorch
 ```
-Or you can instead download a zip file - change "main" to "v1" up left, click on the green "Code" button up right on this page.
-
-Than you need to install python3.10, pytorch and torchaudio, e.g. using
-[mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
-
-If you feel scared, look down for detailed instructions.
-### Integration to praat GUI
-Open script **prak_align_phrase.praat** and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak). Set read/write to UTF-8.
-
-## Usage
-To get an idea about pronunciation variants being considered, run this first (being in the **prak** folder):
+and then this (then Enter again):
 ```
-prongen/prak_prongen.py
+pip install pysoundfile
 ```
-The tool will nicely help you. To see generated Czech pronunciation, try this:
-```
-prongen/prak_prongen.py -p
-```
-and then type Czech sentences in terminal (finish each with Enter, press Ctrl+D to stop).
-(Look at [prongen/README.md](prongen/README.md) for details.) If this works, **python** is installed OK.
+If any Y/n questions pop up, just hit Enter (or type Y and Enter if you wish).
 
-For alignment with audio, you will need a Czech voice recording (wav) and a corresponding Czech transcript (in phrase tier in an utf8 TextGrid).
-The transcript can contain usual punctuation (as a secretary would transcribe it) but should be precise even at
-disfluencies - if the recording contains a repeated word, so should the transcript. If you used **praat** to
-make a phrase tier with transcript and saved it to file ```pocasi.textgrid```, you can use **prak** to guess
-pronunciations and time align all phones and words. Run this in terminal:
-```
-~/prak/prak.py -i pocasi.textgrid -w pocasi.wav -o pocasi.out.textgrid
-```
-Multiple pronunciation variants are considered, the acoustic model will hopefully choose the right
-one. You may need to teach the tool some additional foreign words or tell it about important seams in composite
-words. Using a simple binding praat script, you can also do all this directly from the **praat** GUI.
+Download prak v1 zip file from this GitHub page - change "main" to "v1" up left, click on the green "Code" button up right, download zip. Uncompress it directly to ```C:\```, creating ```C:\prak```. If the downloaded file is named something like 'prak-1', rename it to 'prak'.
 
-## Common details of installation for all the platforms
-You need to install these prerequisities:
-* [python3](https://www.python.org/)
-* [PyTorch](https://pytorch.org/) with **torchaudio** (CPU version is enough, choose Conda or Pip)
+Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak).
 
-There are many ways to do it and the sites above document them very well. But you may just follow our step-by-step
-guides below.
-## Details of Linux installation
-Things happen too fast in the python world for apt package managers to keep up. So you most likely want a special package manager just for python, and there are really great tools to choose from.
+Set Praat text files encoding to UTF-8 (Praat > Preferences > Text reading preferences > UTF-8, then Text writing preferences > UTF-8).
 
-For scientific work, **conda** package manager might be better than **pip**. In the conda world, there are still many options.
-You likely do not want the huge Anaconda but rather the more free and modular conda forge. To get it working, you still have 
-multiple options from which [**mambaforge**](https://mamba.readthedocs.io/en/latest/installation.html) (faster conda) looks quite good. With this general guidance, it is now easy to google your way.
+Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Prak-installation-details) if you need to know more.
 
-Big part of pytorch installation complexity stems from the CUDA GPU drivers installation.
-If you do not plan training big neural networks or do not have a decent GPU, you may very well
-use pytorch just on the CPU. **Prak** only uses CPU for phone alignment and even acoustic model
-can be reasonably trained on just the CPU.
-
-## Details of Mac installation
-Good start is [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
+## Installation on Mac
+Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
 Choose and download the installation file [here](https://github.com/conda-forge/miniforge#mambaforge), either
 [Mambaforge-MacOSX-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh)
 for older Intel-based Macs or
@@ -93,26 +55,108 @@ Answer a few questions (likely **yes** or just Enter but you must explicitly typ
 ```
 mamba install pytorch torchaudio -c pytorch
 ```
-Than you can verify that packages are really available. Run python:
-```
-python3
-```
-and at the ">>>" prompt type:
-```
-import torch
-import torchaudio
-```
-If no errors appear, you won! Quit python with Ctrl+D (^D) and try **prak**.
 
-## Details of Windows installation
-It *should* work but we did not try yet. (Try mambaforge?)
+Get **prak**, preferably using **git** (makes future updates super easy):
+```
+git clone https://github.com/vaclavhanzl/prak.git
+cd prak
+git checkout v1
+```
+(Or you can get zip as described above for Windows and uncompress it in your home folder.)
+
+Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak). Set read/write to UTF-8 (Praat > Preferences > Text reading preferences > UTF-8, then Text writing preferences > UTF-8).
+
+Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Prak-installation-details) if you need to know more.
+
+
+## Installation on Linux
+Things happen too fast in the python world for apt package managers to keep up. So you most likely want a special package manager just for python, and there are really great tools to choose from.
+
+For scientific work, **conda** package manager might be better than **pip**. In the conda world, there are still many options.
+You likely do not want the huge Anaconda but rather the more free and modular conda forge. To get it working, you still have 
+multiple options from which [**mambaforge**](https://mamba.readthedocs.io/en/latest/installation.html) (faster conda) looks quite good. With this general guidance, it is now easy to google your way.
+
+Big part of pytorch installation complexity stems from the CUDA GPU drivers installation.
+If you do not plan training big neural networks or do not have a decent GPU, you may very well
+use pytorch just on the CPU. **Prak** only uses CPU for phone alignment and even acoustic model
+can be reasonably trained on just the CPU.
+
+You need ```pytorch``` and ```torchaudio``` packages. As a linux hacker you likely have other things to do with python so **prak** tries to use its own virtual environment ```prak``` before resorting to ```base``` or even trying to run without a virtual environment
+(this logic is in [prak/prak](https://github.com/vaclavhanzl/prak/blob/main/prak)). Prepare it like this:
+```
+mamba create prak
+mamba activate prak
+mamba install pytorch torchaudio -c pytorch
+```
+
+Get **prak** source code via git. If you have a GitHub account and ssh key, clone directly from your home like this:
+```
+git clone git@github.com:vaclavhanzl/prak.git
+cd prak
+git checkout v1
+```
+otherwise resort to https:
+```
+git clone https://github.com/vaclavhanzl/prak.git
+cd prak
+git checkout v1
+```
+
+Then run **praat** and add ```prak/prak_align_phrase.praat``` to menu, the same way as described above for Mac.
+If you did not put **mamba** or **prak** directly to your home directory, edit config variables in this script.
+
+Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Prak-installation-details) for even more details.
+
+## Usage
+### Align from praat GUI
+Select sound and textgrid containing phrase tier, press your new **Align using prak** button.
+
+You can also align multiple sounds using multiple textgrids, or multiple sounds using one input textgrid for all.
+
+### Align from command line
+For alignment with audio, you will need a Czech voice recording (wav) and a corresponding Czech transcript (in phrase tier in an utf8 TextGrid).
+The transcript can contain usual punctuation (as a secretary would transcribe it) but should be precise even at
+disfluencies - if the recording contains a repeated word, so should the transcript. If you used **praat** to
+make a phrase tier with transcript and saved it to file ```pocasi.textgrid```, you can use **prak** to guess
+pronunciations and time align all phones and words. Run this in terminal:
+```
+~/prak/prak.py -i pocasi.textgrid -w pocasi.wav -o pocasi.out.textgrid
+```
+The **Align using prak** button is in fact using this method internally to do its magic.
+
+### Generate only pronunciations
+To get an idea about pronunciation variants being considered, run this first (being in the **prak** folder):
+```
+prongen/prak_prongen.py
+```
+The tool will nicely help you. To see generated Czech pronunciation, try this:
+```
+prongen/prak_prongen.py -p -s
+```
+or, if you are on Mac or Linux or you somehow got a real terminal in Windows, try much nicer
+```
+prongen/prak_prongen.py -p
+```
+and then type Czech sentences in terminal (finish each with Enter, press Ctrl+D to stop).
+(Look at [prongen/README.md](prongen/README.md) for details.) If this works, **python** is installed OK.
+
+
+Multiple pronunciation variants are considered, the acoustic model will hopefully choose the right
+one. You may need to teach the tool some additional foreign words or tell it about important seams in composite
+words. Just edit the [prak/exceptions.txt file](https://github.com/vaclavhanzl/prak/blob/main/exceptions.txt).
+It is automatically used at this default location by the GUI method and you can also use it from command line
+using the ```-e``` option.
+
 
 ## Prak updates
 If you used **git** to download **prak**, it is easy. Go to the **prak** folder and run:
 ```
 git pull
 ```
-(If you went with the zip option, download a new zip the same way.)
+If you went with the zip option, download a new zip the same way.
+
+You certainly want to update, prak is getting better nearly daily!
+We are currently testing and tuning installation for all the platforms so also this README is still changing quickly.
 
 ## Speed
 1 minute audio was phone-aligned in 18 seconds on a 2014 Mac Air, in 3.6 seconds on a 2020 M1 Mac Air, in 5 seconds on a decent 2020 Intel linux box.
@@ -129,18 +173,6 @@ these alignments are purely machine made.)
 Some Czech phonetitians call similar tools "nastřelovač" as these tools position phones and their time stamps
 in a fast but rather unprecise manner, like positioning objects by shooting them where they should be.
 The Czech word "prak" means "sling", a common shooting toy.
-
-## Work in progress
-We are currently testing and tuning installation for all the platforms so this page is still changing quickly.
-
-The main branch has all the code but NOT the trained acoustic model. We still search for a good and easy way to
-deliver it to you. Currently the model is added in the **v1** branch. So do not forget:
-```
-git checkout v1
-```
-(This trickery should avoid cumulation of old models in prak git repo. Branch can be deleted on github. Commit in main cannot.)
-
-On Windows, we need to add some slightly modified variant of the prak->prak.py envelope script. But you likely can use prak.py directly.
 
 ## Can I contribute to prak?
 Of yourse! You are welcome! You can contribute in many ways:
