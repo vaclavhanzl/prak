@@ -113,7 +113,7 @@ mamba install pytorch torchaudio -c pytorch
 pip install pysoundfile
 ```
 
-Download prak v1 zip file from this page - change "main" to "v1" up left, click on the green "Code" button up right, download zip. Uncompress id directly to ```C:\```, creating ```C:\prak```.
+Download prak v1 zip file from this page - change "main" to "v1" up left, click on the green "Code" button up right, download zip. Uncompress it directly to ```C:\```, creating ```C:\prak```.
 
 Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak). Set read/write to UTF-8.
 
