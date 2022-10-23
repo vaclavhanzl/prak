@@ -3,7 +3,39 @@
 ### Copyright (c) 2022 Vaclav Hanzl & Adleta Hanzlova. This is a free software (see the MIT license).
 ### This file is part of the https://github.com/vaclavhanzl/prak project.
 
+### Config section - where is prak, mambaforge and exceptions.txt
+if windows
+       prak$ = "C:\prak"
+       mambaforge$ = "C:\mambaforge"
+       #prak$ = "C:\Users\Ferda\prak"
+       #mambaforge$ = "C:\Users\Ferda\mambaforge"
+       exceptions$ = prak$ + "\exceptions.txt"
+else
+       prak$ = "~/prak"
+       mambaforge$ = "~/mambaforge"
+       exceptions$ = prak$ + "/exceptions.txt"
+endif
+
+
 clearinfo
+
+### Compute all the remaining system interaction components from config variables
+if windows
+       prak_tmp$ = prak$ + "\tmp\"
+       python$ = mambaforge$ + "\python.exe"
+       prak_py$ = prak$ + "\prak.py"
+       prak_exe$ = python$ + " " + prak_py$
+else
+       prak_tmp$ = prak$ + "/tmp/"
+       prak_exe$ = prak$ + "/prak"
+endif
+prak_tgin$ = prak_tmp$ + "tmp_phrase_align.TextGrid"
+prak_wav$ = prak_tmp$ + "tmp_phrase_align.wav"
+prak_tgout$ = prak_tmp$ + "tmp_phrase_align.out.TextGrid"
+prak_log$ = prak_tmp$ + "prak_invocation.log"
+#printline Will invoke prak like this:
+#printline 'prak_exe$' -i 'prak_tgin$' -w 'prak_wav$' -e 'exceptions$' -o 'prak_tgout$' --force >'prak_log$' 2>&1
+
 
 ### Assess input data
 tg_inputCount = numberOfSelected ("TextGrid")
@@ -168,21 +200,21 @@ endif
 
 ### Save it to prak's temporary directory
 select 'snd'
-Save as WAV file: "~/prak/tmp/tmp_phrase_align.wav"
+Save as WAV file: prak_wav$
 select 'tg'
-Save as text file: "~/prak/tmp/tmp_phrase_align.TextGrid"
+Save as text file: prak_tgin$
 
 #printline saved to temporary directory
 
 
 ### Run prak alignment
-system ~/prak/prak -i ~/prak/tmp/tmp_phrase_align.TextGrid -w ~/prak/tmp/tmp_phrase_align.wav -e ~/prak/exceptions.txt -o ~/prak/tmp/tmp_phrase_align.out.textgrid --force>~/prak/tmp/prak_invocation.log 2>&1
+system 'prak_exe$' -i 'prak_tgin$' -w 'prak_wav$' -e 'exceptions$' -o 'prak_tgout$' --force >'prak_log$' 2>&1
 
 #printline prak alignment done
 
 
 ### Read results back to praat
-Read from file: "~/prak/tmp/tmp_phrase_align.out.textgrid"
+Read from file: prak_tgout$
 tg_out = selected("TextGrid")
 
 #printline results read

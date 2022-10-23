@@ -115,7 +115,7 @@ if (__name__ == '__main__'):
     #print(tg_txt)
 
 
-    with open(args.out_tg, 'w') as f:
+    with open(args.out_tg, 'w', encoding='utf-8') as f: # explicit utf-8 needed on Windows
         f.write(tg_txt)
 
     print(f'Alignment written to phone, word and phrase tiers in "{args.out_tg}"')

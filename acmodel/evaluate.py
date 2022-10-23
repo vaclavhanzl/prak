@@ -354,7 +354,7 @@ def make_auto_textgrid_file_from_wav_file(wav_file, model, out_textgrid_file, de
     tg_txt = textgrid_file_text(dict(words=word_tier, phones=phone_tier, auto_p=auto_phone_tier))
     #print(tg_txt)
     #evaluate_model_on_wav_file(wav, 
-    with open(out_textgrid_file, 'w') as f:
+    with open(out_textgrid_file, 'w', encoding='utf-8') as f: # explicit utf-8 needed it this is ever run on Windows
         f.write(tg_txt)
 
 

@@ -323,7 +323,7 @@ def string_to_table(string):
 def read_replacement_table(filename):
     "Read replacement table from file of lines like 'from to'"
     table = []
-    with open(filename) as file:
+    with open(filename, encoding='utf-8') as file: # explicit utf-8 needed on Windows
         for line in file:
             if line.startswith('###'):
                 continue  # ignore comment lines
@@ -397,7 +397,7 @@ def read_lexirules_table(filename):
     """
     Read lexicon rules from a text file
     """
-    with open(filename) as file:
+    with open(filename, encoding='utf-8') as file: # explicit utf-8 needed on Windows
         return line_iterable_to_lexirules(file)
 
 

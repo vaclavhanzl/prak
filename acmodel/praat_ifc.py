@@ -67,7 +67,7 @@ def read_interval_tiers_from_textgrid_file(filename):
     """
     Read all interval tiers from a TextGrid file
     """
-    with open(filename, 'r') as fileread:
+    with open(filename, 'r', encoding='utf-8') as fileread: # explicit utf-8 needed on Windows
         lines = [l.strip() for l in fileread.readlines()]
     tiers = {}
     state = 'initial'
