@@ -9,7 +9,7 @@
 
 
 
-### Few examples. (You can delete this part, all rules below are also build in.)
+### Few examples. (You can delete this part, all rules below are also built in.)
 ### Write it the "normal" Czech way:
 interview intervjů
 
@@ -25,3 +25,4 @@ videoukázk video=ukázk
 ### This rule allows pronunciations "jsem" and "sem", "jsi" and "si" etc.:
 +js s js
 
+### REMEMBER: This file must be saved as utf-8. NOT utf-16, NOT latin-XXX.
