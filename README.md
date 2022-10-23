@@ -134,6 +134,8 @@ and then type Czech sentences in terminal (finish each with Enter, press Ctrl+D 
 Multiple pronunciation variants are considered, the acoustic model will hopefully choose the right
 one. You may need to teach the tool some additional foreign words or tell it about important seams in composite
 words. Just edit the [prak/exceptions.txt file](https://github.com/vaclavhanzl/prak/blob/main/exceptions.txt).
+It is automatically used at this default location by the GUI method and you can also use it from command line
+using the ```-e``` option.
 
 
 
