@@ -1,0 +1,27 @@
+###
+### exceptions.txt - additional pronunciation rules, see https://github.com/vaclavhanzl/prak
+###
+### Comment lines start with THREE hashes: "###".
+### Longer match wins, order mostly does not matter.
+
+### Write you rules here:
+
+
+
+
+### Few examples. (You can delete this part, all rules below are also build in.)
+### Write it the "normal" Czech way:
+interview intervjů
+
+### Help with ditini where needed, use "ň", "y" etc. (but it should be 98% correct by default):
+nitrolak nytrolak
+
+### Suggest seam. This rule helps for videoukázka, supervideoukázky etc.
+videoukázk video=ukázk
+
+### Use "+" for word begin/end. This rule wil NOT match e.g. "euroombudsman":
++room+ rům
+
+### This rule allows pronunciations "jsem" and "sem", "jsi" and "si" etc.:
++js s js
+
