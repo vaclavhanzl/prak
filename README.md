@@ -105,7 +105,17 @@ import torchaudio
 If no errors appear, you won! Quit python with Ctrl+D (^D) and try **prak**.
 
 ## Details of Windows installation
-It *should* work but we did not try yet. (Try mambaforge?)
+Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html), download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe)). Run it, despite any protests from Windows. Install to ```C:\mambaforge```. This location is the only thing you have to change, otherwise go with default settings in installation dialogs.
+
+Run mambaforge console. Prompt must start ```(base)```. (If it does not, you run something else. Find mambaforge console.) Type this:
+```
+mamba install pytorch torchaudio -c pytorch
+pip install pysoundfile
+```
+
+Download prak v1 zip file from this page - change "main" to "v1" up left, click on the green "Code" button up right, download zip. Uncompress id directly to ```C:\```, creating ```C:\prak```.
+
+Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak). Set read/write to UTF-8.
 
 ## Prak updates
 If you used **git** to download **prak**, it is easy. Go to the **prak** folder and run:
@@ -139,8 +149,6 @@ deliver it to you. Currently the model is added in the **v1** branch. So do not 
 git checkout v1
 ```
 (This trickery should avoid cumulation of old models in prak git repo. Branch can be deleted on github. Commit in main cannot.)
-
-On Windows, we need to add some slightly modified variant of the prak->prak.py envelope script. But you likely can use prak.py directly.
 
 ## Can I contribute to prak?
 Of yourse! You are welcome! You can contribute in many ways:
