@@ -155,7 +155,7 @@ git pull
 ```
 If you went with the zip option, download a new zip the same way.
 
-You certainly want to update, prak is getting better nearly daily!
+You certainly want to update, prak is getting better nearly daily! See recent [list of published changes](https://github.com/vaclavhanzl/prak/commits/v1) or even [what happens in the develop branch](https://github.com/vaclavhanzl/prak/commits/develop) (extremely courios ones can even see feature branches).
 We are currently testing and tuning installation for all the platforms so also this README is still changing quickly.
 
 ## Speed
