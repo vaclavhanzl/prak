@@ -17,6 +17,7 @@ else
 endif
 
 
+### Clear Praat info window
 clearinfo
 
 ### Compute all the remaining system interaction components from config variables
@@ -54,7 +55,6 @@ reuse_tg = 0
 ### Prevent item count mismatch / decide on source text usage
 
 if not tg_inputCount = snd_inputCount
-
 	if tg_inputCount = 1
 		select tgInput1
 		tgtoReuse$ = selected$ ("TextGrid")
@@ -100,14 +100,6 @@ tg_name$ = selected$("TextGrid")
 #printline input data in
 
 
-### Scale times of imput items
-select 'tg'
-plus 'snd'
-Scale times
-
-#printline times scaled
-
-
 ### Make sure textgrid is not aligned already
 select 'tg'
 tiercount = Get number of tiers
@@ -146,8 +138,7 @@ if tiercount = 1
 		textSource = endPause: "Yes, use it!", "No, let me check.", 2, 2
 		if textSource = 1
 			Set tier name: 1, "phrase"
-		endif
-		if textSource = 2
+		elsif textSource = 2
 			printline
 			printline !!! alignment interrupted at 'snd_name$' (source text issue)
 			exitScript ( )
@@ -159,12 +150,16 @@ else
 		tierZname$ = Get tier name: tierz
 		if tierZname$ = "phrase"
 			phrasetierCount = phrasetierCount + 1
+			source_text_tier = tierz
 		elsif tierZname$ = "Phrase"
 			phrasetierCount = phrasetierCount + 1
 			Set tier name: tierz, "phrase"
+			source_text_tier = tierz
 		endif
 	endfor
-	if not phrasetierCount = 1
+	if phrasetierCount = 1
+		textSource = 1
+	else
 		printline identify source text in 'tg_name$'
 		for tierw from 1 to tiercount
 			tierWname$ = Get tier name: tierw
@@ -175,33 +170,37 @@ else
 				comment: "No 'phrase' tier in '" + tg_name$ + "'. Which tier is source text?"
 				natural: "source text tier", tiercount
 			textSource = endPause: "Continue", "What? Stop alignment!", 1, 2
-			if textSource = 1
-				Set tier name: source_text_tier, "phrase"
-			endif
 		elsif phrasetierCount > 1
 			beginPause: "identify text"
 				comment: "Multiple 'phrase' tiers in '" + tg_name$ + "'. Which tier is source text?"		
 				natural: "source text tier", tiercount
 			textSource = endPause: "Continue", "What?? Stop alignment!", 1, 2
-			if textSource = 1
-				Set tier name: source_text_tier, "phrase"
-				tg_rm = tg
-				tg = Extract one tier: source_text_tier
-				select 'tg_rm'
-				Remove
-				tgInput1 = tg
-			endif
 		endif
-		if textSource = 2
-			printline
-			printline !!! alignment interrupted at 'snd_name$' (source text issue)
-			exitScript ( )
-		endif
+	endif
+
+	if textSource = 1
+		Set tier name: source_text_tier, "phrase"
+		tg_rm = tg
+		tg = Extract one tier: source_text_tier
+		select 'tg_rm'
+		Remove
+		tgInput1 = tg
+	elsif textSource = 2
+		printline
+		printline !!! alignment interrupted at 'snd_name$' (source text issue)
+		exitScript ( )
 	endif
 endif
 
 #printline source text ok
 
+
+### Scale times of imput items
+select 'tg'
+plus 'snd'
+Scale times
+
+#printline times scaled
 
 ### Save it to prak's temporary directory
 select 'snd'
