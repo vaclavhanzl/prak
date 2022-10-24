@@ -20,6 +20,7 @@ endif
 ### Clear Praat info window
 clearinfo
 
+
 ### Compute all the remaining system interaction components from config variables
 if windows
        prak_tmp$ = prak$ + "\tmp\"
@@ -50,10 +51,12 @@ for s from 1 to snd_inputCount
 	sndInput's' = selected ("Sound",s)
 endfor
 
+### Reset alignment navigation variables
 reuse_tg = 0
+unmatched_names = 0
+
 
 ### Prevent item count mismatch / decide on source text usage
-
 if not tg_inputCount = snd_inputCount
 	if tg_inputCount = 1
 		select tgInput1
@@ -75,11 +78,10 @@ if not tg_inputCount = snd_inputCount
 		exitScript ( )
 	endif
 endif
-
 #printline item mismatch controll ok
 
-### Script repetition for multiple alignments (endfor at the end of script)
 
+### Script repetition for multiple alignments (endfor at the end of script)
 for runNum from 1 to snd_inputCount
 	if reuse_tg = 1
 		tgInput=tgInput1
@@ -96,14 +98,32 @@ snd = selected("Sound")
 snd_name$ = selected$("Sound")
 tg = selected("TextGrid")
 tg_name$ = selected$("TextGrid")
-
 #printline input data in
+
+
+### If file names don't match, make sure it's ok
+if not reuse_tg = 1
+	if not unmatched_names = 1
+		if not tg_name$ = snd_name$
+			beginPause: "item name mismatch"
+				comment: "Align sound '" + snd_name$ + "' using text from '" + tg_name$ + "'?"
+				boolean: "Do not ask again and align by item order", 0
+			nameMismatch = endPause: "Yes, do it.", "No, stop alignment.", 2, 2
+			if nameMismatch = 1
+				unmatched_names = do_not_ask_again_and_align_by_item_order
+			elsif nameMismatch = 2
+				printline !!! alignment interrupted at 'snd_name$' (item name mismatch)
+				exitScript ( )
+			endif
+		endif
+	endif
+endif
+#printline item name check done
 
 
 ### Make sure textgrid is not aligned already
 select 'tg'
 tiercount = Get number of tiers
-
 	for tierx from 1 to tiercount
 		tiername$ = Get tier name: tierx
 		if tiername$ = "phone" or tiername$ = "Phone"
@@ -122,12 +142,10 @@ tiercount = Get number of tiers
 			endif
 		endif
 	endfor
-
 #printline alignment clash controll ok
 
 
 ### If 'phrase' tier is missing, identify the source text
-
 if tiercount = 1
 	tier1name$ = Get tier name: 1
 	if tier1name$ = "Phrase"
@@ -191,7 +209,6 @@ else
 		exitScript ( )
 	endif
 endif
-
 #printline source text ok
 
 
@@ -199,28 +216,25 @@ endif
 select 'tg'
 plus 'snd'
 Scale times
-
 #printline times scaled
+
 
 ### Save it to prak's temporary directory
 select 'snd'
 Save as WAV file: prak_wav$
 select 'tg'
 Save as text file: prak_tgin$
-
 #printline saved to temporary directory
 
 
 ### Run prak alignment
 system 'prak_exe$' -i 'prak_tgin$' -w 'prak_wav$' -e 'exceptions$' -o 'prak_tgout$' --force >'prak_log$' 2>&1
-
 #printline prak alignment done
 
 
 ### Read results back to praat
 Read from file: prak_tgout$
 tg_out = selected("TextGrid")
-
 #printline results read
 
 
