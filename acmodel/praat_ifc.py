@@ -6,6 +6,7 @@
 #   from praat_ifc import textgrid_file_text
 #   print(textgrid_file_text({"slova": [(0,2,"dobrĂ˝"), (2,3,"den")], "segmenty": [(0,1,"d"),(1,2,"Ă˝"),(2,2.5,'de'),(2.5,3,'n')]}))
 
+import sys
 
 def textgrid_file_intro(xmax, size):
     return f"""File type = "ooTextFile"
@@ -198,7 +199,24 @@ def sampify_tier(tier):
 
 
 
+def unify_tier_ends(tg_dict, leading_tier="phrase", max_fuzz=0.1):
+    """
+    Slightly move ends of last intervals of all tiers to match the leading tier.
+    """
+    assert len(tg_dict[leading_tier])>=1 # at least one interval needed
+    (_, end, _) = tg_dict[leading_tier][-1] # tier is a list of (xmin, xmax, phone)
 
+    for tier_name, tier_list in tg_dict.items(): # includes leading tier but no problem
+        assert len(tier_list)>=1 # at least one interval needed
+        (xmin, xmax, text) = tier_list[-1] # take last interval
+        if abs(xmax-end)<=max_fuzz and xmin<end: # not much fuzz, and positive interval will remain
+            tier_list[-1] = (xmin, end, text) # put it back modified
+        else:
+            print(f'Prak WARNING: Failed to unify exact end of tier "{tier_name}" with tier "{leading_tier}".', file=sys.stderr)
+            if not abs(xmax-end)<=max_fuzz:
+                print(f' Ends differ more than {max_fuzz}s.', file=sys.stderr)
+            if not xmin<end:
+                print(f' Last interval would be negative.', file=sys.stderr)
 
 
 # To be used in Jupyter notebook:

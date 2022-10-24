@@ -111,9 +111,12 @@ if (__name__ == '__main__'):
     #print(phone_tier)
     sampa_phone_tier = acmodel.praat_ifc.sampify_tier(phone_tier)
 
-    tg_txt = acmodel.praat_ifc.textgrid_file_text(dict(phone=sampa_phone_tier, word=word_tier, phrase=phrase_tier))
-    #print(tg_txt)
+    tg_dict = dict(phone=sampa_phone_tier, word=word_tier, phrase=phrase_tier)
 
+    acmodel.praat_ifc.unify_tier_ends(tg_dict, leading_tier="phrase", max_fuzz=0.1)
+
+    tg_txt = acmodel.praat_ifc.textgrid_file_text(tg_dict)
+    #print(tg_txt)
 
     with open(args.out_tg, 'w', encoding='utf-8') as f: # explicit utf-8 needed on Windows
         f.write(tg_txt)
