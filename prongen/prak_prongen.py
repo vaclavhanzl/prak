@@ -389,6 +389,9 @@ def line_iterable_to_lexirules(iterable):
         line = line.split()
         if len(line)==0: # e.g. just "\n" when reading from exceptions file
             continue
+        if len(line)==1: # very dangerous, would produce empty sets in sausages
+            print(f'Prak WARNING: Ignoring rule for "{line[0]}" with ZERO replacements.', file=sys.stderr)
+            continue
         pattern, *replacements = line
         lexirules[pattern] = replacements
     return lexirules
