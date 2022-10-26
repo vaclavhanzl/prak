@@ -110,8 +110,17 @@ Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Pr
 ## Usage
 ### Align from praat GUI
 Select sound and textgrid containing phrase tier, press your new **Align using prak** button.
-
 You can also align multiple sounds using multiple textgrids, or multiple sounds using one input textgrid for all.
+Some details:
+
+* text can be in one or more intervals of tier named "phrase" of "Phrase"
+* if input textgrid does not contain tier with such name, prak will nicely let you choose the right one
+* times of the text tier do not have to match the audio so you can align several wavs using one textgrid
+* prak automatically matches selected wav(s) and textgrid(s) and either goes on automatically if it makes clear sense or asks you for details if needed
+* sound can have any sampling frequency
+
+
+
 
 ### Align from command line
 For alignment with audio, you will need a Czech voice recording (wav) and a corresponding Czech transcript (in phrase tier in an utf8 TextGrid).
