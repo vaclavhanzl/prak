@@ -120,9 +120,9 @@ Some details:
 * prak automatically matches selected wav(s) and textgrid(s) and either goes on automatically if it makes clear sense or asks you for details if needed
 * if the textgrid contains a phone tier, prak warns you before going on to safeguard any manual tuning you already did 
 * sound can have any sampling frequency
-* several pronunciation variants are considered where there is a possible ambiguity and the (hopefully) right one is selected based on acoustic signal match
+* several pronunciation variants are considered where there is possible ambiguity and the (hopefully) right one is selected based on acoustic signal match
 
-
+Most of the phone-phone boundaries will likely still need manual microtununig to suit your needs but not much more than that. On the level of words (and silences present on not present between words), alignment should be mostly correct. Prak tries its best to decide whether voicing assimilation happened or not on word boundaries, whether glottal stop is present, whether some possible phone changes happened or not etc. Often it is right, sometimes the decision is hard even for a human. Sometimes prak gets these things wrong but it should be a minority of cases.
 
 
 ### Align from command line
