@@ -119,7 +119,7 @@ Some details:
 * prak automatically matches selected wav(s) and textgrid(s) and either goes on automatically if it makes clear sense or asks you for details if needed
 * if the textgrid contains a phone tier, prak warns you before going on to safeguard any manual tuning you already did 
 * sound can have any sampling frequency
-* several pronunciation variante are considered where there is a possible ambiguity and the (hopefully) right one is selected based on acoustic signal match
+* several pronunciation variants are considered where there is a possible ambiguity and the (hopefully) right one is selected based on acoustic signal match
 
 
 
