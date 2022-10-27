@@ -20,7 +20,7 @@ allow others to continue this work.
 * More precise than similar tools, specifically targeting needs of the Czech phoneticians.
 
 ## Installation on Windows
-Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html), download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe)). Run it, despite any protests from Windows (it will whine about 'unidentified developer'). Install to ```C:\mambaforge```. This location is the only thing you have to change, otherwise go with default settings in installation dialogs.
+Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html), download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe)). Run it, despite any protests from Windows (it will whine about unknown application, click small text 'more information' and then 'Run anyway'). Install to ```C:\mambaforge```. This location is the only thing you have to change, otherwise go with default settings in installation dialogs.
 
 Run mambaforge console. Should be in Start menu as "Miniforge console" (name of the window is "Miniforge Prompt"). Text prompt must start ```(base)```. (If it does not, you ran something else. Find the right one.) Type this (and hit Enter):
 ```
