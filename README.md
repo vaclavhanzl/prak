@@ -32,7 +32,7 @@ pip install pysoundfile
 ```
 If any Y/n questions pop up, just hit Enter (or type Y and Enter if you wish).
 
-Download prak zip file from this GitHub page - click on the green "Code" button up right, download zip. Uncompress it directly to ```C:\```, creating ```C:\prak```. If the downloaded file is named something like 'prak-1', rename it to 'prak'.
+Download prak zip file from this GitHub page - click on the green "Code" button up right, download zip. Uncompress it directly to ```C:\```, creating ```C:\prak```. If the downloaded file is named something like 'prak-main', rename it to 'prak'.
 
 Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak).
 
