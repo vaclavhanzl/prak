@@ -32,7 +32,7 @@ pip install pysoundfile
 ```
 If any Y/n questions pop up, just hit Enter (or type Y and Enter if you wish).
 
-Download prak v1 zip file from this GitHub page - change "main" to "v1" up left, click on the green "Code" button up right, download zip. Uncompress it directly to ```C:\```, creating ```C:\prak```. If the downloaded file is named something like 'prak-1', rename it to 'prak'.
+Download prak zip file from this GitHub page - click on the green "Code" button up right, download zip. Uncompress it directly to ```C:\```, creating ```C:\prak```. If the downloaded file is named something like 'prak-1', rename it to 'prak'.
 
 Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak).
 
@@ -60,7 +60,6 @@ Get **prak**, preferably using **git** (makes future updates super easy):
 ```
 git clone https://github.com/vaclavhanzl/prak.git
 cd prak
-git checkout v1
 ```
 (Or you can get zip as described above for Windows and uncompress it in your home folder.)
 
@@ -93,13 +92,11 @@ Get **prak** source code via git. If you have a GitHub account and ssh key, clon
 ```
 git clone git@github.com:vaclavhanzl/prak.git
 cd prak
-git checkout v1
 ```
 otherwise resort to https:
 ```
 git clone https://github.com/vaclavhanzl/prak.git
 cd prak
-git checkout v1
 ```
 
 Then run **praat** and add ```prak/prak_align_phrase.praat``` to menu, the same way as described above for Mac.
