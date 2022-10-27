@@ -88,7 +88,7 @@ if (__name__ == '__main__'):
         print(f'     (got {len(additional_rules)} rules there, maybe replacing similar or same already known, increasing the total rules number by {num_rules_after-num_rules_before})')
     print("", flush=True) # 'flush' is just an attempt which may not really flush text out now
 
-    model = acmodel.nn_acmodel.load_nn_acoustic_model(f"{base}/acmodel/sv200c-100_training_0024", mid_size=100, varstates=False)
+    model = acmodel.nn_acmodel.load_nn_acoustic_model(f"{base}/acmodel/half", mid_size=100, varstates=False)
 
     # b prob corr !!!
 
