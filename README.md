@@ -20,7 +20,7 @@ allow others to continue this work.
 * More precise than similar tools, specifically targeting needs of the Czech phoneticians.
 
 ## Installation on Windows
-Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html), download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe)). Run it, despite any protests from Windows. Install to ```C:\mambaforge```. This location is the only thing you have to change, otherwise go with default settings in installation dialogs.
+Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html), download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe)). Run it, despite any protests from Windows (it will whine about 'unidentified developer'). Install to ```C:\mambaforge```. This location is the only thing you have to change, otherwise go with default settings in installation dialogs.
 
 Run mambaforge console. Should be in Start menu as "Miniforge console" (name of the window is "Miniforge Prompt"). Text prompt must start ```(base)```. (If it does not, you ran something else. Find the right one.) Type this (and hit Enter):
 ```
@@ -32,11 +32,11 @@ pip install pysoundfile
 ```
 If any Y/n questions pop up, just hit Enter (or type Y and Enter if you wish).
 
-Download prak zip file from this GitHub page - click on the green "Code" button up right, download zip. Uncompress it directly to ```C:\```, creating ```C:\prak```. If the uncompressed folder is named something like 'prak-main', rename it to 'prak'.
+**Download [prak zip file](https://github.com/vaclavhanzl/prak/archive/refs/heads/main.zip)** (zip also available from green "Code" button up right on this GitHub page, download zip.). Uncompress it directly to ```C:\``` (or uncompress and move there), creating ```C:\prak-main``` folder. **Rename this folder to ```C:\prak```**.
 
 Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak).
 
-Set Praat text files encoding to UTF-8 (Praat > Preferences > Text reading preferences > UTF-8, then Text writing preferences > UTF-8).
+Set Praat **text files encoding to UTF-8** (Praat > Preferences > Text reading preferences > UTF-8, then Text writing preferences > UTF-8).
 
 Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Prak-installation-details) if you need to know more.
 
