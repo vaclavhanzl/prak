@@ -336,8 +336,8 @@ def b_log_corrections(tsv_file, b_set=b1_set):
     Compute log(b()) additive correction needed to suppress very frequent
     phones and boost rare ones.
     """
-
-    if tsv_file.endswith("sv200c-100_training_0024.tsv"): # avoid dependency on tsv and pandas
+    #print(tsv_file)
+    if tsv_file.endswith("sv200c-100_training_0024.tsv") or tsv_file.endswith("half.tsv") or tsv_file.endswith("bfloat16.tsv"): # avoid dependency on tsv and pandas
         return torch.tensor([-11.1186,  -7.9824,  -7.1365,  -9.1255, -10.7120,  -8.5094, -10.6577,
                              -7.4565, -12.0110, -11.0539, -11.4070, -11.4735, -12.1724, -10.4384,
                              -9.7028, -10.7073, -11.6203, -11.7481, -11.9372, -11.5911, -11.9380,
