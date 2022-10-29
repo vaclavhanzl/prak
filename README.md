@@ -110,7 +110,7 @@ Select sound and textgrid containing phrase tier, press your new **Align using p
 You can also align multiple sounds using multiple textgrids, or multiple sounds using one input textgrid for all.
 Some details:
 
-* text can be in one or more intervals of tier named "phrase" of "Phrase"
+* text can be in one or more intervals of tier named "phrase" or "Phrase"
 * if input textgrid does not contain tier with such name, prak will nicely let you choose the right one
 * times of the text tier do not have to match the audio so you can align several wavs using one textgrid
 * text can contain all the usual interpunction (if it is human readable, prak will likely process it, too)
@@ -119,7 +119,7 @@ Some details:
 * sound can have any sampling frequency
 * several pronunciation variants are considered where there is possible ambiguity and the (hopefully) right one is selected based on acoustic signal match
 
-Most of the phone-phone boundaries will likely still need manual microtununig to suit your needs but not much more than that. On the level of words (and silences present on not present between words), alignment should be mostly correct. Prak tries its best to decide whether voicing assimilation happened or not on word boundaries, whether glottal stop is present, whether some possible phone changes happened or not etc. Often it is right, sometimes the decision is hard even for a human. Sometimes prak gets these things wrong but it should be a minority of cases.
+Most of the phone-phone boundaries will likely still need manual microtununig to suit your needs but not much more than that. On the level of words (and silences present or not present between words), alignment should be mostly correct. Prak tries its best to decide whether voicing assimilation happened or not on word boundaries, whether glottal stop is present, whether some possible phone changes happened or not etc. Often it is right, sometimes the decision is hard even for a human. Sometimes prak gets these things wrong but it should be a minority of cases.
 
 
 ### Align from command line
@@ -164,7 +164,7 @@ git pull
 ```
 If you went with the zip option, download a new zip the same way.
 
-You certainly want to update, prak is getting better nearly daily! See recent [list of published changes](https://github.com/vaclavhanzl/prak/commits/v1) or even [what happens in the develop branch](https://github.com/vaclavhanzl/prak/commits/develop) (extremely courios ones can even see feature branches).
+You certainly want to update, prak is getting better nearly daily! See recent [list of published changes](https://github.com/vaclavhanzl/prak/commits/main) or even [what happens in the develop branch](https://github.com/vaclavhanzl/prak/commits/develop) (extremely courios ones can even see feature branches).
 We are currently testing and tuning installation for all the platforms so also this README is still changing quickly.
 
 ## Speed
