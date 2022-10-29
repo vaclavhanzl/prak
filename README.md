@@ -1,5 +1,8 @@
 # prak: Czech phonetic alignment tool
 
+![prak_lecture_banner](https://user-images.githubusercontent.com/64649594/198852300-aac48f73-d61d-4fda-a4f9-f2bf31856b07.png)
+
+
 ## I just want it, now!
 OK. Get **prak** source code and python3.10 with pytorch and torchaudio. Record wav, make phrase
 tier with text and **prak** will find phone and word times: 
