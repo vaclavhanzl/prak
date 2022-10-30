@@ -379,14 +379,23 @@ mf Mf
 """
 
 
+already_warned_about_NFD = False # We already warned the user that we've seen non-NFC input
+
 def clean_textline(line):
     """
     Ensure NFC, no BOM and no CR/LF at the end of line
     """
+    global already_warned_about_NFD
     if line and line[0] == '\uFEFF':
         line = line[1:]
     line = line.rstrip("\r\n")
+    line_before_normalize = line # save just for test/warning
     line = unicodedata.normalize('NFC', line)
+    if line!=line_before_normalize and not already_warned_about_NFD:
+        print(f'Prak WARNING: Encountered non-NFC (NFD?) text "{line_before_normalize}". '
+              f'Normalized it to "{line}". This just LOOKS the same but IS NOT. BEWARE. '
+              f'This often leads to very hard to find bugs. Please compose your unicode.', file=sys.stderr)
+        already_warned_about_NFD = True
     return line
 
 
