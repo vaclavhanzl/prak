@@ -60,6 +60,26 @@ def textgrid_file_text(tiers):
     return txt
 
 
+def count_trailing_doublequotes(txt):
+    """
+    Count trailing '"' characters in a string. If this number is odd,
+    the text ends by a proper termination of a praat string. (Two
+    quotes are quoted quote in praat.)
+    """
+    count = 0
+    for i in range(len(txt)-1,-1,-1):
+        if txt[i]!='"':
+            break
+        count += 1
+    return count
+
+def praat_string_terminated(txt):
+    """
+    True if txt ends by a proper termination of a praat string. (Two
+    quotes are quoted quote in praat and this would NOT be a termination.)
+    """
+    return count_trailing_doublequotes(txt)%2==1
+
 def remove_quotes(txt): # small helper proc for textgrid reader below
     assert txt[0] == txt[-1] == '"'
     return txt[1:-1]
@@ -68,6 +88,7 @@ def read_interval_tiers_from_textgrid_file(filename):
     """
     Read all interval tiers from a TextGrid file
     """
+    already_warned_about_newlines = False
     with open(filename, 'r', encoding='utf-8') as fileread: # explicit utf-8 needed on Windows
         lines = [l.strip() for l in fileread.readlines()]
     tiers = {}
@@ -76,6 +97,16 @@ def read_interval_tiers_from_textgrid_file(filename):
         line_items = line.split()
         #print(f"{state}  {line_items}")
         match line_items:                    # NOTE: Needs Python 3.10
+            # this should be the first case
+            case [*add_text] if state=='finishing_string':
+                text += add_text
+                if praat_string_terminated(text[-1]):
+                    text = remove_quotes(" ".join(text)) # text may be ['"aaa', 'bbb', 'ccc"']
+                    interval = (float(xmin), float(xmax), text)
+                    #print(f"Got interval: {interval}")
+                    tiers[tiername].append(interval) # We just left any '""' inside, will be deleted
+                    state = 'reading_intervals'
+                # else, OMG, another newline in interval text! Stay in finishing_string state.
             case ['class', '=', classname]:
                 classname = remove_quotes(classname)
                 #print(f"===== {classname} =====")
@@ -93,10 +124,18 @@ def read_interval_tiers_from_textgrid_file(filename):
             case ['xmax', '=', xmax] if state=='reading_intervals':
                 pass # dtto, got xmax
             case ['text', '=', *text] if state=='reading_intervals':
-                text = remove_quotes(" ".join(text)) # text may be ['"aaa', 'bbb', 'ccc"']
-                interval = (float(xmin), float(xmax), text)
-                #print(f"Got interval: {interval}")
-                tiers[tiername].append(interval)
+                if not praat_string_terminated(text[-1]): # OMG, newline in interval text!
+                    # keeping text list for later expansion
+                    state = 'finishing_string'
+                    if not already_warned_about_newlines:
+                        print(f'Prak WARNING: Found newline after "...{text[-1]}" in tier "{tiername}". Replaced by space.', file=sys.stderr)
+                        already_warned_about_newlines = True # do nor repeat more than once per file
+                else:
+                    text = remove_quotes(" ".join(text)) # text may be ['"aaa', 'bbb', 'ccc"']
+                    interval = (float(xmin), float(xmax), text)
+                    #print(f"Got interval: {interval}")
+                    tiers[tiername].append(interval)
+
     return tiers
 
 
