@@ -280,6 +280,8 @@ import argparse
 import sys
 import os
 from glob import glob
+import unicodedata
+
 
 #print("Remove inport here")
 #from hmm_pron import HMM
@@ -376,12 +378,38 @@ mv Mv
 mf Mf
 """
 
+
+def clean_textline(line):
+    """
+    Ensure NFC, no BOM and no CR/LF at the end of line
+    """
+    if line and line[0] == '\uFEFF':
+        line = line[1:]
+    line = line.rstrip("\r\n")
+    line = unicodedata.normalize('NFC', line)
+    return line
+
+
+def make_text_unix_clean_and_NFC(text):
+    """
+    Ensure Unix newline conventions, NFC and no BOMs
+    """
+    out_text = ""
+    for line in text.splitlines(): # usual CRLFs are gone already here
+        out_text += clean_textline(line) + "\n" # still, some wild CRLF combinations may be trimmed here
+    return out_text
+
+
+
+
+
 def line_iterable_to_lexirules(iterable):
     """
     Create lexicon rules from iterable providing lines
     """
     lexirules = {}
     for line in iterable:
+        line = clean_textline(line) # Ensure NFC, no BOM and no CR/LF
         if line=="":
             continue
         if line.startswith('###'):
@@ -1354,6 +1382,9 @@ class MarkableList(list):
     """
     pass
 
+
+
+
 def process(txt, all_begins=True, all_ends=True):
     """
     Convert text to pronunciation, using these tables/procedures:
@@ -1364,27 +1395,26 @@ def process(txt, all_begins=True, all_ends=True):
     to final alphabet
     """
 
+    txt = make_text_unix_clean_and_NFC(txt) # ensure LF, NFC, no BOMs. Adds final LF if missing.
+    # NOTE: The above operation gets rid of BOM in ANY LINE should there be some.
+    # These BOMs could arise e.g. by cut-n-paste of starting lines from multiple text files on Windows.
+
+    txt = txt.rstrip("\r\n") # Final LF would break all_ends IF glue_prepos() is commented out, so kill it here
+
     words = transform(interpunctab, txt) # clean interpunction (skipped spelltab)
 
     words_glued = transform(downcasetab, words)
     words_glued = glue_prepos(words_glued)
 
-    words = words.split()
+    words = words.split() # final LF gone here in 'word' branch
     words_glued = words_glued.split()
-
-    #print(words)
-
 
     txt = transform(spelltab, txt) # B. -> bé  etc.
     txt = transform(interpunctab, txt) # clean interpunction
     txt = transform(downcasetab, txt)
 
-
-
-    txt = glue_prepos(txt)  # multipron will split also on '=' and add more '='
-
-
-
+    txt = glue_prepos(txt)  # would also remove final LF in 'phone' branch should there be any (is not)
+    # Getting rid of final LF is necessary for all_ends below to work!
 
     if all_begins:
         txt = "&"+txt # the "&" forces both versions in maybe-glottal-stop situations at start
