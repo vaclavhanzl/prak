@@ -392,8 +392,8 @@ def clean_textline(line):
     line_before_normalize = line # save just for test/warning
     line = unicodedata.normalize('NFC', line)
     if line!=line_before_normalize and not already_warned_about_NFD:
-        print(f'Prak WARNING: Encountered non-NFC (NFD?) text "{line_before_normalize}". '
-              f'Normalized it to "{line}". This just LOOKS the same but IS NOT. BEWARE. '
+        print(f'Prak WARNING: Encountered non-NFC (NFD?) text: "{line_before_normalize}"\n\n'
+              f'Normalized it to: "{line}"\n\nThis just LOOKS the same but IS NOT. BEWARE. '
               f'This often leads to very hard to find bugs. Please compose your unicode.', file=sys.stderr)
         already_warned_about_NFD = True
     return line

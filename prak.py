@@ -78,6 +78,11 @@ if (__name__ == '__main__'):
     print(f'   Input TextGrid: "{args.in_tg}" (will look for a phrase tier here)')
     print(f'  Output TextGrid: "{args.out_tg}" (will make phone, word and phrase tiers here)')
 
+    if os.path.exists(args.out_tg) and not args.in_tg==args.out_tg:
+        print(f'  Removing old pre-existing output TextGrid file "{args.out_tg}".')
+        os.remove(args.out_tg)
+        # NOTE: This increases our chance that praat script on Windows does notice we crashed later
+
     if args.exceptions!=None:
         print(f'  Exceptions file: "{args.exceptions} (will get there additional pronunciation rules)"')
         additional_rules = prongen.hmm_pron.read_lexirules_table(args.exceptions)
