@@ -122,6 +122,7 @@ Some details:
 * if the textgrid contains a phone tier, prak warns you before going on to safeguard any manual tuning you already did 
 * sound can have any sampling frequency
 * several pronunciation variants are considered where there is possible ambiguity and the (hopefully) right one is selected based on acoustic signal match
+* you can specify your own [exceptions for foreign words](https://github.com/vaclavhanzl/prak/wiki/Exceptions-for-foreign-words)
 * phone tier created by prak uses [SAMPA](https://github.com/vaclavhanzl/prak/wiki/Phone-symbols) phone codes
 
 Most of the phone-phone boundaries will likely still need manual microtununig to suit your needs but not much more than that. On the level of words (and silences present or not present between words), alignment should be mostly correct. Prak tries its best to decide whether voicing assimilation happened or not on word boundaries, whether glottal stop is present, whether some possible phone changes happened or not etc. Often it is right, sometimes the decision is hard even for a human. Sometimes prak gets these things wrong but it should be a minority of cases.
