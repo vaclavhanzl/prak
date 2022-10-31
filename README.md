@@ -117,6 +117,7 @@ Some details:
 * if input textgrid does not contain tier with such name, prak will nicely let you choose the right one
 * times of the text tier do not have to match the audio so you can align several wavs using one textgrid
 * text can contain all the usual interpunction (if it is human readable, prak will likely process it, too)
+* text is expected to be utf-8 NFC but prak can deal with problems like [BOM, NFD or CRLF](https://github.com/vaclavhanzl/prak/wiki/Text-encoding)
 * prak automatically matches selected wav(s) and textgrid(s) and either goes on automatically if it makes clear sense or asks you for details if needed
 * if the textgrid contains a phone tier, prak warns you before going on to safeguard any manual tuning you already did 
 * sound can have any sampling frequency
