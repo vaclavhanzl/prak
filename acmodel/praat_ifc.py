@@ -73,12 +73,13 @@ def count_trailing_doublequotes(txt):
         count += 1
     return count
 
-def praat_string_terminated(txt):
+def praat_string_terminated(txt_list):
     """
-    True if txt ends by a proper termination of a praat string. (Two
-    quotes are quoted quote in praat and this would NOT be a termination.)
+    True if txt_list ends by a proper termination of a praat string. (Two
+    quotes are quoted quote in praat and this would NOT be a termination,
+    unless the interval text is empty, written as two quotes.)
     """
-    return count_trailing_doublequotes(txt)%2==1
+    return txt_list==['""'] or count_trailing_doublequotes(txt_list[-1])%2==1
 
 def remove_quotes(txt): # small helper proc for textgrid reader below
     assert txt[0] == txt[-1] == '"'
@@ -100,7 +101,7 @@ def read_interval_tiers_from_textgrid_file(filename):
             # this should be the first case
             case [*add_text] if state=='finishing_string':
                 text += add_text
-                if praat_string_terminated(text[-1]):
+                if praat_string_terminated(text):
                     text = remove_quotes(" ".join(text)) # text may be ['"aaa', 'bbb', 'ccc"']
                     interval = (float(xmin), float(xmax), text)
                     #print(f"Got interval: {interval}")
@@ -124,7 +125,7 @@ def read_interval_tiers_from_textgrid_file(filename):
             case ['xmax', '=', xmax] if state=='reading_intervals':
                 pass # dtto, got xmax
             case ['text', '=', *text] if state=='reading_intervals':
-                if not praat_string_terminated(text[-1]): # OMG, newline in interval text!
+                if not praat_string_terminated(text): # OMG, newline in interval text!
                     # keeping text list for later expansion
                     state = 'finishing_string'
                     if not already_warned_about_newlines:
