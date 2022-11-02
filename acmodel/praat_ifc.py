@@ -8,6 +8,8 @@
 
 import sys
 
+from prongen.prak_prongen import clean_textline
+
 def textgrid_file_intro(xmax, size):
     return f"""File type = "ooTextFile"
 Object class = "TextGrid"
@@ -103,6 +105,7 @@ def read_interval_tiers_from_textgrid_file(filename):
                 text += add_text
                 if praat_string_terminated(text):
                     text = remove_quotes(" ".join(text)) # text may be ['"aaa', 'bbb', 'ccc"']
+                    text = clean_textline(text)
                     interval = (float(xmin), float(xmax), text)
                     #print(f"Got interval: {interval}")
                     tiers[tiername].append(interval) # We just left any '""' inside, will be deleted
@@ -133,6 +136,7 @@ def read_interval_tiers_from_textgrid_file(filename):
                         already_warned_about_newlines = True # do nor repeat more than once per file
                 else:
                     text = remove_quotes(" ".join(text)) # text may be ['"aaa', 'bbb', 'ccc"']
+                    text = clean_textline(text)
                     interval = (float(xmin), float(xmax), text)
                     #print(f"Got interval: {interval}")
                     tiers[tiername].append(interval)
