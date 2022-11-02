@@ -43,10 +43,11 @@ if (__name__ == '__main__'):
 
     parser.add_argument('-e','--exceptions', help='Text file with additional pronunciation rules') 
 
-    args = parser.parse_args()
+    parser.add_argument('-t','--text_tier', default=[], action='extend', nargs='*', help='Name of input tier with text') # can repeat
 
-    #print(f"{args.exceptions=}")
-    #print(f"{prongen.hmm_pron.lexicon_replacements=}")
+    args = parser.parse_args()
+    if len(args.text_tier)==0:
+        args.text_tier = ['phrase', 'Phrase'] # handling default here, otherwise it would be kept even when -t used
 
     problems = False
 
@@ -78,6 +79,11 @@ if (__name__ == '__main__'):
     print(f'   Input TextGrid: "{args.in_tg}" (will look for a phrase tier here)')
     print(f'  Output TextGrid: "{args.out_tg}" (will make phone, word and phrase tiers here)')
 
+    if os.path.exists(args.out_tg) and not args.in_tg==args.out_tg:
+        print(f'  Removing old pre-existing output TextGrid file "{args.out_tg}".')
+        os.remove(args.out_tg)
+        # NOTE: This increases our chance that praat script on Windows does notice we crashed later
+
     if args.exceptions!=None:
         print(f'  Exceptions file: "{args.exceptions} (will get there additional pronunciation rules)"')
         additional_rules = prongen.hmm_pron.read_lexirules_table(args.exceptions)
@@ -95,12 +101,15 @@ if (__name__ == '__main__'):
 
     in_tiers = acmodel.praat_ifc.read_interval_tiers_from_textgrid_file(args.in_tg)
 
-    if 'phrase' not in in_tiers:
-        print(f'Input TextGrid file "{args.in_tg}" does not contain a "phrase" interval tier.', file=sys.stderr)
-        print(f'Only these interval tiers found in it: {" ".join(in_tiers.keys())}', file=sys.stderr)
+    for phrase_tier_name in args.text_tier:
+        if phrase_tier_name in in_tiers: # find first tier named in -t options
+            break
+    else: # if no break
+        print(f'Input TextGrid file "{args.in_tg}" has no phrase tier named: {", ".join(args.text_tier)}', file=sys.stderr)
+        print(f'Only these interval tiers found in it: {", ".join(in_tiers.keys())}', file=sys.stderr)
         sys.exit(1)
 
-    phrase_tier = in_tiers['phrase']
+    phrase_tier = in_tiers[phrase_tier_name]
 
     text = " ".join(phrase for (begin, end, phrase) in phrase_tier)
 
