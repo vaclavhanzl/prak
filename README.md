@@ -1,6 +1,7 @@
 # prak: Czech phonetic alignment tool
 
-**[Slides from Prak presentation at FňUK/FÚ Nov 8th 2022](https://github.com/vaclavhanzl/presentations/raw/main/prak/Prak.pdf)**
+**[View slides from Prak presentation at FňUK/FÚ Nov 8th 2022](https://docs.google.com/viewer?url=https://raw.githubusercontent.com/vaclavhanzl/presentations/main/prak/Prak.pdf)**
+(or [download slides here](https://github.com/vaclavhanzl/presentations/raw/main/prak/Prak.pdf))
 
 
 ## I just want it, now!
