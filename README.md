@@ -199,7 +199,7 @@ Of yourse! You are welcome! You can contribute in many ways:
 
 ## Discussions and Contact
 You can discuss prak in public here in [Discussions](https://github.com/vaclavhanzl/prak/discussions).
-If you want to tell me more personally that you love this or hate this, message @vaclav512 on Twitter.
+If you want to tell me more personally that you love this or hate this, message [Vaclav Hanzl on Mastodon](https://sigmoid.social/@vaclavh).
 
 ## Thanks
 I'd like to thank all the nice people from [Fonetický ústav FFUK](https://fonetika.ff.cuni.cz/) and equally nice young people from [FňUK](https://www.facebook.com/profile.php?id=100057425272524) who inspired me by their charming approach to science and life.
