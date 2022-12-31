@@ -32,18 +32,29 @@ if (__name__ == '__main__'):
     parser = argparse.ArgumentParser(description='Make time aligned pronunciations from Czech text and wav.')
 
 
-    parser.add_argument('-w','--in-wav', help='Input wav with voice recording', required=True) 
+    parser.add_argument('-w','--in-wav', help='Input wav file with voice recording', required=True)
 
-    parser.add_argument('-i','--in-tg', help='Input TextGrid with phrase tier', required=True) 
+    parser.add_argument('-i','--in-tg', help='Input TextGrid file with phrase tier', required=True)
 
-    parser.add_argument('-o','--out-tg', help='Output TextGrid with phone, word and phrase tiers', required=True) 
+    parser.add_argument('-o','--out-tg', help='Output TextGrid file with phone, word and phrase tiers', required=True)
 
     parser.add_argument('-f', '--force', action='store_true',
                         help='Overwrite output file if it already exists, even if it was also an input file')
 
     parser.add_argument('-e','--exceptions', help='Text file with additional pronunciation rules') 
 
-    parser.add_argument('-t','--text_tier', default=[], action='extend', nargs='*', help='Name of input tier with text') # can repeat
+    parser.add_argument('-t','--text_tier', default=[], action='extend', nargs='*',
+                        help='Name of input tier with text (may repeat for multiple options, first match will be used)')
+
+    parser.add_argument('-k','--keep_tier', default=[], action='extend', nargs='*', help='Keep input tier "old", '
+                        'possibly renamed "old:new" or keep all adding suffix by ":suf". Use ":" to just keep all. '
+                        'Option may repeat, then for every input tier, all specs will be tried in order till the first match (if any). '
+                        'Any colon in tier name can be escaped by backslash.')
+
+    parser.add_argument('-a','--align_tier', default=[], action='extend', nargs='*',
+                        help="Rename output tier(s) with alignment from default ['phone', 'word', 'phrase']. "
+                        "Same specification as for -k, e.g. '-a phone:ali_phone -a :' or '-a :_auto'. "
+                        "Can also prune, e.g. '-a phone' discards 'word' and 'phrase' tiers.")
 
     args = parser.parse_args()
     if len(args.text_tier)==0:
@@ -83,15 +94,16 @@ if (__name__ == '__main__'):
         print(f'  Removing old pre-existing output TextGrid file "{args.out_tg}".')
         os.remove(args.out_tg)
         # NOTE: This increases our chance that praat script on Windows does notice we crashed later
+        # We should rather compare  normalized pathnames to avoid deleting our input when abs/rel names are used.
 
     if args.exceptions!=None:
-        print(f'  Exceptions file: "{args.exceptions} (will get there additional pronunciation rules)"')
+        print(f'  Exceptions file: "{args.exceptions}" (additional pronunciation rules)')
         additional_rules = prongen.hmm_pron.read_lexirules_table(args.exceptions)
         num_rules_before = len(prongen.hmm_pron.lexicon_replacements)
         prongen.hmm_pron.lexicon_replacements |= additional_rules
         num_rules_after = len(prongen.hmm_pron.lexicon_replacements)
         # print change, so as the user can see number of her own rules, not just examples from exceptions.txt:
-        print(f'     (got {len(additional_rules)} rules there, maybe replacing similar or same already known, increasing the total rules number by {num_rules_after-num_rules_before})')
+        print(f'     (got {len(additional_rules)} rules there, maybe already known, increasing the total rules number by {num_rules_after-num_rules_before})')
     print("", flush=True) # 'flush' is just an attempt which may not really flush text out now
 
     model = acmodel.nn_acmodel.load_nn_acoustic_model(f"{base}/acmodel/half", mid_size=100, varstates=False)
@@ -109,28 +121,34 @@ if (__name__ == '__main__'):
         print(f'Only these interval tiers found in it: {", ".join(in_tiers.keys())}', file=sys.stderr)
         sys.exit(1)
 
+    print(f"Tiers {[*in_tiers.keys()]} at input, reading text from '{phrase_tier_name}'.")
     phrase_tier = in_tiers[phrase_tier_name]
 
     text = " ".join(phrase for (begin, end, phrase) in phrase_tier)
 
-    #print(text)
+    if args.keep_tier==[]:
+        in_tiers = {} # forget all input tiers (just keeping aside phrase_tier)
+    else:
+        in_tiers = acmodel.praat_ifc.rename_prune_tiers(in_tiers, args.keep_tier)
+        print(f"Keeping input tier(s) as {[*in_tiers.keys()]}.")
 
     phone_tier, word_tier = acmodel.nn_acmodel.align_wav_and_text_using_model(args.in_wav, text, model)
-
-    #print(phone_tier)
     sampa_phone_tier = acmodel.praat_ifc.sampify_tier(phone_tier)
-
     tg_dict = dict(phone=sampa_phone_tier, word=word_tier, phrase=phrase_tier)
+    if args.align_tier!=[]:
+        tg_dict = acmodel.praat_ifc.rename_prune_tiers(tg_dict, args.align_tier)
+    print(f"Alignment goes to tier(s) {[*tg_dict.keys()]}.")
 
-    acmodel.praat_ifc.unify_tier_ends(tg_dict, leading_tier="phrase", max_fuzz=0.1)
+    final_tg_dict = {**in_tiers, **tg_dict} # in case of a name clash, prefer our new tiers
 
-    tg_txt = acmodel.praat_ifc.textgrid_file_text(tg_dict)
-    #print(tg_txt)
+    acmodel.praat_ifc.unify_tier_ends(final_tg_dict, phrase_tier, max_fuzz=0.1)
+
+    tg_txt = acmodel.praat_ifc.textgrid_file_text(final_tg_dict)
 
     with open(args.out_tg, 'w', encoding='utf-8') as f: # explicit utf-8 needed on Windows
         f.write(tg_txt)
 
-    print(f'Alignment written to phone, word and phrase tiers in "{args.out_tg}"')
+    print(f"Output written to tiers {list(final_tg_dict.keys())} in \"{args.out_tg}\".")
 
 
 

@@ -1,7 +1,7 @@
 
 import torch
 
-from evaluate import dtw_forward_pass, fix_ins_del_alignment_in_s1
+from .evaluate import dtw_forward_pass, fix_ins_del_alignment_in_s1
 
 
 def test0_dtw_forward_pass():

@@ -6,9 +6,9 @@
 
 import torch
 
-from praat_ifc import desampify_dict, read_word_tier_from_textgrid_file, read_phone_tier_from_textgrid_file, textgrid_file_text, desampify_phone_tier
+from .praat_ifc import desampify_dict, read_word_tier_from_textgrid_file, read_phone_tier_from_textgrid_file, textgrid_file_text, desampify_phone_tier
 
-from nn_acmodel import align_wav_file_using_model
+from .nn_acmodel import align_wav_file_using_model
 
 
 def dist_matrix_for_strings(vertical_string, horizontal_string):

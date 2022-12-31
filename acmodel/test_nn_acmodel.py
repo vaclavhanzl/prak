@@ -3,12 +3,14 @@
 
 
 
-
+import sys
+sys.path.append("..")
+print(sys.path)
 
 
 import torch
 
-from nn_acmodel import mfcc_add_sideview, mfcc_win_view
+from .nn_acmodel import mfcc_add_sideview, mfcc_win_view
 
 
 def test_mfcc_add_sideview():

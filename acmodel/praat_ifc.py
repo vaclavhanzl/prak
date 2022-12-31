@@ -1,3 +1,4 @@
+
 # Interface to praat
 
 # Functions to convert computed alignment intervals to praat textgrid file format
@@ -243,12 +244,12 @@ def sampify_tier(tier):
 
 
 
-def unify_tier_ends(tg_dict, leading_tier="phrase", max_fuzz=0.1):
+def unify_tier_ends(tg_dict, leading_tier, max_fuzz=0.1):
     """
     Slightly move ends of last intervals of all tiers to match the leading tier.
     """
-    assert len(tg_dict[leading_tier])>=1 # at least one interval needed
-    (_, end, _) = tg_dict[leading_tier][-1] # tier is a list of (xmin, xmax, phone)
+    assert len(leading_tier)>=1 # at least one interval needed
+    (_, end, _) = leading_tier[-1] # tier is a list of (xmin, xmax, phone)
 
     for tier_name, tier_list in tg_dict.items(): # includes leading tier but no problem
         assert len(tier_list)>=1 # at least one interval needed
@@ -256,11 +257,90 @@ def unify_tier_ends(tg_dict, leading_tier="phrase", max_fuzz=0.1):
         if abs(xmax-end)<=max_fuzz and xmin<end: # not much fuzz, and positive interval will remain
             tier_list[-1] = (xmin, end, text) # put it back modified
         else:
-            print(f'Prak WARNING: Failed to unify exact end of tier "{tier_name}" with tier "{leading_tier}".', file=sys.stderr)
+            print(f'Prak WARNING: Failed to unify exact end of tier "{tier_name}" with leading tier".', file=sys.stderr)
             if not abs(xmax-end)<=max_fuzz:
                 print(f' Ends differ more than {max_fuzz}s.', file=sys.stderr)
             if not xmin<end:
                 print(f' Last interval would be negative.', file=sys.stderr)
+
+
+
+
+
+def split_by_char_unless_quoted(text, split_char=':', escape_char='\\'):
+    """
+    Split text to list of strings at occurences of split char ":".
+    Escape char (backslash) quotes (only) the split char and itself.
+    Misplaced escape chars are removed and warning is printed.
+    """
+    retval = []
+    after_e_ch = False
+    chunk = ""
+    esc_error = False
+    for ch in text:
+        if after_e_ch:
+            chunk += ch
+            after_e_ch = False
+            if ch!=escape_char and ch!=split_char: # nothing else can be escaped
+                esc_error = True
+            continue
+        if ch==escape_char:
+            after_e_ch = True
+            continue
+        if ch==split_char:
+            retval.append(chunk)
+            chunk = ""
+            continue
+        chunk += ch
+    if after_e_ch:
+        esc_error = True # trailing escape with no char after it
+    retval.append(chunk)
+    if esc_error:
+        print(f"Detected stray escape character '{escape_char}' in input '{text}'.")
+        print(f"Prak WARNING: Split the above text as '{(' '+split_char+' ').join(retval)}' but maybe it is not what you wanted.")
+    return retval
+
+
+
+
+def rename_tier_by_spec(tier_name, rename_spec_list):
+    """
+    Compute new name for a tier according to rename_spec_list which is
+    iterated till the first match and renamed acording to it.
+    If there is no match, None is returned (meaning to discard the tier).
+    Rules can have the following form:
+       'name'    .. just keep this name
+       'old:new' .. replace old name by new
+       ':suffix' .. rename anything by adding a suffix
+       ':'       .. keep anything as is (special case of the suffix ruile)
+    There should be at most one separating ':' in the rule. Tiers containing
+    a ':' must use backslash to escape this non-separating ':'.
+    """
+    for spec in rename_spec_list:
+        spec = split_by_char_unless_quoted(spec) # split on ':'
+        if len(spec)==1 and tier_name==spec[0]: # 'name'
+            return tier_name
+        if len(spec)==2 and len(spec[0])==0: # ':suffix'
+            return tier_name+spec[1]
+        if len(spec)==2 and tier_name==spec[0]: # 'old:new'
+            return spec[1]
+    return None
+
+
+
+def rename_prune_tiers(tiers, rename_spec_list):
+    """
+    Rename tiers in dictionary-represented TextGrid according to rename
+    specification, which is a list of rules applied to each key.
+    Tiers with no match in rename_spec_list are pruned away.
+    """
+    return {tnm2: tls for tnm, tls in tiers.items() if (tnm2:=rename_tier_by_spec(tnm, rename_spec_list))!=None}
+
+
+
+
+
+
 
 
 # To be used in Jupyter notebook:
