@@ -56,6 +56,13 @@ if (__name__ == '__main__'):
                         "Same specification as for -k, e.g. '-a phone:ali_phone -a :' or '-a :_auto'. "
                         "Can also prune, e.g. '-a phone' discards 'word' and 'phrase' tiers.")
 
+    parser.add_argument('--join-phrase', action='store_true',
+                        help='Join all intervals in phrase tier into one')
+
+    parser.add_argument('--do-not-align', action='store_true',
+                        help="Do not compute aligned 'phone' and 'word' tiers. (Useful for TextGrid manipulations.)")
+
+
     args = parser.parse_args()
     if len(args.text_tier)==0:
         args.text_tier = ['phrase', 'Phrase'] # handling default here, otherwise it would be kept even when -t used
@@ -125,6 +132,9 @@ if (__name__ == '__main__'):
     phrase_tier = in_tiers[phrase_tier_name]
 
     text = " ".join(phrase for (begin, end, phrase) in phrase_tier)
+    if args.join_phrase and len(phrase_tier) > 0:
+        text_cleaner = " ".join(p for (begin, end, phrase) in phrase_tier if (p:=phrase.strip())!="")
+        phrase_tier = [(phrase_tier[0][0], phrase_tier[-1][1], text_cleaner)] # get time span from first and last interval
 
     if args.keep_tier==[]:
         in_tiers = {} # forget all input tiers (just keeping aside phrase_tier)
@@ -132,9 +142,12 @@ if (__name__ == '__main__'):
         in_tiers = acmodel.praat_ifc.rename_prune_tiers(in_tiers, args.keep_tier)
         print(f"Keeping input tier(s) as {[*in_tiers.keys()]}.")
 
-    phone_tier, word_tier = acmodel.nn_acmodel.align_wav_and_text_using_model(args.in_wav, text, model)
-    sampa_phone_tier = acmodel.praat_ifc.sampify_tier(phone_tier)
-    tg_dict = dict(phone=sampa_phone_tier, word=word_tier, phrase=phrase_tier)
+    if args.do_not_align:
+        tg_dict = dict(phrase=phrase_tier)
+    else:
+        phone_tier, word_tier = acmodel.nn_acmodel.align_wav_and_text_using_model(args.in_wav, text, model)
+        sampa_phone_tier = acmodel.praat_ifc.sampify_tier(phone_tier)
+        tg_dict = dict(phone=sampa_phone_tier, word=word_tier, phrase=phrase_tier)
     if args.align_tier!=[]:
         tg_dict = acmodel.praat_ifc.rename_prune_tiers(tg_dict, args.align_tier)
     print(f"Alignment goes to tier(s) {[*tg_dict.keys()]}.")
