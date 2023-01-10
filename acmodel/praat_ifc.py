@@ -257,7 +257,7 @@ def unify_tier_ends(tg_dict, leading_tier, max_fuzz=0.1):
         if abs(xmax-end)<=max_fuzz and xmin<end: # not much fuzz, and positive interval will remain
             tier_list[-1] = (xmin, end, text) # put it back modified
         else:
-            print(f'Prak WARNING: Failed to unify exact end of tier "{tier_name}" with leading tier".', file=sys.stderr)
+            print(f'Prak WARNING: Failed to unify exact end of tier "{tier_name}" with leading tier.', file=sys.stderr)
             if not abs(xmax-end)<=max_fuzz:
                 print(f' Ends differ more than {max_fuzz}s.', file=sys.stderr)
             if not xmin<end:
@@ -337,6 +337,33 @@ def rename_prune_tiers(tiers, rename_spec_list):
     return {tnm2: tls for tnm, tls in tiers.items() if (tnm2:=rename_tier_by_spec(tnm, rename_spec_list))!=None}
 
 
+
+def gather_merge_in_tiers_from_files(merge_in):
+    """
+    Gather tiers according to spec in merge_in, see prak.py help, e.g.:
+    ['another_file.textgrid', 'phone:another_phone', 'Phone:another_phone']
+    ['file1.textgrid', 'phone:p1', '::', 'file2.textgrid', 'phone:p2']
+    Trailing '::' in merge_in is allowed (has no effect) but leading one is not.
+    For 'x:y' select/rename specs, see rename_tier_by_spec above.
+    """
+    #print(f"{merge_in=}")
+    merged_tiers = {} # will accumulate additions from individual files
+    rename_spec_list = [] # accumulated from elems for one file
+    now_comes_filename = True
+    tiers = {} # for first dummy merge
+    for elem in merge_in:
+        if now_comes_filename:
+            now_comes_filename = False
+            # first merge tiers from previous file if any, rename_spec_list is final now
+            merged_tiers = {**merged_tiers, **rename_prune_tiers(tiers, rename_spec_list)}
+            rename_spec_list = []
+            tiers = read_interval_tiers_from_textgrid_file(elem)
+            continue
+        if elem=='::':
+            now_comes_filename = True
+        rename_spec_list.append(elem)
+    merged_tiers = {**merged_tiers, **rename_prune_tiers(tiers, rename_spec_list)}
+    return merged_tiers
 
 
 

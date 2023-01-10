@@ -62,6 +62,11 @@ if (__name__ == '__main__'):
     parser.add_argument('--do-not-align', action='store_true',
                         help="Do not compute aligned 'phone' and 'word' tiers. (Useful for TextGrid manipulations.)")
 
+    parser.add_argument('--merge-in', default=[], action='extend', nargs='*',
+                        help="Merge to our output some tier(s) from an additional input TextGrid, "
+                        "e.g: '--merge-in another_file.textgrid phone:another_phone Phone:another_phone'. "
+                        "Same spec as for -k, additionally '::' separates merged files, e.g.: "
+                        "'--merge-in file1.textgrid phone:p1 :: file2.textgrid phone:p2'. ")
 
     args = parser.parse_args()
     if len(args.text_tier)==0:
@@ -142,6 +147,15 @@ if (__name__ == '__main__'):
         in_tiers = acmodel.praat_ifc.rename_prune_tiers(in_tiers, args.keep_tier)
         print(f"Keeping input tier(s) as {[*in_tiers.keys()]}.")
 
+
+    merge_in = acmodel.praat_ifc.gather_merge_in_tiers_from_files(args.merge_in)
+    if args.merge_in!=[]:
+        if merge_in=={}:
+            print(f'Prak WARNING: No merge-in tiers collected using spec {args.merge_in}', file=sys.stderr)
+        else:
+            print(f"Merging in {[*merge_in.keys()]} tier(s) from additional input TextGrid file(s).")
+
+
     if args.do_not_align:
         tg_dict = dict(phrase=phrase_tier)
     else:
@@ -152,7 +166,8 @@ if (__name__ == '__main__'):
         tg_dict = acmodel.praat_ifc.rename_prune_tiers(tg_dict, args.align_tier)
     print(f"Alignment goes to tier(s) {[*tg_dict.keys()]}.")
 
-    final_tg_dict = {**in_tiers, **tg_dict} # in case of a name clash, prefer our new tiers
+
+    final_tg_dict = {**in_tiers, **merge_in, **tg_dict} # in case of a name clash, prefer our new tiers
 
     acmodel.praat_ifc.unify_tier_ends(final_tg_dict, phrase_tier, max_fuzz=0.1)
 
