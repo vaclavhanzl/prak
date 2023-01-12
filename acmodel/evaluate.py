@@ -155,6 +155,11 @@ def align_strings(string_1, string_2, fill_char='.'):
     aligned strings where characters do not match or one of them is fill_char
     (meaning substitution or deletion/insertion).
     """
+    if string_1=="":
+        return fill_char*len(string_2), string_2, len(string_2)
+    if string_2=="":
+        return string_1, fill_char*len(string_1), len(string_1)
+
     dist = dist_matrix_for_strings(string_1, string_2) # vertical, horizontal
     idx, cum = dtw_forward_pass(dist)
     path = dtw_backward_pass(idx)
@@ -192,6 +197,10 @@ def prune_tiers_to_comparable_intervals(tier1, tier2):
     phone in both tiers. This alignment is based purely on phone text,
     disregarding times. All phones should have exactly one-character names.
     """
+    for _, _, p in tier1:
+        assert len(p)==1
+    for _, _, p in tier2:
+        assert len(p)==1
     s1 = "".join([p for _, _, p in tier1])
     s2 = "".join([p for _, _, p in tier2])
     s1, s2, dif = align_strings(s1, s2)
@@ -246,8 +255,8 @@ def compare_tiers(manual, auto):
     """
     Compare tier times for intervals matched by DTW on phonestring.
     """
-    p_auto, p_manual = prune_tiers_to_comparable_intervals(auto, manual)
-    return compare_tier_times(p_auto, p_manual)
+    p_auto, p_manual, dif = prune_tiers_to_comparable_intervals(auto, manual)
+    return compare_tier_times(p_auto, p_manual), dif
 
 
 
@@ -360,9 +369,44 @@ def make_auto_textgrid_file_from_wav_file(wav_file, model, out_textgrid_file, de
 
 
 
+def group_empty_intervals_in_tier(tier):
+    """
+    Group consecutive empty intervals to one. Expect time boundaries
+    to match, do not check (there may be micro differences).
+    """
+    out_tier = []
+    f_g = None
+    for f, t, p in tier:
+        if p=="":
+            if f_g==None:
+                f_g = f
+            t_g = t
+            continue
+        if f_g!=None:
+            out_tier.append((f_g, t_g, ""))
+            f_g = None
+        out_tier.append((f, t, p))
+    if f_g!=None:
+        out_tier.append((f_g, t_g, ""))
+    return out_tier
 
 
+def prune_tiers_to_suspicious_intervals(tier1, tier2):
+    """
+    Create tiers with just suspicios intervals from input tiers.
+    Align phone strings by DTW and keep just intervals which no NOT have
+    the same phone in the other tier. This alignment is based purely on phone text,
+    disregarding times. All phones should have exactly one-character names!
+    Each matching sequence of phones is replaced by one grouped empty interval.
+    Output tiers are intended to be used as an attention attractors when manually
+    fixing one of the input tiers (all four tiers being seen in a common textgrid).
+    """
+    ok1, ok2, dif = prune_tiers_to_comparable_intervals(tier1, tier2) # first look what is OK
+    def tier_dif(t1, t2):
+        "Prune from t1 everything being in t2"
+        t2 = set(t2)
+        return [(f,t,p) if (f,t,p) not in t2 else (f,t,"") for (f,t,p) in t1]
 
-
+    return group_empty_intervals_in_tier(tier_dif(tier1, ok1)), group_empty_intervals_in_tier(tier_dif(tier2, ok2))
 
 

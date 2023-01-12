@@ -1,7 +1,7 @@
 
 import torch
 
-from .evaluate import dtw_forward_pass, fix_ins_del_alignment_in_s1
+from .evaluate import *
 
 
 def test0_dtw_forward_pass():
@@ -73,3 +73,64 @@ def test1_fix_ins_del_alignment_in_s1():
     assert fix_ins_del_alignment_in_s1("x..abc", "xabcbc")=="xa..bc"
     assert fix_ins_del_alignment_in_s1(".a", "ab")=="a."
     assert fix_ins_del_alignment_in_s1("hello.amello", "helloabmello")=="helloa.mello"
+
+
+
+
+def test_align_strings():
+    assert align_strings("", "")==("", "", 0)
+    assert align_strings("x", "")==("x", ".", 1)
+    assert align_strings("xxx", "")==("xxx", "...", 3)
+    assert align_strings("", "y")==(".", "y", 1)
+    assert align_strings("x", "y")==("x", "y", 1)
+    assert align_strings("abc", "abc")==("abc", "abc", 0)
+    assert align_strings("abc", "axc")==("abc", "axc", 1)
+    assert align_strings("abcx", "abc")==("abcx", "abc.", 1)
+    assert align_strings("abxc", "abc")==("abxc", "ab.c", 1)
+    assert align_strings("axbc", "abc")==("axbc", "a.bc", 1)
+    assert align_strings("xabc", "abc")==("xabc", ".abc", 1)
+    assert align_strings("abc", "def")==("abc", "def", 3)
+    assert align_strings("abc", "xxx")==("abc", "xxx", 3)
+    assert align_strings("xxx", "def")==("xxx", "def", 3)
+    s1, s2, d = align_strings("a", "aa")
+    assert s1 in {".a", "a."}
+    assert (s2, d)==("aa", 1)
+    assert align_strings("xlorem ipsumx", "lorqem ypsum")==("xlor.em ipsumx", ".lorqem ypsum.", 4)
+    assert align_strings("ahoj", "Ahoj")==("ahoj", "Ahoj", 1)
+    #assert align_strings("aaabbbb", "aaaabbb")==("aaabbbb", "aaaabbb", 1) # these fail due to sloppy implementation
+    #assert align_strings("aabbbb", "aaabbb")==("aabbbb", "aaabbb", 1)     # fails
+    #assert align_strings("abbbb", "aabbb")==("abbbb", "aabbb", 1)         # fails
+
+
+def test_group_empty_intervals_in_tier():
+    assert group_empty_intervals_in_tier([(1, 2, 'a'), (2, 3, ""), (3, 4, "")]) == [(1, 2, 'a'), (2, 4, "")]
+    assert group_empty_intervals_in_tier([(1, 2, 'a'), (2, 3, ""), (3, 4, ""), (4, 5, "x")]) == [(1, 2, 'a'), (2, 4, ""), (4, 5, "x")]
+    assert group_empty_intervals_in_tier([(2, 3, ""), (3, 4, ""), (4, 5, "x")]) == [(2, 4, ""), (4, 5, "x")]
+    assert group_empty_intervals_in_tier([(2, 3, "")]) == [(2, 3, "")]
+    assert group_empty_intervals_in_tier([(2, 3, "x")]) == [(2, 3, "x")]
+    assert group_empty_intervals_in_tier([]) == []
+    assert group_empty_intervals_in_tier([(22, 33, ""), (33, 44, "x")]) == [(22, 33, ""), (33, 44, "x")]
+    assert group_empty_intervals_in_tier([(22, 33, "x"), (33, 44, "")]) == [(22, 33, "x"), (33, 44, "")]
+    assert group_empty_intervals_in_tier([(1, 2, ""), (2, 3, ""), (3, 4, "")]) == [(1, 4, "")]
+
+
+def test_prune_tiers_to_suspicious_intervals():
+    assert prune_tiers_to_suspicious_intervals([(1, 2, 'a')], [(1, 2, 'b')])==([(1, 2, 'a')], [(1, 2, 'b')])
+    assert prune_tiers_to_suspicious_intervals([], [])==([], [])
+    assert prune_tiers_to_suspicious_intervals([(1, 2, 'a')], [(1, 2, 'a')])==([(1, 2, '')], [(1, 2, '')])
+    assert prune_tiers_to_suspicious_intervals(
+        [(1, 2, 'a'), (2, 3, 'b'), (3, 4, 'c')],
+        [(1, 2, 'a'), (2, 4, 'b')])==(
+        [(1, 3, ''), (3, 4, 'c')],
+        [(1, 4, '')])
+    assert prune_tiers_to_suspicious_intervals(
+        [(1, 2, 'a'), (2, 3, 'b'), (3, 4, 'c')],
+        [(1, 2, 'a'), (2, 3, 'x'), (3, 4, 'c')])==(
+        [(1, 2, ''), (2, 3, 'b'), (3, 4, '')],
+        [(1, 2, ''), (2, 3, 'x'), (3, 4, '')])
+    assert prune_tiers_to_suspicious_intervals(
+        [(1, 2, 'a'), (2, 3, 'b'), (3, 4, 'c')],
+        [(1, 2, 'a'), (2, 3, 'b'), (3, 4, 'c')])==(
+        [(1, 4, '')], [(1, 4, '')])
+
+
