@@ -557,12 +557,13 @@ def align_hmm(hmm, model, x_set, b_log_corr, group_tripled=True):
 
 class Dotaccess():
     """
-    Primitive class allowing .x access instead of ["x"]
+    Primitive class allowing .x access instead of ["x"].
     Should be created from a dictionary.
     """
     def __init__(self, d):
         self.__dict__ = d
-
+    def __repr__(self):
+        return str(self.__dict__)
 
 
 inference_device = "cpu"

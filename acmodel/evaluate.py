@@ -1,7 +1,9 @@
 
 # Copyright © 2022 Václav Hanžl. Part of MIT-licensed https://github.com/vaclavhanzl/prak
 
-# Evaluate alignments
+# Evaluate alignments. Nothing from file should be used in the user tool prak.py.
+# Functions defined here should be called from Jupyter notebooks (or eventually
+# from a binary specially made for evaluations).
 
 
 import torch
@@ -231,38 +233,6 @@ def prune_tiers_to_comparable_intervals(tier1, tier2):
     return out1, out2, dif
 
 
-def compare_tier_times(tier1, tier2):
-    """
-    Compare times of two tiers with identical phones
-    """
-    dif = 0
-    mid_dif = 0
-    for i, ((b1, e1, p1), (b2, e2, p2)) in enumerate(zip(tier1, tier2)):
-        #print((p1, p2))
-        #assert p1==p2
-        if p1!=p2:
-            #print(f"{i} phones matched, then '{p1}'!='{p2}'")
-            break
-        dif += abs(b1-b2)+abs(e1-e2)
-        mid_dif += abs((b1+e1)/2-(b2+e2)/2)
-    if i==0:
-        return 0, 100, 100, 'xx'
-    return i, mid_dif/i, dif/i/2, p1+p2
-
-
-
-def compare_tiers(manual, auto):
-    """
-    Compare tier times for intervals matched by DTW on phonestring.
-    """
-    p_auto, p_manual, dif = prune_tiers_to_comparable_intervals(auto, manual)
-    return compare_tier_times(p_auto, p_manual), dif
-
-
-
-
-
-
 
 def evaluate_model_on_wav_file(wav_file, model, desampify_dict=desampify_dict):
     """
@@ -301,15 +271,31 @@ demil_dict['dz'] = "Z"
 demil_dict['eu'] = "E"
 
 
-def compare_tier_times_detailed(tier1, tier2, dif, info):
+
+class Accumulator():
     """
-    Compare times of two tiers with identical phones
+    Class for summarizing things in attributes. Attributes are initialized to 0 on the fly,
+    so you can do "a = Accumulator(); a.b += 5".
+    (Similar to defaultdict but uses attributes instead of keys.)
+    """
+    def __getattr__(self, attr): # used only when reading yet non-existing attribute
+        return 0
+    def __repr__(self): # for convenient print(a)
+        return "Accumulator:"+str(self.__dict__)
+
+
+def compare_tier_times_detailed(tier1, tier2, total, dif=0, file_id="", max_misplace=0.1):
+    """
+    Compare times of two tiers with identical phones.
+    Accumulate results in 'total'. Initialize it as 'total = Accumulator()'.
+    'dif' is an edit distance before alignment of phone strings.
     """
     absdif = 0 # abs value
     bdif = 0 # incl. sign, just begins
     mid_dif = 0
     max_mid_dif = 0
     cnt_misplaced = 0
+    cnt_misbeg = cnt_misend = 0
     for i, ((b1, e1, p1), (b2, e2, p2)) in enumerate(zip(tier1, tier2)):
         #print((p1, p2))
         assert p1==p2
@@ -319,16 +305,29 @@ def compare_tier_times_detailed(tier1, tier2, dif, info):
         mid_dif += mid_dif_now
         if mid_dif_now>max_mid_dif:
             max_mid_dif = mid_dif_now
-        if mid_dif_now>0.1:
+        if mid_dif_now>max_misplace:   ###############   0.1  0.2  0.05  0.03  0.02
             cnt_misplaced += 1
-    
+
+        if abs(b1-b2)>0.1:
+            cnt_misbeg += 1
+
+        if abs(e1-e2)>0.1:
+            cnt_misend += 1 
+
     if i==0:
-        return 0, 100, 100, 'xx'
+        print(f"{file_id}: skipped, nothing to compare")
+        return
+
     absdif /= 2*i
     bdif /= i
     mid_dif /= i
 
-    print(f"{info.filename_base:30}: {dif=}, "
+    total.dif += dif
+    total.misplaced += cnt_misplaced
+    total.misbeg += cnt_misbeg
+    total.misend += cnt_misend
+
+    print(f"{file_id}: {dif=}, "
           f"{absdif=:.3}, "
           f"{bdif=:.3}, "
           f"{mid_dif=:.3}, "
@@ -336,12 +335,13 @@ def compare_tier_times_detailed(tier1, tier2, dif, info):
           f"{cnt_misplaced=}")
 
 
-def compare_tiers_detailed(manual, auto, info):
+
+def compare_tiers_detailed(manual, auto, total, info, max_misplace=0.1):
     """
     Compare tier times for intervals matched by DTW on phonestring.
     """
     p_auto, p_manual, dif = prune_tiers_to_comparable_intervals(auto, manual)
-    return compare_tier_times_detailed(p_auto, p_manual, dif, info)
+    return compare_tier_times_detailed(p_auto, p_manual, total, dif, info, max_misplace)
 
 
 
