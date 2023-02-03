@@ -63,12 +63,19 @@ b_set = b1_set # Default 45 phone set, can be changed to 133 state b123_set
 
 
 def get_training_hmms(nn_train_tsv_file, derivatives=2):
+    import pandas as pd # deffered till really needed (just for training)
     df = pd.read_csv(nn_train_tsv_file, sep="\t", keep_default_na=False)
     hmms = []
-    for wav, sentence, targets in list(zip(df.wav.values, df.sentence.values, df.targets.values)):
-        hmm = HMM(sentence, wav=wav, derivatives=derivatives)
-        hmm.targets = targets
-        hmms.append(hmm)
+    if 'targets' in df.keys():
+        for wav, sentence, targets in list(zip(df.wav.values, df.sentence.values, df.targets.values)):
+            hmm = HMM(sentence, wav=wav, derivatives=derivatives)
+            hmm.targets = targets
+            hmms.append(hmm)
+    else:
+        for wav, sentence in list(zip(df.wav.values, df.sentence.values)):
+            hmm = HMM(sentence, wav=wav, derivatives=derivatives)
+            hmm.targets = None
+            hmms.append(hmm)
     return hmms
 
 
@@ -346,6 +353,7 @@ def b_log_corrections(tsv_file, b_set=b1_set):
                              -11.8518, -11.1380, -10.3673, -11.5502, -10.7025, -10.2276, -10.9719,
                              -10.6571,  -5.9738, -10.7126])
 
+    import pandas as pd # deffered till really needed (just for training, or testing new models)
     df = pd.read_csv(tsv_file, sep="\t", keep_default_na=False)
     c=Counter("".join([s for s in df.targets.values]))
     return -torch.tensor([c[phone] for phone in b_set]).log()
