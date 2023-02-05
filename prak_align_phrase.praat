@@ -127,7 +127,7 @@ tiercount = Get number of tiers
 	for tierx from 1 to tiercount
 		tiername$ = Get tier name: tierx
 		if tiername$ = "phone" or tiername$ = "Phone"
-			intervalcount = Get number of intervals: 1
+			intervalcount = Get number of intervals: tierx
 			if reuse_tg = 0
 				if intervalcount > 1
 					beginPause: "phone tier clash"
