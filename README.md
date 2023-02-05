@@ -203,3 +203,7 @@ If you want to tell me more personally that you love this or hate this, message 
 
 ## Thanks
 I'd like to thank all the nice people from [Fonetický ústav FFUK](https://fonetika.ff.cuni.cz/) and equally nice young people from [FňUK](https://www.facebook.com/profile.php?id=100057425272524) who inspired me by their charming approach to science and life.
+
+## More Prak documentation
+Look at [Prak wiki](https://github.com/vaclavhanzl/prak/wiki) to learn more details than you ever wanted to know.
+
