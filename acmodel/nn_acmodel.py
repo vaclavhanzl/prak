@@ -442,13 +442,15 @@ def triple_sausage_states(sg, untied=False):
     return result
 
 
-# Number of states for phones. Groups separated by dots get min. durations 1, 2(j), 3, ..., 9(á)
-phone_min_duration_string = ".j.?GNdehlnoruvyň.abfgmtúý.Hpz|ďŘřž.Zkséóšť.AŽ.OEcč.á"
+# Number of states for phones. Groups separated by dots get min. durations 0(_), 1, 2(j), 3, ..., 9(á)
+# (The _ is needed for varstate experiments)
+phone_min_duration_string = "_..j.?GNdehlnoruvyň.abfgmtúý.Hpz|ďŘřž.Zkséóšť.AŽ.OEcč.á"
 
 phone_num_states = {}
-for num_states, phones in enumerate(phone_min_duration_string.split('.'), 1):
+for num_states, phones in enumerate(phone_min_duration_string.split('.')):
     for p in phones:
         phone_num_states[p] = num_states
+
 
 def multiply_sausage_states(sg, phone_num_states=phone_num_states):
     """
@@ -739,6 +741,9 @@ def align_wav_and_text_using_model(wav_file, txt, model):
     alp = align_hmm(hmm, model, hmm.b_set, b_log_corr=model.par.b_log_corr*model.par.corr_weight, group_tripled=model.par.morestates and not model.par.varstates)
     if model.par.varstates:
         hmm.intervals = group_multiplied_intervals(hmm.intervals)
+
+        # Hack for phone measurements with varstate models:
+        return hmm.intervals, hmm.intervals # DO NOT COMPUTE WORD INTERVALS, BROKEN
 
     compute_word_tier(hmm)
         
