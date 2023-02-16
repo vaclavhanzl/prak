@@ -193,11 +193,13 @@ def align_strings(string_1, string_2, fill_char='.'):
 
 
 
-def prune_tiers_to_comparable_intervals(tier1, tier2):
+def prune_tiers_to_comparable_intervals(tier1, tier2, total=None):
     """
     Align phone strings by DTW and keep just intervals which have the same
     phone in both tiers. This alignment is based purely on phone text,
     disregarding times. All phones should have exactly one-character names.
+    If 'total' accumulator is provided, add couple of aligned phone lists
+    to total.proncouples.
     """
     for _, _, p in tier1:
         assert len(p)==1
@@ -208,6 +210,10 @@ def prune_tiers_to_comparable_intervals(tier1, tier2):
     s1, s2, dif = align_strings(s1, s2)
     #print(f"{dif=}, {len(s1)=}, {len(tier1)=}")
     assert len(s1)==len(s2)
+    if total!=None:
+        if total.proncouples==0: # not yet initialized
+            total.proncouples = []
+        total.proncouples.append((s1, s2)) # save it for phone error statistics
     g1 = (f_t_p for f_t_p in tier1)
     g2 = (f_t_p for f_t_p in tier2)
     out1 = []
@@ -308,14 +314,19 @@ def compare_tier_times_detailed(tier1, tier2, total, dif=0, file_id="", max_misp
         if mid_dif_now>max_misplace:   ###############   0.1  0.2  0.05  0.03  0.02
             cnt_misplaced += 1
 
+        if mid_dif_now>0.2:
+            total.misplaced_200 += 1
+
         if abs(b1-b2)>0.1:
             cnt_misbeg += 1
 
         if abs(e1-e2)>0.1:
-            cnt_misend += 1 
+            cnt_misend += 1
+
+        total.midshift += (b1+e1)/2-(b2+e2)/2
 
     if i==0:
-        print(f"{file_id}: skipped, nothing to compare")
+        #print(f"{file_id}: skipped, nothing to compare")
         return
 
     absdif /= 2*i
@@ -327,12 +338,12 @@ def compare_tier_times_detailed(tier1, tier2, total, dif=0, file_id="", max_misp
     total.misbeg += cnt_misbeg
     total.misend += cnt_misend
 
-    print(f"{file_id}: {dif=}, "
-          f"{absdif=:.3}, "
-          f"{bdif=:.3}, "
-          f"{mid_dif=:.3}, "
-          f"{max_mid_dif=:.3}, "
-          f"{cnt_misplaced=}")
+    #print(f"{file_id}: {dif=}, "
+    #      f"{absdif=:.3}, "
+    #      f"{bdif=:.3}, "
+    #      f"{mid_dif=:.3}, "
+    #      f"{max_mid_dif=:.3}, "
+    #      f"{cnt_misplaced=}")
 
 
 
@@ -340,7 +351,7 @@ def compare_tiers_detailed(manual, auto, total, info, max_misplace=0.1):
     """
     Compare tier times for intervals matched by DTW on phonestring.
     """
-    p_auto, p_manual, dif = prune_tiers_to_comparable_intervals(auto, manual)
+    p_auto, p_manual, dif = prune_tiers_to_comparable_intervals(auto, manual) # may add ", total"
     return compare_tier_times_detailed(p_auto, p_manual, total, dif, info, max_misplace)
 
 
