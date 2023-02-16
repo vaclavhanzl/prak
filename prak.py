@@ -68,6 +68,9 @@ if (__name__ == '__main__'):
                         "Same spec as for -k, additionally '::' separates merged files, e.g.: "
                         "'--merge-in file1.textgrid phone:p1 :: file2.textgrid phone:p2'. ")
 
+    parser.add_argument('--model', help='Acoustic model filename without suffix')
+
+
     args = parser.parse_args()
     if len(args.text_tier)==0:
         args.text_tier = ['phrase', 'Phrase'] # handling default here, otherwise it would be kept even when -t used
@@ -118,10 +121,11 @@ if (__name__ == '__main__'):
         print(f'     (got {len(additional_rules)} rules there, maybe already known, increasing the total rules number by {num_rules_after-num_rules_before})')
     print("", flush=True) # 'flush' is just an attempt which may not really flush text out now
 
-    model = acmodel.nn_acmodel.load_nn_acoustic_model(f"{base}/acmodel/half", mid_size=100, varstates=False)
-
-    # b prob corr !!!
-
+    if args.model == None:
+        model = acmodel.nn_acmodel.load_nn_acoustic_model(f"{base}/acmodel/half", mid_size=100, varstates=False)
+    else:
+        # NOTE: This will likely try to import pandas, install them first
+        model = acmodel.nn_acmodel.load_nn_acoustic_model(args.model, mid_size=100, varstates=False)
 
     in_tiers = acmodel.praat_ifc.read_interval_tiers_from_textgrid_file(args.in_tg)
 
