@@ -171,8 +171,9 @@ git pull
 ```
 If you went with the zip option, download a new zip the same way.
 
-You certainly want to update, prak is getting better nearly daily! See recent [list of published changes](https://github.com/vaclavhanzl/prak/commits/main) or even [what happens in the develop branch](https://github.com/vaclavhanzl/prak/commits/develop) (extremely courios ones can even see feature branches).
-We are currently testing and tuning installation for all the platforms so also this README is still changing quickly.
+You certainly want to update, prak is getting better often! See recent [list of published changes](https://github.com/vaclavhanzl/prak/commits/main) or even [what happens in the develop branch](https://github.com/vaclavhanzl/prak/commits/develop) (extremely courios ones can even see feature branches).
+
+If you feel very conservative, you can use zips from Releases (like 1.0.0) - these are older but more tested.
 
 ## Speed
 1 minute audio was phone-aligned in 18 seconds on a 2014 Mac Air, in 3.6 seconds on a 2020 M1 Mac Air, in 5 seconds on a decent 2020 Intel linux box.
