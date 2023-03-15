@@ -7,7 +7,6 @@ Copyright (c) 2022 Vaclav Hanzl. This is a free software (see the MIT license).
 This file is part of the https://github.com/vaclavhanzl/prak project
 """
 
-
 import sys
 import os
 import torchaudio # for mfcc
@@ -18,28 +17,7 @@ if (__name__ == '__main__'): # messing with path to make imports work when this 
 
 from prongen.prak_prongen import *
 
-#from acmodel import matrix
-
-
-
-
-# line_iterable_to_lexirules() cannot make this because of space being replaced
-#explicit_spaces = {" ": ["", "|"], "_": [""], "=": [""]}
-#final_cleanup_for_b = {'=': [''], '_': ['']} # remove _ =
-
-# FINISHME
-
-#explicit_spaces = {' ': ['_', '|'], '~': ['_'], '=': ['_']}  # ERROR !!!
 explicit_spaces = {' ': ['_', '|'], '~': ['_'], '=': ['']}
-
-
-
-
-
-
-#final_cleanup_for_b = {'=': [''], '_': ['']} # remove _ =
-
-
 
 def anonate_sg_with_words(sg, words):  # FINISHME
     """

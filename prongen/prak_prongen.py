@@ -272,8 +272,6 @@ vrti vrti\nxti xty\nydi ydy\nzni zni\násti ásti\nédi édy\níti íti\nódi ó
 #  glue_prepos() glues by '~'
 #  deleted interpunction:   '"'+".,?!„“-=–:;—/_"
 
-#  align_wav_and_text_using_model() ???????
-
 
 
 import argparse
@@ -281,10 +279,6 @@ import sys
 import os
 from glob import glob
 import unicodedata
-
-
-#print("Remove inport here")
-#from hmm_pron import HMM
 
 
 def transform(table, text):
@@ -1250,8 +1244,6 @@ def prettyprint_sausage(sausage, phon_from=0):
 
 
 
-
-
 lexicon_replacements = {}
 
 autogen_lexicon_replacements = line_iterable_to_lexirules(autogen_lexicon_replacements_txt.split("\n"))
@@ -1260,11 +1252,6 @@ lexicon_replacements |= autogen_lexicon_replacements
 # Automatic rules added first so that even the same lenght match in manual rules
 # added below can override them.
 lexicon_replacements |= line_iterable_to_lexirules(lexicon_txt.split("\n"))
-
-
-
-
-
 
 
         

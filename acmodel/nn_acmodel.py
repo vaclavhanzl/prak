@@ -3,30 +3,16 @@
 
 # NN acoustic models
 
-
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from collections import Counter
 
-# We need pandas only for NN AM training. Avoid dependency for just the inference
-# using a standard model. FIXME, get rid of the need to comment/uncomment.
+# Avoid dependency for the inference, import only when needed during training
 #import pandas as pd
 
-
-#print(f"{__name__=}")
-#print(f"{__package__=}")
-
-#from ..prongen.hmm_pron import HMM
 from prongen.hmm_pron import HMM
-
-
-
-
-# line above fails in pytest, need some other setup
-#from .prongen.hmm_pron import HMM
-
 from .praat_ifc import read_word_tier_from_textgrid_file
 
 torch.set_default_dtype(torch.float64)  # TRY TO REMOVE THIS AND USE float
@@ -51,10 +37,7 @@ for p, p2, p3 in zip(b1_set, b2_set, b3_set):
     phone_states[p] = p+p2+p3
 phone_states['_'] = '___' # hand-fix beeded for untied tristate phones and word separators introduced for word tier
 
-
 b_set = b1_set # Default 45 phone set, can be changed to 133 state b123_set
-
-
 
 
 def get_training_hmms(nn_train_tsv_file, derivatives=2):
@@ -107,8 +90,6 @@ def mfcc_make_speaker_vector(mfcc):
     # NOTE: This acts as ONE s-vector, even if formed 4*13
 
 
-
-
 class SpeechDataset(Dataset):
     def __init__(self, all_mfcc, all_targets, b_set, sideview = 9, speaker_vectors = None):
         self.all_mfcc = all_mfcc
@@ -135,7 +116,6 @@ class SpeechDataset(Dataset):
             nn_input = torch.cat([mfcc_window, speaker_vector])
     
         return nn_input, self.output_map[self.all_targets[idx]]
-
 
 
 class NeuralNetwork(nn.Module):
@@ -181,8 +161,6 @@ def train_n_epochs(train_dataloader, optimizer, model, criterion, n):
             if i % 20000 == 19999:    # print every 2000 mini-batches
                 print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 20000:.3f}')
                 running_loss = 0.0
-
-
 
 
 def compute_hmm_nn_b(hmm, nn_model, full_b_set):
@@ -312,7 +290,6 @@ def compute_hmm_nn_log_b(hmm, nn_model, full_b_set, b_log_corr=None):
     For a sentence hmm model with an attached mfcc, compute ln(b()) values
     for every sound frame and every model state, using NN phone model.
     """
-    #logits = nn_model(hmm.mfcc.double().to(device)).detach()
     if hmm.speaker_vector==None:
         nn_input = hmm.mfcc
     else:
@@ -331,14 +308,11 @@ def compute_hmm_nn_log_b(hmm, nn_model, full_b_set, b_log_corr=None):
 
 
 
-
-
 def b_log_corrections(tsv_file, b_set=b1_set):
     """
     Compute log(b()) additive correction needed to suppress very frequent
     phones and boost rare ones.
     """
-    #print(tsv_file)
     if tsv_file.endswith("sv200c-100_training_0024.tsv") or tsv_file.endswith("half.tsv") or tsv_file.endswith("bfloat16.tsv"): # avoid dependency on tsv and pandas
         return torch.tensor([-11.1186,  -7.9824,  -7.1365,  -9.1255, -10.7120,  -8.5094, -10.6577,
                              -7.4565, -12.0110, -11.0539, -11.4070, -11.4735, -12.1724, -10.4384,
@@ -352,7 +326,6 @@ def b_log_corrections(tsv_file, b_set=b1_set):
     df = pd.read_csv(tsv_file, sep="\t", keep_default_na=False)
     c=Counter("".join([s for s in df.targets.values]))
     return -torch.tensor([c[phone] for phone in b_set]).log()
-
 
 
 def viterbi_log_align_nn(hmm, nn_model, full_b_set, timrev=False, b_log_corr=None):
@@ -566,9 +539,6 @@ def align_hmm(hmm, model, x_set, b_log_corr, group_tripled=True):
     return alp # just for debuging, the real result is in hmm.intervals
 
 
-
-
-
 class Dotaccess():
     """
     Primitive class allowing .x access instead of ["x"].
@@ -701,24 +671,20 @@ def compute_word_tier(hmm):
             
         if p_i!=last_p_i: # HMM state change
             pi_begin, pi_end, pi_phone = next(phone_intervals) # consume phone intervals in sync with state changes
-            #print((pi_begin, pi_end, pi_phone))
             last_p_i = p_i    
         
             if w_i!=last_w_i or pi_phone=='|': # just coming phone interval already belongs to a new word or silence interval
                 if wi_begin!=None: # we have preceding word interval to finish
                     wi_end = pi_begin
                     word_intervals.append((wi_begin, wi_end, wi_word)) # complete another word tier interval
-                    #print(("--------------", wi_begin, wi_end, wi_word))
         
                 wi_begin = pi_begin
                 last_w_i = w_i
 
-        #print(i, idx, p_i, w_i, phone, word)
         wi_word = word # remember last word in case we need to emit it the next time
 
     
     word_intervals.append((wi_begin, pi_end, wi_word)) # complete last silence in the word tier interval
-    #print(("--------------", wi_begin, pi_end, wi_word))
     assert generator_is_empty(phone_intervals)
     hmm.word_intervals = word_intervals
 

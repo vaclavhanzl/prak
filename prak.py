@@ -12,17 +12,13 @@ import sys
 import os
 import argparse
 
-#print(sys.path)
-
 import prongen.hmm_pron
 import acmodel.praat_ifc
+import acmodel.nn_acmodel
 
 device = "cpu"
-import acmodel.nn_acmodel
-# acmodel.evaluate
 
 base = sys.argv[0][:-len('/prak.py')] # base directory of prak
-#print(base)
 
 if (__name__ == '__main__'):
     if len(sys.argv)==1: # no argumnents at all
