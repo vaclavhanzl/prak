@@ -32,14 +32,10 @@ from .hmm_acmodel import round_to_two_decimal_digits
 from .matrix import *
 from .praat_ifc import read_word_tier_from_textgrid_file
 
-
-
-
-# COMMENTED OUT BELOW FOR TEXTGRID TESTS
-#device = "cuda" if torch.cuda.is_available() else "cpu"
 device = "cpu"
-
-#print(f"Using {device} device")
+# NOTE: To use cuda for training, do this in your training notebook:
+#    import acmodel
+#    acmodel.nn_acmodel.device = "cuda" if torch.cuda.is_available() else "cpu"
 
 b1_string  = "?AEGHNOZabcdefghjklmnoprstuvyz|áéóúýčďňŘřšťŽž" # phones used by our AC models
 b2_string = "ȜĀĒĜĤŅŌŹāƃȼƌēƒĝħĵĸłƜńōƤŕşŦūɅȳź|ǎĕŏŭƿĉȢǹŔȑŝţȤȥ" # names for state 2
