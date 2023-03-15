@@ -27,10 +27,9 @@ from prongen.hmm_pron import HMM
 # line above fails in pytest, need some other setup
 #from .prongen.hmm_pron import HMM
 
-
-from .hmm_acmodel import round_to_two_decimal_digits
-from .matrix import *
 from .praat_ifc import read_word_tier_from_textgrid_file
+
+torch.set_default_dtype(torch.float64)  # TRY TO REMOVE THIS AND USE float
 
 device = "cpu"
 # NOTE: To use cuda for training, do this in your training notebook:
@@ -380,6 +379,15 @@ def viterbi_log_align_nn(hmm, nn_model, full_b_set, timrev=False, b_log_corr=Non
         x += b[row]
     return torch.stack(alpha)
 
+
+def round_to_two_decimal_digits(x):
+    """
+    Slightly change the value of x so that it is likely printed with at most two
+    decimal digits, even for values like 35*0.01 (=0.35000000000000003).
+    """
+    x = "%.2f" % x
+    x = float(x)
+    return x
 
 def backward_log_alignment_pass_intervals(hmm, alp):
     """
