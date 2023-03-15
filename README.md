@@ -1,12 +1,12 @@
 # prak: Czech phonetic alignment tool
 
-**[View slides from Prak presentation at FňUK/FÚ Nov 8th 2022](https://docs.google.com/viewer?url=https://raw.githubusercontent.com/vaclavhanzl/presentations/main/prak/Prak.pdf)**
-(or [download slides here](https://github.com/vaclavhanzl/presentations/raw/main/prak/Prak.pdf))
+**[View slides from the Prak presentation at FňUK/FÚ Nov 8th 2022](https://docs.google.com/viewer?url=https://raw.githubusercontent.com/vaclavhanzl/presentations/main/prak/Prak.pdf)**
+(or [download the slides here](https://github.com/vaclavhanzl/presentations/raw/main/prak/Prak.pdf))
 
 
-## I just want it, now!
-OK. Get **prak** source code and python3.10 with pytorch and torchaudio. Record wav, make phrase
-tier with text and **prak** will find phone and word times: 
+## I just want it now!
+OK. Get the **Prak** source code and python3.10 with pytorch and torchaudio. Record a wav, make a phrase
+tier with text and **prak** will find the phone and word times: 
 ```
 prak -i pocasi.textgrid -w pocasi.wav -o pocasi.out.textgrid
 ```
@@ -17,30 +17,30 @@ Given a Czech voice recording and corresponding text transcript, this tool can g
 of phones and their position in time.
 
 Design goals:
-* Fully opensource, avoiding dependencies which would restrict academic and/or comercial use in 
-any way. Original code was written for this project from scratch to avoid any legal limits and
+* Fully open-source, avoiding dependencies which would restrict academic and/or commercial use in 
+any way. Original code was written for this project from scratch to avoid any legal limitations and
 allow others to continue this work.
-* Usable on Linux, Mac and Windows.
-* More precise than similar tools, specifically targeting needs of the Czech phoneticians.
+* Compatible with Linux, Mac, and Windows.
+* More precise than competing tools, specifically targeting the needs of Czech phoneticians.
 
 ## Installation on Windows
-Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html), download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe)). Run it, despite any protests from Windows (it will whine about unknown application, click small text 'more information' and then 'Run anyway'). Install to ```C:\mambaforge```. This location is the only thing you have to change, otherwise go with default settings in installation dialogs.
+Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html), download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe)). Run it, despite any protests from Windows (it will whine about installing an unknown application, shrug it off through 'More information' and then 'Run anyway'). Install to ```C:\mambaforge```. This location is the only thing you have to change during the installation process, you can go with the default settings in the other installation dialog windows.
 
-Run mambaforge console. Should be in Start menu as "Miniforge console" (name of the window is "Miniforge Prompt"). Text prompt must start ```(base)```. (If it does not, you ran something else. Find the right one.) Type this (and hit Enter):
+Run a mambaforge console. It should be in your Start menu under the name "Miniforge Console" (the window will be called "Miniforge Prompt"). The text prompt should start with ```(base)```. (If it doesn't, you opened the wrong executable. Find the right one.) Type this (and hit return):
 ```
 mamba install pytorch torchaudio -c pytorch
 ```
-and then this (then Enter again):
+...and then this (then return again):
 ```
 pip install pysoundfile
 ```
-If any Y/n questions pop up, just hit Enter (or type Y and Enter if you wish).
+If any Y/N questions pop up, just hit return (or type Y and then return if you feel like it).
 
-**Download [prak zip file](https://github.com/vaclavhanzl/prak/archive/refs/heads/main.zip)** (zip also available from green "Code" button up right on this GitHub page, download zip.). Uncompress it directly to ```C:\``` (or uncompress and move there), creating ```C:\prak-main``` folder. **Rename this folder to ```C:\prak```**.
+**Download the [Prak ZIP file](https://github.com/vaclavhanzl/prak/archive/refs/heads/main.zip)** (also available through the green "Code" button at the top right of this GitHub page → Download ZIP.). Uncompress it directly to ```C:\``` (or move it there after uncompressing it elsewhere), creating the ```C:\prak-main``` folder. **Rename this folder to ```C:\prak```**.
 
-Run praat. Open script ```C:\prak\prak_align_phrase.praat``` and add it to menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using prak).
+Run Praat. Open the script ```C:\prak\prak_align_phrase.praat``` and add it to the menu (File > Add to dynamic menu > Class1: Sound, Class2: TextGrid, Command: Align using Prak).
 
-Set Praat **text files encoding to UTF-8** (Praat > Preferences > Text reading preferences > UTF-8, then Text writing preferences > UTF-8).
+**Set Praat's encoding to UTF-8** (Praat → Preferences → Text reading preferences → UTF-8, then Text writing preferences → UTF-8).
 
 Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Prak-installation-details) if you need to know more.
 
@@ -203,3 +203,7 @@ If you want to tell me more personally that you love this or hate this, message 
 
 ## Thanks
 I'd like to thank all the nice people from [Fonetický ústav FFUK](https://fonetika.ff.cuni.cz/) and equally nice young people from [FňUK](https://www.facebook.com/profile.php?id=100057425272524) who inspired me by their charming approach to science and life.
+
+## More Prak documentation
+Look at [Prak wiki](https://github.com/vaclavhanzl/prak/wiki) to learn more details than you ever wanted to know.
+
