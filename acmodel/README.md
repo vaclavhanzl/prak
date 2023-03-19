@@ -12,3 +12,5 @@ If you have additional manually fine tuned TextGrid files, you can train a tuned
 * [`NN_Train_Align_Man.ipynb`](/acmodel/NN_Train_Align_Man.ipynb)
 
 Notebooks run for up to 50 iterations, you can interrupt the training much earlier (like after 20).
+
+Look at the [Prak Wiki](https://github.com/vaclavhanzl/prak/wiki/NN-model-training) for many additional details.
