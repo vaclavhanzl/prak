@@ -7,3 +7,8 @@ run these Jupyter notebooks:
 * [`Prepare_Training_Data.ipynb`](/acmodel/Prepare_Training_Data.ipynb)
 * [`NN_Train_Align.ipynb`](/acmodel/NN_Train_Align.ipynb)
 
+If you have additional manually fine tuned TextGrid files, you can train a tuned model. Run also these:
+* [`Prep_Manual_Train_Data.ipynb`](/acmodel/Prep_Manual_Train_Data.ipynb)
+* [`NN_Train_Align_Man.ipynb`](/acmodel/NN_Train_Align_Man.ipynb)
+
+Notebooks run for up to 50 iterations, you can interrupt the training much earlier (like after 20).
