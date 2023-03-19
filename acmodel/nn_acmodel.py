@@ -57,6 +57,21 @@ def get_training_hmms(nn_train_tsv_file, derivatives=2):
     return hmms
 
 
+def create_start_targets(hmm):
+    """
+    Create mostly fictional targets for direct launch of the NN training.
+    Except some silence at the begining/end, most targets will be false.
+    We just take the b string as it is (with triple states), even with
+    variants (!) and put it in the middle of the training data, with silence
+    around.
+    """
+    states = len(hmm.b)
+    frames = hmm.mfcc.size()[0]
+    before = (frames-states)//2
+    after = frames-before-states
+    hmm.targets = '|'*before+hmm.b+'|'*after
+
+
 def collect_training_material(hmms):
     #b_set = sorted({*"".join([hmm.b for hmm in hmms ])}) # make sorted set of all phone names in the training set
     #out_size = len(b_set)
@@ -101,9 +116,10 @@ class SpeechDataset(Dataset):
         self.output_map = {}
         for i, b in enumerate(b_set):
             self.output_map[b] = self.wanted_outputs[i] # prepare outputs with one 1 at the right place
+        self.ignored_end = 0
 
     def __len__(self):
-        return len(self.all_targets) - 2*self.sideview
+        return len(self.all_targets) - 2*self.sideview - self.ignored_end
 
     def __getitem__(self, idx):
         idx += self.sideview
