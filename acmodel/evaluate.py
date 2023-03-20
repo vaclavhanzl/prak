@@ -316,6 +316,10 @@ def compare_tier_times_detailed(tier1, tier2, total, dif=0, file_id="", max_misp
 
         if mid_dif_now>0.2:
             total.misplaced_200 += 1
+        if mid_dif_now>0.1:
+            total.misplaced_100 += 1
+        if mid_dif_now>0.05:
+            total.misplaced_50 += 1
 
         if abs(b1-b2)>0.1:
             cnt_misbeg += 1
