@@ -1,5 +1,7 @@
 # prak: Czech phonetic alignment tool
 
+**NEWS: Prak will be presented at the [International Congress of Phonetic Sciences 2023](https://www.icphs2023.org/)!**
+
 **[View slides from the Prak presentation at FňUK/FÚ Nov 8th 2022](https://docs.google.com/viewer?url=https://raw.githubusercontent.com/vaclavhanzl/presentations/main/prak/Prak.pdf)**
 (or [download the slides here](https://github.com/vaclavhanzl/presentations/raw/main/prak/Prak.pdf))
 
