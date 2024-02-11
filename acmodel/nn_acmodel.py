@@ -322,6 +322,40 @@ def compute_hmm_nn_log_b(hmm, nn_model, full_b_set, b_log_corr=None):
     idx = torch.tensor([ph_to_i[ph] for ph in hmm.b])
     return(pred_probab[:, idx]) # repeat each b() column as needed
 
+# Variant version - to be unified with the variant above
+def compute_hmm_nn_log_b_fresh(hmm, nn_model, full_b_set, b_log_corr=None):
+    """
+    For a sentence hmm model with an attached mfcc, compute ln(b()) values
+    for every sound frame and every model state, using NN phone model.
+    """
+    if hmm.speaker_vector==None:
+        nn_input = hmm.mfcc
+    else:
+        nn_input = make_nn_input_from_mfcc_and_s_vec(hmm.mfcc, hmm.speaker_vector)
+
+    #nn_input = torch.cat([hmm.mfcc.flatten(1), hmm.features[ii,...]], dim=1)
+    nn_input = nn_input.flatten(1)
+
+    ii = []
+    for i in range(hmm.features.size()[0]):
+        ii.append(i)
+        ii.append(i)
+
+    nn_input = torch.cat([nn_input, hmm.features[ii,...]], dim=1)
+
+    #logits = nn_model(nn_input.double().to(device)).detach().to('cpu')
+    logits = nn_model(nn_input.float().to(device)).detach().to('cpu')
+
+    pred_probab = nn.LogSoftmax(dim=1)(logits)
+    if b_log_corr!=None:
+        pred_probab += b_log_corr[None]
+
+    # Now select b() columns as needed for this hmm
+    ph_to_i = {ph:i for i, ph in enumerate(full_b_set)} # map phone to column
+
+    idx = torch.tensor([ph_to_i[ph] for ph in hmm.b])
+    return(pred_probab[:, idx]) # repeat each b() column as needed
+
 
 
 def b_log_corrections(tsv_file, b_set=b1_set):
@@ -569,7 +603,9 @@ class Dotaccess():
 inference_device = "cpu"
 
 
-def load_nn_acoustic_model(filename_base, mid_size=100, varstates=True, morestates=True, adapt=True, corr_weight=1.0, special_corr=None, b_set=b1_set):
+def load_nn_acoustic_model(filename_base, mid_size=100, varstates=True, morestates=True,
+                           adapt=True, corr_weight=1.0, special_corr=None, b_set=b1_set,
+                           in_size = None):
     """
     Prepare everything needed for decoding with a given NN AM.
     Using most common defaults from latest good trainings. (These
@@ -585,7 +621,8 @@ def load_nn_acoustic_model(filename_base, mid_size=100, varstates=True, morestat
     else:
         s_vector_size = 0
     mfcc_size = 13
-    in_size = (sideview+1+sideview + s_vector_size)*mfcc_size
+    if in_size is None:
+        in_size = (sideview+1+sideview + s_vector_size)*mfcc_size
     out_size = len(b_set)
     if special_corr is None:
         b_log_corr = b_log_corrections(filename_base+".tsv", b_set=b_set)

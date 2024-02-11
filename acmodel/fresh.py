@@ -62,7 +62,7 @@ def collect_training_material_fresh(hmms):
     return all_mfcc.bfloat16(), all_targets, all_features.bfloat16()
 
 
-def compute_wav_vector_features(hmm, bundle, dwm, n=7):
+def compute_wav_vector_features(hmm, bundle, dwm, n=7, device="cpu"):
     """
     Compute wav vector embedings. Example parameters:
       bundle = torchaudio.pipelines.HUBERT_BASE
@@ -72,7 +72,31 @@ def compute_wav_vector_features(hmm, bundle, dwm, n=7):
     waveform, sample_rate = torchaudio.load(hmm.wav)
     if sample_rate!=bundle.sample_rate:
         waveform = torchaudio.functional.resample(waveform, sample_rate, bundle.sample_rate)
+    waveform = waveform.double()
     features, x = dwm.extract_features(waveform.to(device))
     hmm.features = features[n][0].detach().to("cpu")
+
+
+def unify_mfcc_and_features_size(hmm):
+    """
+    Slightly trim ends to make sure sizes do correspond
+    """
+    m = len(hmm.mfcc)
+    f = len(hmm.features)
+    #print(m, f)
+    f = min(int(m/2), f)
+    m = 2*f
+    #print('..', m, f)
+    hmm.mfcc = hmm.mfcc[:m]
+    if hmm.targets != None:
+        hmm.targets = hmm.targets[:m]
+    hmm.features = hmm.features[:f]
+
+
+
+
+
+
+
 
 
