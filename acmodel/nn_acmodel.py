@@ -15,6 +15,10 @@ from collections import Counter
 from prongen.hmm_pron import HMM
 from .praat_ifc import read_word_tier_from_textgrid_file
 
+# for Fresh:
+from .fresh import compute_wav_vector_features, unify_mfcc_and_features_size
+
+
 torch.set_default_dtype(torch.float64)  # TRY TO REMOVE THIS AND USE float
 
 device = "cpu"
@@ -343,8 +347,10 @@ def compute_hmm_nn_log_b_fresh(hmm, nn_model, full_b_set, b_log_corr=None):
 
     nn_input = torch.cat([nn_input, hmm.features[ii,...]], dim=1)
 
-    #logits = nn_model(nn_input.double().to(device)).detach().to('cpu')
-    logits = nn_model(nn_input.float().to(device)).detach().to('cpu')
+    # PROBLEMATIC HERE:
+    logits = nn_model(nn_input.double().to(device)).detach().to('cpu')
+    # THIS VARIANT WORKS IN NOTEBOOK:
+    #logits = nn_model(nn_input.float().to(device)).detach().to('cpu')
 
     pred_probab = nn.LogSoftmax(dim=1)(logits)
     if b_log_corr!=None:
@@ -371,6 +377,15 @@ def b_log_corrections(tsv_file, b_set=b1_set):
                              -11.9744, -11.5930, -14.1668, -11.7700, -11.0398,  -7.3505, -10.6392,
                              -11.8518, -11.1380, -10.3673, -11.5502, -10.7025, -10.2276, -10.9719,
                              -10.6571,  -5.9738, -10.7126])
+
+    if tsv_file.endswith("manual_train.tsv"): # dtto for HUBERT model
+        return torch.tensor([-10.2289,  -6.3526,  -3.2581,  -6.0283,  -9.8355,  -7.0690,  -9.8046,
+                             -5.2523, -11.3631,  -9.9331, -10.3554, -10.3296, -11.5651,  -9.3134,
+                             -8.5382,  -9.6929, -10.0927, -10.8469, -10.7912, -10.8086, -10.7187,
+                             -11.1641, -10.8075, -10.4197, -11.4483, -11.1830, -10.1932, -10.4957,
+                             -11.0621, -10.2347, -12.8233, -10.9477,  -9.9539,  -6.4938,  -9.2773,
+                             -10.9525,  -9.9790,  -8.8374, -10.0567,  -8.9141,  -9.1800, -10.0693,
+                             -9.6945,  -5.1240,  -9.4699])
 
     import pandas as pd # deffered till really needed (just for training, or testing new models)
     df = pd.read_csv(tsv_file, sep="\t", keep_default_na=False)
@@ -605,7 +620,7 @@ inference_device = "cpu"
 
 def load_nn_acoustic_model(filename_base, mid_size=100, varstates=True, morestates=True,
                            adapt=True, corr_weight=1.0, special_corr=None, b_set=b1_set,
-                           in_size = None):
+                           in_size = None, is_HUBERT = False):
     """
     Prepare everything needed for decoding with a given NN AM.
     Using most common defaults from latest good trainings. (These
@@ -661,7 +676,6 @@ def align_wav_file_using_model(wav_file, model):
     else:
         hmm.speaker_vector = None
     hmm.mfcc = mfcc_win_view(mfcc_add_sideview(hmm.mfcc, sideview=model.par.sideview), sideview=model.par.sideview)
-
     alp = align_hmm(hmm, model, b_set, b_log_corr=model.par.b_log_corr*model.par.corr_weight, group_tripled=model.par.morestates and not model.par.varstates)
     if model.par.varstates:
         hmm.intervals = group_multiplied_intervals(hmm.intervals)
@@ -754,6 +768,11 @@ def align_wav_and_text_using_model(wav_file, txt, model):
     #txt = " ".join(word for _, _, word in word_tier)
     hmm = HMM(txt, wav_file, derivatives=0)
     global show_hmm; show_hmm = hmm
+
+    if model.par.is_HUBERT:
+        compute_wav_vector_features(hmm, model.par.bundle, model.par.dwm, n=7, device=device) # 7 11 2
+        hmm.targets = None # DO THIS IN prak.py ???
+        unify_mfcc_and_features_size(hmm)
 
     hmm.b_set = b_set
     if model.par.out_size>45:  # FIXME, HACK

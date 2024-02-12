@@ -16,6 +16,10 @@ import prongen.hmm_pron
 import acmodel.praat_ifc
 import acmodel.nn_acmodel
 
+# for Fresh:
+import torch
+import torchaudio
+
 device = "cpu"
 
 base = sys.argv[0][:-len('/prak.py')] # base directory of prak
@@ -119,6 +123,18 @@ if (__name__ == '__main__'):
 
     if args.model == None:
         model = acmodel.nn_acmodel.load_nn_acoustic_model(f"{base}/acmodel/half", mid_size=100, varstates=False)
+    elif args.model == "HUBERT":
+        b_log_corr = acmodel.nn_acmodel.b_log_corrections('manual_train.tsv', b_set=acmodel.nn_acmodel.b_set) # get b() corrections based on frequency
+        model = acmodel.nn_acmodel.load_nn_acoustic_model(f"{base}/acmodel/freshtest_training_0017", mid_size=100, varstates=False,
+                                       special_corr=b_log_corr, in_size=1067, is_HUBERT = True)
+        model.eval() # switch to evaluation mode - ALSO DO IT ELSEWHERE?
+        acmodel.nn_acmodel.compute_hmm_nn_log_b = acmodel.nn_acmodel.compute_hmm_nn_log_b_fresh
+
+        print('Preparing HUBERT model')
+        model.par.bundle = torchaudio.pipelines.HUBERT_BASE
+        model.par.wav_model = model.par.bundle.get_model()
+        model.par.dwm = model.par.wav_model  # do we need both??
+
     else:
         # NOTE: This will likely try to import pandas, install them first
         model = acmodel.nn_acmodel.load_nn_acoustic_model(args.model, mid_size=100, varstates=False)
@@ -160,6 +176,11 @@ if (__name__ == '__main__'):
         tg_dict = dict(phrase=phrase_tier)
     else:
         phone_tier, word_tier = acmodel.nn_acmodel.align_wav_and_text_using_model(args.in_wav, text, model)
+
+
+
+
+
         sampa_phone_tier = acmodel.praat_ifc.sampify_tier(phone_tier)
         tg_dict = dict(phone=sampa_phone_tier, word=word_tier, phrase=phrase_tier)
     if args.align_tier!=[]:
