@@ -228,7 +228,8 @@ Save as text file: prak_tgin$
 
 
 ### Run prak alignment
-system 'prak_exe$' -i 'prak_tgin$' -w 'prak_wav$' -e 'exceptions$' -o 'prak_tgout$' --force >'prak_log$' 2>&1
+#system 'prak_exe$' -i 'prak_tgin$' -w 'prak_wav$' -e 'exceptions$' -o 'prak_tgout$' --force >'prak_log$' 2>&1
+system 'prak_exe$' --model HUBERT -i 'prak_tgin$' -w 'prak_wav$' -e 'exceptions$' -o 'prak_tgout$' --force >'prak_log$' 2>&1
 #printline prak alignment done
 
 
