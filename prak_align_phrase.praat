@@ -17,6 +17,9 @@ else
 endif
 
 
+### Measure total duration of the process
+stopwatch
+
 ### Clear Praat info window
 clearinfo
 
@@ -250,5 +253,10 @@ Rename... 'snd_name$'
 ### End of alignment repetition
 endfor
 
+### Get elapsed time
+elapsedtime = stopwatch
+
+
 printline aligned!!
+printline elapsed time: 'elapsedtime:3' seconds
 
