@@ -28,9 +28,9 @@ allow others to continue this work.
 * More precise than competing tools, specifically targeting the needs of Czech phoneticians.
 
 ## Installation on Windows
-Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html), download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe)). Run it, despite any protests from Windows (it will whine about installing an unknown application, shrug it off through 'More information' and then 'Run anyway'). Install to ```C:\mambaforge```. This location is the only thing you have to change during the installation process, you can go with the default settings in the other installation dialog windows.
+Go to [mambaforge](https://conda-forge.org/download/), download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe)). Run it, despite any protests from Windows (it will whine about installing an unknown application, shrug it off through 'More information' and then 'Run anyway'). Install to ```C:\mambaforge```. This location is the only thing you have to change during the installation process, you can go with the default settings in the other installation dialog windows.
 
-Run a mambaforge console. It should be in your Start menu under the name "Miniforge Console" (the window will be called "Miniforge Prompt"). The text prompt should start with ```(base)```. (If it doesn't, you opened the wrong executable. Find the right one.) Type this (and hit return):
+Run a mambaforge console. It should be in your Start menu under the name "Miniforge Prompt". Type this (and hit return):
 ```
 mamba install pytorch torchaudio -c pytorch
 ```
