@@ -32,6 +32,10 @@ Download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/
 
 Run a mambaforge console. It should be in your Start menu under the name "Miniforge Prompt". Type this (and hit return):
 ```
+conda install mamba -c conda-forge
+```
+...then type this (then return again):
+```
 mamba install pytorch torchaudio -c pytorch
 ```
 ...and then this (then return again):
