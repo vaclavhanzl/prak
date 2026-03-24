@@ -28,9 +28,13 @@ allow others to continue this work.
 * More precise than competing tools, specifically targeting the needs of Czech phoneticians.
 
 ## Installation on Windows
-Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html), download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Windows-x86_64.exe)). Run it, despite any protests from Windows (it will whine about installing an unknown application, shrug it off through 'More information' and then 'Run anyway'). Install to ```C:\mambaforge```. This location is the only thing you have to change during the installation process, you can go with the default settings in the other installation dialog windows.
+Download mambaforge for windows ([Mambaforge-Windows-x86_64](https://github.com/conda-forge/miniforge/releases/download/23.1.0-1/Miniforge3-Windows-x86_64.exe)). Run it, despite any protests from Windows (it will whine about installing an unknown application, shrug it off through 'More information' and then 'Run anyway'). Install to ```C:\mambaforge```. This location is the only thing you have to change during the installation process, you can go with the default settings in the other installation dialog windows.
 
-Run a mambaforge console. It should be in your Start menu under the name "Miniforge Console" (the window will be called "Miniforge Prompt"). The text prompt should start with ```(base)```. (If it doesn't, you opened the wrong executable. Find the right one.) Type this (and hit return):
+Run a mambaforge console. It should be in your Start menu under the name "Miniforge Prompt". Type this (and hit return):
+```
+conda install mamba -c conda-forge
+```
+...then type this (then return again):
 ```
 mamba install pytorch torchaudio -c pytorch
 ```
@@ -49,15 +53,14 @@ Run Praat. Open the script ```C:\prak\prak_align_phrase.praat``` and add it to t
 Refer to [Prak installation details](https://github.com/vaclavhanzl/prak/wiki/Prak-installation-details) if you need to know more.
 
 ## Installation on Mac
-Go to [mambaforge](https://mamba.readthedocs.io/en/latest/installation.html).
-Choose and download the installation file [here](https://github.com/conda-forge/miniforge#mambaforge), either
-[Mambaforge-MacOSX-x86_64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh)
+Install mambaforge – choose and download the installation file, either
+[Mambaforge-MacOSX-x86_64](https://github.com/conda-forge/miniforge/releases/download/23.1.0-1/Miniforge3-MacOSX-x86_64.sh)
 for older Intel-based Macs or
-[Mambaforge-MacOSX-arm64](https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-arm64.sh)
+[Mambaforge-MacOSX-arm64](https://github.com/conda-forge/miniforge/releases/download/23.1.0-1/Miniforge3-MacOSX-arm64.sh)
 for new Macs with Apple M1 chips. Then make the downloaded file executable (using chmod) and run it in the terminal, for example (for Intel Mac):
 ```
-chmod +x Downloads/Mambaforge-MacOSX-x86_64.sh 
-Downloads/Mambaforge-MacOSX-x86_64.sh
+chmod +x Downloads/Miniforge3-MacOSX-x86_64.sh 
+Downloads/Miniforge3-MacOSX-x86_64.sh
 ```
 Answer a few questions (likely **yes** or just Enter but you must explicitly type **yes** where needed). If the licence agreement is too long to show, press spacebar untill you reach the end, then agree (yes). After installing mambaforge successfully, QUIT TERMINAL COMPLETELY and run it again. The prompt will now start with "(base)" and you can install python packages we need:
 ```
